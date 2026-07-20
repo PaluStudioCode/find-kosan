@@ -220,10 +220,8 @@ const handleLocationSelected = async (location) => {
                         <Label class="mb-2 block">Titik Lokasi Peta</Label>
                         <div class="h-[400px] border rounded-md overflow-hidden relative">
                             <MapPicker 
-                                :initial-lat="form.latitude" 
-                                :initial-lng="form.longitude" 
-                                @update:modelValue="handleLocationSelected"
-                                @selected="handleLocationSelected" 
+                                :modelValue="{ lat: form.latitude || -6.200000, lng: form.longitude || 106.816666 }" 
+                                @update:modelValue="handleLocationSelected" 
                             />
                         </div>
                         <p v-if="form.latitude && form.longitude" class="text-xs text-green-600 mt-2 flex items-center">

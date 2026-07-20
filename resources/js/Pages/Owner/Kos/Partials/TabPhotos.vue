@@ -269,7 +269,7 @@ const deleteQris = () => {
                             </Button>
                         </div>
                         <div class="w-48 h-48 mx-auto flex items-center justify-center rounded border overflow-hidden bg-white">
-                            <img :src="`/media/${kos.payment_qris_image_path}`" alt="QRIS" class="w-full h-full object-contain" />
+                            <img :src="kos.payment_qris_image_path" alt="QRIS" class="w-full h-full object-contain" />
                         </div>
                     </div>
                     <div v-else class="text-gray-400 text-sm text-center">

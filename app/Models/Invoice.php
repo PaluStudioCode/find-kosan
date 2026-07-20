@@ -10,6 +10,12 @@ class Invoice extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::deleting(function ($invoice) {
+            $invoice->payments()->delete();
+        });
+    }
     protected $fillable = [
         'tenancy_id', 'tenant_id', 'owner_id', 'period_start', 'period_end',
         'amount', 'due_date', 'status',

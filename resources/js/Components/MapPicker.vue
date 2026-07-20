@@ -50,7 +50,10 @@ onMounted(() => {
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     });
 
-    map = L.map(mapContainer.value).setView([props.modelValue.lat, props.modelValue.lng], 15);
+    const isDefault = props.modelValue.lat === -6.200000 && props.modelValue.lng === 106.816666;
+    const initialZoom = isDefault ? 5 : 15;
+
+    map = L.map(mapContainer.value).setView([props.modelValue.lat, props.modelValue.lng], initialZoom);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -71,8 +74,8 @@ onMounted(() => {
             emit('update:modelValue', { lat: e.latlng.lat, lng: e.latlng.lng });
         });
 
-        // Auto request GPS if it's default Jakarta coordinates
-        if (props.modelValue.lat === -6.200000 && props.modelValue.lng === 106.816666) {
+        // Only auto request GPS if no location was previously saved (still default)
+        if (isDefault) {
             getCurrentLocation();
         }
     }

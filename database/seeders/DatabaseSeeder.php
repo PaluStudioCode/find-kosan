@@ -41,17 +41,17 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => Carbon::now(),
         ]);
 
-        // Penyewa Dummy
         User::firstOrCreate([
-            'email' => 'tenant@kosonline.test',
+            'email' => 'penyewa@kosonline.test',
         ], [
-            'name' => 'Penyewa Kos',
+            'name' => 'Penyewa',
             'password' => Hash::make('password'),
             'role' => 'penyewa',
             'status' => 'aktif',
-            'whatsapp_number' => '628333333333',
+            'whatsapp_number' => '085151246624',
             'email_verified_at' => Carbon::now(),
         ]);
+
 
         // Master Data Facilities
         $facilities = [
@@ -84,5 +84,6 @@ class DatabaseSeeder extends Seeder
                 'status' => $facility['status'],
             ]);
         }
+        
     }
 }

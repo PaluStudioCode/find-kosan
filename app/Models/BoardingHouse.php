@@ -10,6 +10,13 @@ class BoardingHouse extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::deleting(function ($boardingHouse) {
+            $boardingHouse->rooms()->delete();
+            $boardingHouse->tenancies()->delete();
+        });
+    }
     protected $fillable = [
         'owner_id', 'name', 'description', 'address', 'public_contact_name',
         'public_contact_whatsapp_number', 'payment_instructions', 'payment_qris_image_path',

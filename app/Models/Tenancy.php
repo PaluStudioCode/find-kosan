@@ -10,6 +10,12 @@ class Tenancy extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::deleting(function ($tenancy) {
+            $tenancy->invoices()->delete();
+        });
+    }
     protected $fillable = [
         'tenant_id', 'owner_id', 'boarding_house_id', 'room_id',
         'occupant_count', 'start_date', 'end_date', 'status',

@@ -6,17 +6,21 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PublicKosController;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-})->name('home');
+use App\Http\Middleware\GuestOrTenant;
 
-Route::get('/kos', [PublicKosController::class, 'index'])->name('public.kos.index');
-Route::get('/kos/{kos}', [PublicKosController::class, 'show'])->name('public.kos.show');
+Route::middleware([GuestOrTenant::class])->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    })->name('home');
+
+    Route::get('/kos', [PublicKosController::class, 'index'])->name('public.kos.index');
+    Route::get('/kos/{kos}', [PublicKosController::class, 'show'])->name('public.kos.show');
+});
 use App\Http\Controllers\Tenant\DashboardController as TenantDashboard;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboard;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
@@ -38,7 +42,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             $role = auth()->user()->role;
             if ($role === 'super_admin') return redirect()->route('admin.dashboard');
             if ($role === 'pemilik_kos') return redirect()->route('owner.dashboard');
-            return redirect()->route('tenant.dashboard');
+            return redirect()->route('home');
         })->name('dashboard');
 
         // Role Super Admin
@@ -80,8 +84,6 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         // Role Penyewa
         Route::middleware(['role:penyewa'])->prefix('tenant')->name('tenant.')->group(function () {
-            Route::get('/dashboard', [TenantDashboard::class, 'index'])->name('dashboard');
-
             // Tenancies Management
             Route::post('/rooms/{room}/book', [\App\Http\Controllers\Tenant\TenancyController::class, 'store'])->name('tenancies.store');
             Route::get('/tenancies', [\App\Http\Controllers\Tenant\TenancyController::class, 'index'])->name('tenancies.index');

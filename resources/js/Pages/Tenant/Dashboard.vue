@@ -1,8 +1,8 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, AlertCircle, Clock } from 'lucide-vue-next';
+import { FileText, AlertCircle, Clock, Search } from 'lucide-vue-next';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 
@@ -18,8 +18,10 @@ const formatRupiah = (amount) => {
 </script>
 
 <template>
-    <AppLayout>
+    <PublicLayout>
         <Head title="Dashboard Penyewa" />
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <div class="mb-6">
             <h2 class="text-2xl font-bold text-gray-900">Dashboard Penyewa</h2>
@@ -103,5 +105,6 @@ const formatRupiah = (amount) => {
                 </CardContent>
             </Card>
         </div>
-    </AppLayout>
+        </div>
+    </PublicLayout>
 </template>

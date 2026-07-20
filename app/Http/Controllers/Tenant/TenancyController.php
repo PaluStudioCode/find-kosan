@@ -15,11 +15,58 @@ class TenancyController extends Controller
 {
     public function index()
     {
+        $tenantId = auth()->user()->id;
+
         $tenancies = auth()->user()->tenanciesAsTenant()->with(['room', 'boardingHouse', 'invoices' => function($q) {
             $q->latest();
         }])->latest()->paginate(10);
         
-        return Inertia::render('Tenant/Tenancies/Index', compact('tenancies'));
+        $unpaidInvoicesCount = Invoice::where('tenant_id', $tenantId)
+            ->where('status', 'belum_dibayar')
+            ->whereHas('tenancy', function($q) {
+                $q->where('status', '!=', 'nonaktif');
+            })
+            ->count();
+            
+        $overdueInvoicesCount = Invoice::where('tenant_id', $tenantId)
+            ->where('status', 'belum_dibayar')
+            ->where('due_date', '<', now()->startOfDay())
+            ->whereHas('tenancy', function($q) {
+                $q->where('status', '!=', 'nonaktif');
+            })
+            ->count();
+        
+        $pendingPaymentsCount = Payment::whereHas('invoice', function ($q) use ($tenantId) {
+            $q->where('tenant_id', $tenantId);
+        })->where('status', 'menunggu_konfirmasi')->count();
+
+        $recentInvoices = Invoice::with(['tenancy.room.boardingHouse'])
+            ->where('tenant_id', $tenantId)
+            ->whereHas('tenancy', function($q) {
+                $q->where('status', '!=', 'nonaktif');
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $recentPayments = Payment::with(['invoice.tenancy.room.boardingHouse'])
+            ->whereHas('invoice', function ($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        return Inertia::render('Tenant/Tenancies/Index', [
+            'tenancies' => $tenancies,
+            'metrics' => [
+                'unpaidInvoices' => $unpaidInvoicesCount,
+                'overdueInvoices' => $overdueInvoicesCount,
+                'pendingPayments' => $pendingPaymentsCount,
+            ],
+            'recentInvoices' => $recentInvoices,
+            'recentPayments' => $recentPayments,
+        ]);
     }
 
     public function show(Tenancy $tenancy)

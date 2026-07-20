@@ -1,212 +1,222 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Search, Map, ShieldCheck, CreditCard, Home, MapPin, CheckCircle, ArrowRight, Star } from 'lucide-vue-next';
+import { Map, ShieldCheck, CreditCard, ArrowRight, Star, Sparkles, Navigation } from 'lucide-vue-next';
 
 defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
 });
-
-const searchQuery = ref('');
-
-const search = () => {
-    if (searchQuery.value) {
-        router.get(route('public.kos.index'), { search: searchQuery.value });
-    } else {
-        router.get(route('public.kos.index'));
-    }
-};
 </script>
 
 <template>
     <PublicLayout>
-        <Head title="Temukan Kos Impianmu" />
+        <Head title="Platform Kos Era Baru" />
 
-        <!-- Hero Section -->
-        <section class="relative bg-gradient-to-br from-primary/90 to-blue-900 text-white overflow-hidden">
-            <!-- Abstract background patterns -->
-            <div class="absolute inset-0 opacity-10">
-                <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white blur-3xl"></div>
-                <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-300 blur-3xl"></div>
-            </div>
-            
-            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 flex flex-col items-center text-center">
-                <span class="px-4 py-1.5 rounded-full bg-white/20 text-white/90 backdrop-blur-sm text-sm font-semibold mb-6 border border-white/20 shadow-sm flex items-center gap-2">
-                    <Star class="w-4 h-4 text-yellow-300 fill-yellow-300" /> Platform Kos #1 di Indonesia
-                </span>
-                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-                    Temukan Kos Nyaman,<br />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-indigo-100">Tanpa Ribet.</span>
-                </h1>
-                <p class="text-lg md:text-xl text-blue-100 max-w-2xl mb-10 leading-relaxed">
-                    Sistem penyewaan kos yang transparan, aman, dan terverifikasi. 
-                    Mulai dari pencarian hingga pembayaran, semua dalam genggaman Anda.
-                </p>
+        <!-- Next-Gen Hero Section -->
+        <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#0A0F1C]">
+            <!-- Dynamic Background Elements -->
+            <div class="absolute inset-0 w-full h-full">
+                <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-600/30 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[150px] mix-blend-screen"></div>
                 
-                <!-- Search Box -->
-                <div class="w-full max-w-3xl bg-white/10 p-2 md:p-3 rounded-2xl backdrop-blur-md shadow-2xl border border-white/20 flex flex-col md:flex-row gap-2 transition-all hover:bg-white/15">
-                    <div class="relative flex-grow">
-                        <MapPin class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <Input 
-                            v-model="searchQuery" 
-                            @keyup.enter="search"
-                            placeholder="Cari nama kos, kota, atau area..." 
-                            class="h-14 pl-12 pr-4 w-full bg-white rounded-xl text-gray-900 placeholder:text-gray-400 border-0 focus-visible:ring-2 focus-visible:ring-primary text-lg" 
-                        />
-                    </div>
-                    <Button @click="search" size="lg" class="h-14 px-8 rounded-xl bg-primary hover:bg-primary/90 text-lg font-semibold shadow-lg shrink-0">
-                        <Search class="w-5 h-5 mr-2" /> Cari Kos
-                    </Button>
-                </div>
+                <!-- Grid overlay -->
+                <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                 
-                <div class="mt-8 flex items-center justify-center flex-wrap gap-6 text-sm font-medium text-blue-200">
-                    <div class="flex items-center"><CheckCircle class="w-4 h-4 mr-1 text-green-400" /> 100+ Kos Terverifikasi</div>
-                    <div class="flex items-center"><CheckCircle class="w-4 h-4 mr-1 text-green-400" /> Pembayaran Aman</div>
-                    <div class="flex items-center"><CheckCircle class="w-4 h-4 mr-1 text-green-400" /> Dukungan 24/7</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Value Proposition Section -->
-        <section class="py-20 bg-gray-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h2>
-                    <p class="text-gray-600 max-w-2xl mx-auto text-lg">Kami menghadirkan pengalaman mencari dan menyewa kos yang jauh lebih baik, mengutamakan keamanan dan kenyamanan Anda.</p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Feature 1 -->
-                    <Card class="border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white">
-                        <CardHeader>
-                            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-4">
-                                <ShieldCheck class="w-7 h-7 text-blue-600" />
-                            </div>
-                            <CardTitle class="text-xl">Terverifikasi & Aman</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p class="text-gray-600 leading-relaxed">
-                                Setiap properti yang tampil telah melewati proses verifikasi ketat oleh tim admin kami. Dokumen legalitas terjamin sehingga terhindar dari penipuan.
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <!-- Feature 2 -->
-                    <Card class="border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white">
-                        <CardHeader>
-                            <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-4">
-                                <Map class="w-7 h-7 text-green-600" />
-                            </div>
-                            <CardTitle class="text-xl">Informasi Super Lengkap</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p class="text-gray-600 leading-relaxed">
-                                Dilengkapi dengan galeri foto beresolusi tinggi, daftar fasilitas terperinci per kamar, dan integrasi titik koordinat peta yang sangat akurat.
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <!-- Feature 3 -->
-                    <Card class="border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white">
-                        <CardHeader>
-                            <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mb-4">
-                                <CreditCard class="w-7 h-7 text-purple-600" />
-                            </div>
-                            <CardTitle class="text-xl">Pembayaran Digital Instan</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p class="text-gray-600 leading-relaxed">
-                                Lakukan pembayaran uang sewa atau DP langsung melalui aplikasi. Mendukung transfer bank otomatis dan pindai QRIS untuk kemudahan transaksi.
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works Section -->
-        <section class="py-24 bg-white border-y border-gray-100 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row items-center gap-16">
-                    <div class="md:w-1/2">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Cara Kerja yang Sangat Mudah</h2>
-                        <div class="space-y-8 mt-10">
-                            <div class="flex gap-4">
-                                <div class="shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl shadow-md">1</div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Cari Kos Impian</h4>
-                                    <p class="text-gray-600">Gunakan fitur pencarian cerdas kami untuk menemukan kos yang sesuai dengan kriteria lokasi, jarak, dan *budget* Anda.</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl shadow-md">2</div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Pilih Kamar & Pesan</h4>
-                                    <p class="text-gray-600">Lihat ketersediaan kamar secara real-time, pilih periode sewa yang Anda inginkan, dan ajukan pemesanan langsung ke pemilik kos.</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="shrink-0 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl shadow-md">3</div>
-                                <div>
-                                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Bayar & Tempati</h4>
-                                    <p class="text-gray-600">Setelah disetujui, bayar tagihan dengan aman. Anda akan menerima bukti pembayaran sah dan siap untuk memindahkan barang Anda!</p>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Hero Text Content -->
+                <div class="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left pt-12 lg:pt-0">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
+                        <Sparkles class="w-4 h-4 text-indigo-400" />
+                        <span class="text-sm font-medium text-indigo-100 tracking-wide">Pencarian Kos Cerdas Berbasis Lokasi</span>
                     </div>
-                    <div class="md:w-1/2 w-full relative">
-                        <!-- Abstract illustration -->
-                        <div class="aspect-square bg-gradient-to-tr from-blue-100 to-indigo-50 rounded-full p-8 relative shadow-inner border border-blue-50/50 flex items-center justify-center w-full max-w-md mx-auto">
-                            <Home class="w-40 h-40 text-blue-200" />
-                            
-                            <!-- Floating UI elements to simulate app interaction -->
-                            <div class="absolute top-12 -left-4 md:-left-12 bg-white p-4 rounded-xl shadow-xl border border-gray-100 flex items-center gap-3 animate-[bounce_4s_infinite]">
-                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center"><CheckCircle class="w-5 h-5" /></div>
-                                <div>
-                                    <p class="text-xs text-gray-500 font-medium">Status Pemesanan</p>
-                                    <p class="text-sm font-bold text-gray-900">Disetujui Pemilik</p>
-                                </div>
-                            </div>
-                            
-                            <div class="absolute bottom-16 -right-4 md:-right-8 bg-white p-4 rounded-xl shadow-xl border border-gray-100 flex items-center gap-3 animate-[bounce_5s_infinite_reverse]">
-                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center"><CreditCard class="w-5 h-5" /></div>
-                                <div>
-                                    <p class="text-xs text-gray-500 font-medium">Pembayaran QRIS</p>
-                                    <p class="text-sm font-bold text-gray-900">Rp 1.500.000 Berhasil</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Call to Action -->
-        <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]"></div>
-            <div class="relative max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Siap Menemukan Kos Baru Anda?</h2>
-                <p class="text-xl text-gray-400 mb-10">Ribuan kamar kos pilihan dengan fasilitas terbaik siap untuk Anda huni hari ini juga.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <Link :href="route('public.kos.index')">
-                        <Button size="lg" class="w-full sm:w-auto h-14 px-8 text-lg bg-primary hover:bg-primary/90 rounded-full shadow-lg">
-                            Eksplorasi Semua Kos <ArrowRight class="w-5 h-5 ml-2" />
-                        </Button>
-                    </Link>
-                    <template v-if="!$page.props.auth.user">
-                        <Link :href="route('register')">
-                            <Button variant="outline" size="lg" class="w-full sm:w-auto h-14 px-8 text-lg rounded-full text-gray-900 hover:text-gray-900 bg-white hover:bg-gray-100 border-none shadow-lg">
-                                Daftar Sebagai Penyewa
+                    
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-8">
+                        Cari Kos Kini<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-300">
+                            Lebih Intuitif.
+                        </span>
+                    </h1>
+                    
+                    <p class="text-lg text-gray-400 mb-10 max-w-xl leading-relaxed font-light">
+                        Lupakan cara lama mencari kos. Sistem kami menggunakan pelacakan GPS *real-time* untuk menampilkan properti terbaik tepat di sekitar Anda, secara instan.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row w-full sm:w-auto gap-4">
+                        <Link :href="route('public.kos.index')">
+                            <Button class="w-full sm:w-auto h-14 px-8 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-lg font-semibold shadow-[0_0_40px_-10px_rgba(79,70,229,0.5)] transition-all hover:scale-105 group">
+                                Buka Peta Kos <Map class="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
                             </Button>
                         </Link>
-                    </template>
+                    </div>
+                </div>
+
+                <!-- Interactive Visual / Bento Box -->
+                <div class="w-full lg:w-1/2 relative h-[500px] lg:h-[600px] flex items-center justify-center">
+                    
+                    <!-- Floating Main Card (Map Simulation) -->
+                    <div class="absolute inset-x-4 lg:inset-x-10 h-[400px] bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl overflow-hidden transform lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                        <!-- Header fake -->
+                        <div class="h-12 border-b border-white/10 flex items-center px-4 gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            <div class="ml-4 h-4 w-32 bg-white/10 rounded-full"></div>
+                        </div>
+                        
+                        <!-- Map Content Fake -->
+                        <div class="relative w-full h-full bg-[#0F172A] overflow-hidden p-6">
+                            <!-- Radar pulse effect -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                <div class="w-64 h-64 bg-indigo-500/20 rounded-full animate-ping [animation-duration:3s]"></div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-indigo-400 rounded-full ring-4 ring-indigo-400/30"></div>
+                            </div>
+
+                            <!-- Mock Markers -->
+                            <div class="absolute top-1/4 left-1/4 bg-white p-2 rounded-xl shadow-xl transform hover:scale-110 transition-transform cursor-pointer animate-[bounce_4s_infinite]">
+                                <div class="w-32 h-20 bg-gray-200 rounded-lg mb-2 overflow-hidden relative">
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-400 to-indigo-500 opacity-80"></div>
+                                </div>
+                                <div class="h-3 w-20 bg-gray-800 rounded-full mb-1"></div>
+                                <div class="h-2 w-12 bg-gray-400 rounded-full"></div>
+                            </div>
+
+                            <div class="absolute bottom-1/3 right-1/4 bg-white p-2 rounded-xl shadow-xl transform hover:scale-110 transition-transform cursor-pointer animate-[bounce_5s_infinite_reverse]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                                        <Home class="w-5 h-5 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <div class="h-3 w-16 bg-gray-800 rounded-full mb-1"></div>
+                                        <div class="h-2 w-10 bg-gray-400 rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Feature Card 1 -->
+                    <div class="absolute -bottom-6 -left-4 lg:-left-12 bg-white/10 backdrop-blur-xl border border-white/20 p-5 rounded-2xl shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] transform -rotate-3 hover:scale-105 transition-all z-20">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <ShieldCheck class="w-6 h-6 text-green-400" />
+                            </div>
+                            <div>
+                                <p class="text-white font-bold text-lg">100% Aman</p>
+                                <p class="text-gray-400 text-sm">Properti Terverifikasi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Feature Card 2 -->
+                    <div class="absolute top-10 -right-4 lg:-right-8 bg-white/10 backdrop-blur-xl border border-white/20 p-5 rounded-2xl shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] transform rotate-6 hover:scale-105 transition-all z-20">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                <Navigation class="w-6 h-6 text-blue-400" />
+                            </div>
+                            <div>
+                                <p class="text-white font-bold text-lg">GPS Real-time</p>
+                                <p class="text-gray-400 text-sm">Pemindaian Radius</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+            
+            <!-- Bottom Fade for transition -->
+            <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50 to-transparent z-20"></div>
+        </section>
+
+        <!-- Bento Grid Features Section -->
+        <section class="py-24 bg-gray-50 relative z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl font-extrabold text-gray-900 mb-6">Ekosistem Sewa Modern</h2>
+                    <p class="text-xl text-gray-500 max-w-3xl mx-auto">Dirancang khusus untuk gaya hidup serba cepat. Tidak ada lagi penipuan, survei lokasi tanpa hasil, atau pembayaran tunai yang merepotkan.</p>
+                </div>
+                
+                <!-- Bento Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+                    
+                    <!-- Large Feature -->
+                    <div class="md:col-span-2 bg-white rounded-3xl p-8 lg:p-12 border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group">
+                        <div class="relative z-10 w-full md:w-2/3">
+                            <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6">
+                                <Map class="w-7 h-7 text-indigo-600" />
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">Pemindaian Peta Interaktif</h3>
+                            <p class="text-gray-600 leading-relaxed text-lg mb-8">
+                                Teknologi kami membaca koordinat Anda dan memunculkan ketersediaan kos di sekitar Anda secara langsung. Geser radius pencarian untuk memperluas jangkauan tanpa mengetik satu huruf pun.
+                            </p>
+                            <Link :href="route('public.kos.index')" class="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700">
+                                Cobalah Sekarang <ArrowRight class="w-4 h-4 ml-1 group-hover:translate-x-2 transition-transform" />
+                            </Link>
+                        </div>
+                        
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 opacity-20 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                            <Map class="w-96 h-96 text-indigo-100" />
+                        </div>
+                    </div>
+
+                    <!-- Small Feature 1 -->
+                    <div class="bg-gray-900 rounded-3xl p-8 border border-gray-800 shadow-xl relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
+                                <CreditCard class="w-6 h-6 text-white" />
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Transaksi Digital</h3>
+                            <p class="text-gray-400">
+                                Integrasi pembayaran otomatis. Lakukan booking, bayar sewa, hingga perpanjangan hanya dalam 3 klik.
+                            </p>
+                        </div>
+                        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/20 blur-3xl rounded-full"></div>
+                    </div>
+
+                    <!-- Small Feature 2 -->
+                    <div class="bg-indigo-600 rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="w-12 h-12 bg-black/20 rounded-xl flex items-center justify-center mb-6">
+                                <ShieldCheck class="w-6 h-6 text-white" />
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Anti Penipuan</h3>
+                            <p class="text-indigo-100">
+                                Identitas pemilik dan legalitas kos divalidasi langsung oleh tim internal sebelum dipublikasikan.
+                            </p>
+                        </div>
+                        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/10 blur-2xl rounded-full"></div>
+                    </div>
+
+                    <!-- Horizontal Feature -->
+                    <div class="md:col-span-2 bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold mb-4">
+                                <Star class="w-3 h-3 fill-green-700" /> Reputasi Terbaik
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Penyewa & Pemilik Dalam Satu Atap</h3>
+                            <p class="text-gray-600 max-w-md">Kami membangun platform yang memudahkan penyewa mencari tempat tinggal, sekaligus memberdayakan pemilik kos dalam manajemen properti cerdas.</p>
+                        </div>
+                        <Link v-if="!$page.props.auth.user" :href="route('register')" class="shrink-0">
+                            <Button class="rounded-full bg-gray-900 hover:bg-black h-12 px-8">Mulai Daftar</Button>
+                        </Link>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="py-24 bg-white text-center">
+            <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-8">Ubah Cara Anda Mencari Tempat Tinggal</h2>
+            <Link :href="route('public.kos.index')">
+                <Button size="lg" class="h-16 px-10 text-xl bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-[0_10px_40px_-10px_rgba(79,70,229,0.5)] transform hover:scale-105 transition-all">
+                    Buka Peta Interaktif
+                </Button>
+            </Link>
         </section>
 
     </PublicLayout>

@@ -167,11 +167,12 @@ class KosController extends Controller
         $request->validate(['qris_image' => 'required|image|max:2048']);
 
         if ($kos->payment_qris_image_path) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($kos->payment_qris_image_path);
+            $oldPath = str_replace('/storage/', '', $kos->payment_qris_image_path);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
 
-        $path = $request->file('qris_image')->store('qris', 'local');
-        $kos->update(['payment_qris_image_path' => $path]);
+        $path = $request->file('qris_image')->store('qris', 'public');
+        $kos->update(['payment_qris_image_path' => '/storage/' . $path]);
 
         return back()->with('success', 'QRIS berhasil diunggah.');
     }
@@ -183,7 +184,8 @@ class KosController extends Controller
         }
 
         if ($kos->payment_qris_image_path) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($kos->payment_qris_image_path);
+            $oldPath = str_replace('/storage/', '', $kos->payment_qris_image_path);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             $kos->update(['payment_qris_image_path' => null]);
         }
 

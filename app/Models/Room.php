@@ -10,6 +10,12 @@ class Room extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::deleting(function ($room) {
+            $room->tenancies()->delete();
+        });
+    }
     protected $fillable = [
         'boarding_house_id', 'name', 'room_number', 'description', 'price',
         'price_period', 'capacity', 'status',

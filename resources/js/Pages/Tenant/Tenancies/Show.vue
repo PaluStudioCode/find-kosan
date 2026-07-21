@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -11,13 +11,10 @@ import StatusBadge from '@/Components/StatusBadge.vue';
 import { ChevronLeft, UploadCloud, Clock, CheckCircle, Home, User, Users, Calendar, Hash, Maximize2, Download } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { useToast } from '@/components/ui/toast/use-toast';
 
 const props = defineProps({
     tenancy: Object
 });
-
-const { toast } = useToast();
 
 const formatDate = (date) => {
     return format(new Date(date), 'dd MMM yyyy', { locale: id });
@@ -33,12 +30,23 @@ const form = useForm({
 
 const activeInvoice = computed(() => {
     if (!props.tenancy.invoices) return null;
-    return props.tenancy.invoices.find(i => ['belum_dibayar', 'ditolak', 'jatuh_tempo', 'menunggu_konfirmasi'].includes(i.status));
+    return props.tenancy.invoices.find(i => ['belum_dibayar', 'jatuh_tempo', 'menunggu_konfirmasi'].includes(i.status));
 });
 
 const pastInvoices = computed(() => {
     if (!props.tenancy.invoices) return [];
     return props.tenancy.invoices.filter(i => i.status === 'lunas');
+});
+
+const nextBillingDate = computed(() => {
+    if (pastInvoices.value.length === 0) {
+        if (props.tenancy.invoices && props.tenancy.invoices.length > 0) {
+            return props.tenancy.invoices[0].period_end;
+        }
+        return props.tenancy.start_date;
+    }
+    const latest = [...pastInvoices.value].sort((a, b) => new Date(b.period_end) - new Date(a.period_end))[0];
+    return latest.period_end;
 });
 
 const isInitialPayment = computed(() => props.tenancy.status === 'nonaktif');
@@ -49,7 +57,6 @@ const uploadPayment = () => {
     form.post(route('tenant.invoices.payment', activeInvoice.value.id), {
         preserveScroll: true,
         onSuccess: () => {
-            toast({ title: 'Berhasil', description: 'Bukti bayar diunggah. Menunggu konfirmasi pemilik.' });
             form.reset('proof_file');
         },
         onError: (err) => {
@@ -57,6 +64,53 @@ const uploadPayment = () => {
         }
     });
 };
+
+const expirationTime = computed(() => {
+    if (!activeInvoice.value || !isInitialPayment.value) return null;
+    const createdAt = new Date(activeInvoice.value.created_at);
+    return new Date(createdAt.getTime() + 24 * 60 * 60 * 1000);
+});
+
+const isOverdue = computed(() => {
+    if (!activeInvoice.value || isInitialPayment.value) return false;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const dueDate = new Date(activeInvoice.value.due_date);
+    return activeInvoice.value.status === 'jatuh_tempo' || today > dueDate;
+});
+
+const countdownText = ref('');
+const isExpired = ref(false);
+let timerInterval = null;
+
+const updateCountdown = () => {
+    if (!expirationTime.value) return;
+    const now = new Date();
+    const diff = expirationTime.value - now;
+
+    if (diff <= 0) {
+        countdownText.value = 'Kadaluarsa';
+        isExpired.value = true;
+        clearInterval(timerInterval);
+    } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        countdownText.value = `${hours}:${minutes}:${seconds}`;
+        isExpired.value = false;
+    }
+};
+
+onMounted(() => {
+    updateCountdown();
+    if (expirationTime.value && !isExpired.value) {
+        timerInterval = setInterval(updateCountdown, 1000);
+    }
+});
+
+onUnmounted(() => {
+    if (timerInterval) clearInterval(timerInterval);
+});
 </script>
 
 <template>
@@ -131,22 +185,42 @@ const uploadPayment = () => {
                 
                 <CardContent class="pt-6 space-y-6">
                     <!-- Amount Display -->
-                    <div class="text-center bg-gray-50 rounded-xl py-6 border border-gray-100">
-                        <p class="text-sm text-gray-500 mb-1 font-medium uppercase tracking-wider">Total Pembayaran</p>
+                    <div class="text-center bg-gray-50 rounded-xl py-6 border border-gray-100 relative overflow-hidden">
+                        <div v-if="isInitialPayment && !isExpired" class="absolute top-0 inset-x-0 bg-orange-100 text-orange-800 text-xs py-1.5 font-bold flex justify-center items-center gap-2">
+                            <Clock class="w-3.5 h-3.5" /> Selesaikan pembayaran dalam: {{ countdownText }}
+                        </div>
+                        <div v-else-if="isInitialPayment && isExpired" class="absolute top-0 inset-x-0 bg-red-100 text-red-800 text-xs py-1.5 font-bold flex justify-center items-center gap-2">
+                            <Clock class="w-3.5 h-3.5" /> Waktu pembayaran telah habis
+                        </div>
+
+                        <p :class="['text-sm text-gray-500 mb-1 font-medium uppercase tracking-wider', isInitialPayment ? 'mt-4' : '']">Total Pembayaran</p>
                         <p class="text-4xl font-extrabold text-gray-900 tracking-tight">{{ formatPrice(activeInvoice.amount) }}</p>
-                        <p class="text-sm text-red-600 mt-3 font-medium bg-red-50 inline-block px-3 py-1 rounded-full border border-red-100" v-if="['belum_dibayar', 'ditolak', 'jatuh_tempo'].includes(activeInvoice.status)">
-                            {{ isInitialPayment ? 'Batas Waktu: ' : 'Jatuh Tempo: ' }} {{ formatDate(activeInvoice.due_date) }}
+                        <p v-if="isOverdue" class="text-sm text-red-700 mt-3 font-bold bg-red-100 inline-block px-3 py-1 rounded-full border border-red-200">
+                            Telah Lewat Jatuh Tempo: {{ formatDate(activeInvoice.due_date) }}
+                        </p>
+                        <p v-else-if="['belum_dibayar', 'jatuh_tempo'].includes(activeInvoice.status)" class="text-sm text-red-600 mt-3 font-medium bg-red-50 inline-block px-3 py-1 rounded-full border border-red-100">
+                            {{ isInitialPayment ? 'Batas Waktu (24 Jam): ' : 'Jatuh Tempo: ' }} {{ formatDate(activeInvoice.due_date) }}
                         </p>
                     </div>
                     
-                    <div v-if="['belum_dibayar', 'ditolak', 'jatuh_tempo'].includes(activeInvoice.status)" class="space-y-6">
+                    <div v-if="['belum_dibayar', 'jatuh_tempo'].includes(activeInvoice.status)" class="space-y-6">
+                        
+                        <!-- Overdue Warning -->
+                        <div v-if="isOverdue" class="bg-red-50 p-4 border border-red-300 rounded-lg shadow-sm">
+                            <p class="text-sm font-bold text-red-800 mb-1 flex items-center gap-2">
+                                <span class="flex w-5 h-5 rounded-full bg-red-200 text-red-900 items-center justify-center">!</span>
+                                Peringatan Jatuh Tempo
+                            </p>
+                            <p class="text-sm text-red-700 ml-7 leading-relaxed">Tagihan sewa Anda telah melewati batas waktu yang ditentukan. Mohon segera lakukan pembayaran dan unggah bukti untuk menghindari sanksi atau pemutusan sewa dari pemilik kos.</p>
+                        </div>
+
                         <!-- Last rejected note if any -->
-                        <div v-if="activeInvoice.status === 'ditolak' && activeInvoice.payments && activeInvoice.payments.length > 0" class="bg-red-50 p-4 border border-red-200 rounded-lg">
+                        <div v-if="activeInvoice.payments && activeInvoice.payments.length > 0 && activeInvoice.payments[0].status === 'ditolak'" class="bg-red-50 p-4 border border-red-200 rounded-lg">
                             <p class="text-sm font-bold text-red-800 mb-1 flex items-center gap-2">
                                 <span class="flex w-5 h-5 rounded-full bg-red-100 items-center justify-center">!</span>
-                                Pembayaran Sebelumnya Ditolak
+                                Catatan dari Pemilik Kos
                             </p>
-                            <p class="text-sm text-red-700 ml-7">{{ activeInvoice.payments[activeInvoice.payments.length-1].review_note || 'Mohon unggah bukti pembayaran yang lebih jelas atau valid.' }}</p>
+                            <p class="text-sm text-red-700 ml-7">{{ activeInvoice.payments[0].review_note || 'Mohon unggah bukti pembayaran yang lebih jelas atau valid.' }}</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -192,10 +266,13 @@ const uploadPayment = () => {
                                 <form @submit.prevent="uploadPayment" class="space-y-5">
                                     <div>
                                         <Label for="proof" class="mb-2 block">Unggah Bukti Transfer / Resi</Label>
-                                        <Input id="proof" type="file" accept="image/*" @change="e => form.proof_file = e.target.files[0]" required class="bg-white cursor-pointer" />
+                                        <Input id="proof" type="file" accept="image/*" @change="e => form.proof_file = e.target.files[0]" required class="bg-white cursor-pointer" :disabled="isExpired" />
                                         <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB.</p>
                                     </div>
-                                    <Button type="submit" class="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-all" :disabled="form.processing || !form.proof_file">
+                                    <Button v-if="isExpired" type="button" class="w-full h-11 bg-gray-300 text-gray-600 font-medium shadow-sm cursor-not-allowed" disabled>
+                                        Booking Kadaluarsa
+                                    </Button>
+                                    <Button v-else type="submit" class="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-all" :disabled="form.processing || !form.proof_file">
                                         <UploadCloud class="w-4 h-4 mr-2" /> 
                                         {{ form.processing ? 'Mengunggah...' : 'Kirim Bukti Pembayaran' }}
                                     </Button>
@@ -213,13 +290,44 @@ const uploadPayment = () => {
                 </CardContent>
             </Card>
             
-            <Card v-else class="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-sm">
-                <CardContent class="py-12 text-center space-y-3">
-                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-2">
-                        <CheckCircle class="w-10 h-10 text-emerald-500" />
+            <Card v-else-if="tenancy.status === 'selesai'" class="bg-gradient-to-br from-gray-50 to-slate-100 border-gray-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gray-400"></div>
+                <CardContent class="py-10">
+                    <div class="text-center space-y-3">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-2 border border-gray-100">
+                            <CheckCircle class="w-8 h-8 text-gray-500" />
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-gray-900">Masa Sewa Telah Selesai</h3>
+                        <p class="text-gray-600 text-sm max-w-md mx-auto">Terima kasih telah menyewa kamar ini. Riwayat transaksi Anda tetap dapat dilihat di bawah.</p>
                     </div>
-                    <h3 class="text-2xl font-extrabold text-emerald-900">Sewa Aktif & Lunas</h3>
-                    <p class="text-emerald-700 text-sm max-w-md mx-auto">Anda tidak memiliki tagihan pembayaran yang tertunda saat ini. Tagihan periode berikutnya akan muncul secara otomatis di sini.</p>
+                </CardContent>
+            </Card>
+
+            <Card v-else class="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                <CardContent class="py-10">
+                    <div class="text-center space-y-3 mb-8">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-2">
+                            <CheckCircle class="w-8 h-8 text-emerald-500" />
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-emerald-900">Sewa Aktif & Lunas</h3>
+                        <p class="text-emerald-700 text-sm max-w-md mx-auto">Anda tidak memiliki tagihan pembayaran yang tertunda saat ini.</p>
+                    </div>
+
+                    <div class="bg-white/60 backdrop-blur-sm rounded-xl p-5 border border-emerald-100 max-w-md mx-auto">
+                        <h4 class="text-sm font-bold text-emerald-900 mb-3 flex items-center gap-2">
+                            <Calendar class="w-4 h-4" /> Informasi Tagihan Berikutnya
+                        </h4>
+                        <div class="flex justify-between items-center py-2 border-b border-emerald-100/50">
+                            <span class="text-sm text-emerald-700">Perkiraan Tanggal</span>
+                            <span class="font-semibold text-emerald-900">{{ formatDate(nextBillingDate) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-sm text-emerald-700">Jumlah Tagihan</span>
+                            <span class="font-bold text-emerald-900">{{ formatPrice(tenancy.room?.price || 0) }}</span>
+                        </div>
+                        <p class="text-xs text-emerald-600 mt-3 italic text-center">Tagihan akan otomatis muncul di sini saat waktunya tiba.</p>
+                    </div>
                 </CardContent>
             </Card>
 

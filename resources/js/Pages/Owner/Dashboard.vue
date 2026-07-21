@@ -67,11 +67,11 @@ const formatRupiah = (amount) => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-            <Card class="lg:col-span-2">
+            <Card class="lg:col-span-2 flex flex-col h-fit max-h-[450px]">
                 <CardHeader>
                     <CardTitle>Pembayaran Terbaru</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent class="overflow-y-auto pr-4">
                     <div v-if="recentPayments.length > 0" class="space-y-4">
                         <div v-for="payment in recentPayments" :key="payment.id" class="flex items-center justify-between p-4 border rounded-lg">
                             <div class="flex items-center gap-4">
@@ -97,22 +97,22 @@ const formatRupiah = (amount) => {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card class="flex flex-col h-fit max-h-[450px]">
                 <CardHeader>
                     <CardTitle>Aktivitas Terakhir</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div v-if="activityLogs.length > 0" class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                        <div v-for="log in activityLogs" :key="log.id" class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                <CardContent class="overflow-y-auto pr-4 pt-1">
+                    <div v-if="activityLogs.length > 0" class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gray-100">
+                        <div v-for="log in activityLogs" :key="log.id" class="relative flex items-start gap-4">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-indigo-50 text-indigo-500 shadow-sm shrink-0 z-10">
                                 <Clock class="w-4 h-4" />
                             </div>
-                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-200 shadow-sm bg-white">
-                                <div class="flex items-center justify-between space-x-2 mb-1">
-                                    <div class="font-bold text-slate-900 capitalize">{{ log.action.replace('.', ' ') }}</div>
-                                    <time class="text-xs text-slate-500">{{ new Date(log.created_at).toLocaleDateString('id-ID') }}</time>
+                            <div class="pt-1 w-full">
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <h4 class="font-semibold text-sm text-gray-900 capitalize">{{ log.action.replace('.', ' ') }}</h4>
+                                    <time class="text-xs text-gray-500 whitespace-nowrap">{{ new Date(log.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'}) }}</time>
                                 </div>
-                                <div class="text-sm text-slate-500">{{ log.description }}</div>
+                                <p class="text-sm text-gray-600">{{ log.description }}</p>
                             </div>
                         </div>
                     </div>

@@ -79,6 +79,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             // Tenancies Management
             Route::get('/tenancies', [\App\Http\Controllers\Owner\TenancyController::class, 'index'])->name('tenancies.index');
             Route::get('/tenancies/{tenancy}', [\App\Http\Controllers\Owner\TenancyController::class, 'show'])->name('tenancies.show');
+            Route::post('/tenancies/{tenancy}/end', [\App\Http\Controllers\Owner\TenancyController::class, 'endTenancy'])->name('tenancies.end');
             Route::post('/payments/{payment}/confirm', [\App\Http\Controllers\Owner\TenancyController::class, 'confirmPayment'])->name('payments.confirm');
         });
 

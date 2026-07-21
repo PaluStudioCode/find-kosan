@@ -116,19 +116,7 @@ class TenancyController extends Controller
             'status' => 'belum_dibayar',
         ]);
 
-        // Create WhatsApp Notification to Owner
-        $owner = $room->boardingHouse->owner;
-        if ($owner && $owner->whatsapp_number) {
-            \App\Models\WhatsappNotification::create([
-                'invoice_id' => $invoice->id,
-                'tenant_id' => $owner->id, // Store owner ID here as recipient
-                'phone_number' => $owner->whatsapp_number,
-                'message_type' => 'pembayaran_baru',
-                'message_body' => "Halo {$owner->name}, ada pengajuan sewa baru untuk kamar {$room->name} di {$room->boardingHouse->name}. Silakan cek dashboard Anda.",
-                'scheduled_date' => today(),
-                'status' => 'belum_dikirim',
-            ]);
-        }
+
 
         return redirect()->route('tenant.tenancies.show', $tenancy->id)->with('success', 'Pengajuan sewa berhasil dibuat, silakan lakukan pembayaran.');
     }
@@ -141,7 +129,7 @@ class TenancyController extends Controller
             'proof_file' => 'required|image|max:2048'
         ]);
 
-        $path = $request->file('proof_file')->store('payments', 'local');
+        $path = $request->file('proof_file')->store('payments', 'public');
 
         $payment = Payment::create([
             'invoice_id' => $invoice->id,
@@ -158,15 +146,19 @@ class TenancyController extends Controller
         // Notification to Owner
         $owner = $invoice->owner;
         if ($owner && $owner->whatsapp_number) {
-            \App\Models\WhatsappNotification::create([
-                'invoice_id' => $invoice->id,
-                'tenant_id' => $owner->id,
-                'phone_number' => $owner->whatsapp_number,
-                'message_type' => 'pembayaran_baru',
-                'message_body' => "Halo {$owner->name}, ada pembayaran baru sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " yang menunggu konfirmasi. Silakan cek dashboard Anda.",
-                'scheduled_date' => today(),
-                'status' => 'belum_dikirim',
-            ]);
+            \App\Models\WhatsappNotification::updateOrCreate(
+                [
+                    'invoice_id' => $invoice->id,
+                    'message_type' => 'pembayaran_baru',
+                    'scheduled_date' => today(),
+                ],
+                [
+                    'tenant_id' => $owner->id,
+                    'phone_number' => $owner->whatsapp_number,
+                    'message_body' => "Halo {$owner->name}, ada pembayaran baru sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " yang menunggu konfirmasi. Silakan cek dashboard Anda.",
+                    'status' => 'belum_dikirim',
+                ]
+            );
         }
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah.');

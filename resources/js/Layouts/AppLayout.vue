@@ -43,7 +43,7 @@ const navItems = computed(() => {
         items.push({ name: 'Sewa & Pembayaran', route: 'owner.tenancies.index', icon: Users });
         items.push({ name: 'Laporan & Pengaduan', route: 'reports.index', icon: Flag });
     } else if (role === 'penyewa') {
-        items.push({ name: 'Dashboard', route: 'tenant.dashboard', icon: LayoutDashboard });
+        items.push({ name: 'Beranda Kos', route: 'public.kos.index', icon: LayoutDashboard });
         items.push({ name: 'Sewa & Tagihan', route: 'tenant.tenancies.index', icon: ReceiptText });
         items.push({ name: 'Laporan & Pengaduan', route: 'reports.index', icon: Flag });
     }

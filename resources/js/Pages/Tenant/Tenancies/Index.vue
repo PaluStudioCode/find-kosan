@@ -42,10 +42,10 @@ const formatPrice = (price) => {
 
 
             <!-- Main Content Grid -->
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 gap-8">
                 
                 <!-- Full Column: Tenancies List -->
-                <div class="xl:col-span-2 space-y-8">
+                <div class="space-y-8">
                     <Card class="shadow-sm border-0 ring-1 ring-black/5">
                         <CardHeader class="border-b bg-gray-50/50">
                             <CardTitle class="flex items-center gap-2">
@@ -123,40 +123,6 @@ const formatPrice = (price) => {
                                         </Link>
                                     </template>
                                 </EmptyState>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <!-- Right Column: Tagihan Berikutnya -->
-                <div class="space-y-6">
-                    <Card class="shadow-sm border-0 ring-1 ring-black/5">
-                        <CardHeader class="border-b bg-gray-50/50 pb-4">
-                            <CardTitle class="text-base flex items-center gap-2">
-                                <FileText class="w-4 h-4 text-indigo-600" /> Tagihan Berikutnya
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent class="p-0">
-                            <div v-if="recentInvoices.length > 0" class="divide-y">
-                                <div v-for="invoice in recentInvoices" :key="invoice.id" class="p-4 hover:bg-gray-50 transition-colors">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-900 line-clamp-1">Tagihan {{ invoice.tenancy?.room?.name }}</p>
-                                            <p class="text-xs text-gray-500 mt-0.5">{{ invoice.tenancy?.boardingHouse?.name }}</p>
-                                        </div>
-                                        <StatusBadge :status="invoice.status" class="text-[10px] px-1.5 py-0.5" />
-                                    </div>
-                                    <div class="flex justify-between items-end mt-3">
-                                        <p class="text-[11px] text-red-500 font-medium">Jatuh Tempo: {{ formatDate(invoice.due_date) }}</p>
-                                        <p class="text-sm font-bold text-indigo-700">{{ formatPrice(invoice.amount) }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else class="text-center py-10 px-4 text-sm text-gray-500 flex flex-col items-center">
-                                <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
-                                    <FileText class="w-6 h-6 text-gray-300" />
-                                </div>
-                                Tidak ada tagihan berikutnya.
                             </div>
                         </CardContent>
                     </Card>

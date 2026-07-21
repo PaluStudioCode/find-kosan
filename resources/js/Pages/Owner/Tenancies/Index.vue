@@ -1,19 +1,26 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import EmptyState from '@/Components/EmptyState.vue';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-defineProps({
-    tenancies: Object
+const props = defineProps({
+    tenancies: Object,
+    properties: Array,
+    filters: Object
 });
 
 const formatDate = (date) => {
     return format(new Date(date), 'dd MMM yyyy', { locale: id });
+};
+
+const handleFilterChange = (val) => {
+    router.get(route('owner.tenancies.index'), { kos_id: val === 'all' ? null : val }, { preserveState: true });
 };
 </script>
 
@@ -21,9 +28,25 @@ const formatDate = (date) => {
     <AppLayout>
         <Head title="Manajemen Penyewaan" />
 
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Manajemen Penyewaan</h2>
-            <p class="text-gray-500 mt-1">Kelola data penyewa kos dan riwayat transaksinya.</p>
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Manajemen Penyewaan</h2>
+                <p class="text-gray-500 mt-1">Kelola data penyewa kos dan riwayat transaksinya.</p>
+            </div>
+            
+            <div v-if="properties && properties.length > 0" class="w-full sm:w-64">
+                <Select :model-value="filters.kos_id || 'all'" @update:model-value="handleFilterChange">
+                    <SelectTrigger class="bg-white">
+                        <SelectValue placeholder="Pilih Properti Kos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Semua Properti Kos</SelectItem>
+                        <SelectItem v-for="kos in properties" :key="kos.id" :value="kos.id.toString()">
+                            {{ kos.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
 
         <div class="bg-white rounded-lg shadow-sm border p-4">
@@ -46,6 +69,7 @@ const formatDate = (date) => {
                                 <div class="text-xs text-gray-500">{{ tenancy.tenant?.whatsapp_number || tenancy.tenant?.email }}</div>
                             </TableCell>
                             <TableCell>
+                                <div class="font-bold text-indigo-900 text-sm mb-1">{{ tenancy.room?.boarding_house?.name || 'Kos' }}</div>
                                 <div class="font-medium text-gray-900">{{ tenancy.room?.name }} (No. {{ tenancy.room?.room_number }})</div>
                                 <div class="text-xs text-gray-500">Kapasitas: {{ tenancy.occupant_count }} Orang</div>
                             </TableCell>

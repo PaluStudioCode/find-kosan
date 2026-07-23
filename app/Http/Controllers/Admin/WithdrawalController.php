@@ -31,9 +31,14 @@ class WithdrawalController extends Controller
 
     public function approve(Request $request, WithdrawalRequest $withdrawal)
     {
-        $request->validate(['review_note' => 'nullable|string|max:1000']);
+        $validated = $request->validate([
+            'transfer_reference' => 'required|string|max:100',
+            'transfer_proof' => 'required|image|max:2048',
+        ]);
 
-        DB::transaction(function () use ($request, $withdrawal) {
+        $proofPath = '/storage/' . $request->file('transfer_proof')->store('withdrawal-proofs', 'public');
+
+        DB::transaction(function () use ($request, $withdrawal, $validated, $proofPath) {
             $withdrawal = WithdrawalRequest::lockForUpdate()->findOrFail($withdrawal->id);
             if ($withdrawal->status !== 'menunggu_persetujuan') {
                 abort(422, 'Permintaan penarikan ini sudah diproses.');
@@ -43,16 +48,27 @@ class WithdrawalController extends Controller
             $wallet->decrement('pending_withdrawal_balance', $withdrawal->amount);
 
             $withdrawal->update([
-                'status' => 'disetujui',
+                'status' => 'selesai',
                 'reviewed_by' => $request->user()->id,
                 'reviewed_at' => now(),
-                'review_note' => $request->review_note,
+                'transferred_by' => $request->user()->id,
+                'transferred_at' => now(),
+                'transfer_reference' => $validated['transfer_reference'],
+                'transfer_proof_path' => $proofPath,
             ]);
 
-            $this->log($request, 'withdrawal.approved', $withdrawal);
+            OwnerWalletTransaction::create([
+                'owner_wallet_id' => $wallet->id,
+                'withdrawal_request_id' => $withdrawal->id,
+                'type' => 'withdrawal_debit',
+                'amount' => $withdrawal->amount,
+                'description' => "Penarikan #{$withdrawal->id} berhasil ditransfer",
+            ]);
+
+            $this->log($request, 'withdrawal.completed', $withdrawal);
         });
 
-        return back()->with('success', 'Penarikan disetujui. Silakan lakukan transfer manual lalu tandai selesai.');
+        return back()->with('success', 'Penarikan telah disetujui dan ditransfer.');
     }
 
     public function reject(Request $request, WithdrawalRequest $withdrawal)
@@ -88,45 +104,6 @@ class WithdrawalController extends Controller
         });
 
         return back()->with('success', 'Penarikan ditolak dan saldo pemilik dikembalikan.');
-    }
-
-    public function complete(Request $request, WithdrawalRequest $withdrawal)
-    {
-        $validated = $request->validate([
-            'transfer_reference' => 'required|string|max:100',
-            'transfer_proof' => 'required|image|max:2048',
-        ]);
-
-        $proofPath = '/storage/' . $request->file('transfer_proof')->store('withdrawal-proofs', 'public');
-
-        DB::transaction(function () use ($request, $withdrawal, $validated, $proofPath) {
-            $withdrawal = WithdrawalRequest::lockForUpdate()->findOrFail($withdrawal->id);
-            if ($withdrawal->status !== 'disetujui') {
-                abort(422, 'Hanya penarikan yang telah disetujui yang dapat diselesaikan.');
-            }
-
-            $wallet = OwnerWallet::where('owner_id', $withdrawal->owner_id)->firstOrFail();
-
-            $withdrawal->update([
-                'status' => 'selesai',
-                'transferred_by' => $request->user()->id,
-                'transferred_at' => now(),
-                'transfer_reference' => $validated['transfer_reference'],
-                'transfer_proof_path' => $proofPath,
-            ]);
-
-            OwnerWalletTransaction::create([
-                'owner_wallet_id' => $wallet->id,
-                'withdrawal_request_id' => $withdrawal->id,
-                'type' => 'withdrawal_debit',
-                'amount' => $withdrawal->amount,
-                'description' => "Penarikan #{$withdrawal->id} berhasil ditransfer",
-            ]);
-
-            $this->log($request, 'withdrawal.completed', $withdrawal);
-        });
-
-        return back()->with('success', 'Penarikan telah ditandai selesai.');
     }
 
     private function log(Request $request, string $action, WithdrawalRequest $withdrawal): void

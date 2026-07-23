@@ -9,14 +9,17 @@ import { Textarea } from '@/components/ui/textarea';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import { ChevronLeft, CheckCircle, XCircle, Landmark } from 'lucide-vue-next';
 
+import { ref } from 'vue';
+
 const props = defineProps({ withdrawal: Object });
 const reviewForm = useForm({ review_note: '' });
 const transferForm = useForm({ transfer_reference: '', transfer_proof: null });
 const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
 
-const approve = () => reviewForm.post(route('admin.withdrawals.approve', props.withdrawal.id));
+const isRejecting = ref(false);
+
+const approveAndComplete = () => transferForm.post(route('admin.withdrawals.approve', props.withdrawal.id), { forceFormData: true });
 const reject = () => reviewForm.post(route('admin.withdrawals.reject', props.withdrawal.id));
-const complete = () => transferForm.post(route('admin.withdrawals.complete', props.withdrawal.id), { forceFormData: true });
 </script>
 
 <template>
@@ -43,24 +46,44 @@ const complete = () => transferForm.post(route('admin.withdrawals.complete', pro
             </Card>
 
             <Card v-if="withdrawal.status === 'menunggu_persetujuan'">
-                <CardHeader><CardTitle>Tinjau Permintaan</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Proses Penarikan</CardTitle></CardHeader>
                 <CardContent>
-                    <Textarea v-model="reviewForm.review_note" rows="4" placeholder="Catatan untuk pemilik (wajib jika ditolak)" />
-                    <p v-if="reviewForm.errors.review_note" class="text-sm text-red-600 mt-1">{{ reviewForm.errors.review_note }}</p>
-                    <div class="flex gap-3 mt-4">
-                        <Button class="flex-1" :disabled="reviewForm.processing" @click="approve"><CheckCircle class="w-4 h-4 mr-2" /> Setujui</Button>
-                        <Button class="flex-1" variant="destructive" :disabled="reviewForm.processing" @click="reject"><XCircle class="w-4 h-4 mr-2" /> Tolak</Button>
-                    </div>
-                </CardContent>
-            </Card>
+                    <form v-if="!isRejecting" class="space-y-4" @submit.prevent="approveAndComplete">
+                        <div>
+                            <Label for="transfer_reference">Nomor referensi transfer</Label>
+                            <Input id="transfer_reference" v-model="transferForm.transfer_reference" class="mt-1" />
+                            <p v-if="transferForm.errors.transfer_reference" class="text-sm text-red-600 mt-1">{{ transferForm.errors.transfer_reference }}</p>
+                        </div>
+                        <div>
+                            <Label for="transfer_proof">Bukti transfer</Label>
+                            <Input id="transfer_proof" class="mt-1" type="file" accept="image/*" @change="transferForm.transfer_proof = $event.target.files[0]" />
+                            <p v-if="transferForm.errors.transfer_proof" class="text-sm text-red-600 mt-1">{{ transferForm.errors.transfer_proof }}</p>
+                        </div>
+                        
+                        <div class="flex gap-3 mt-6">
+                            <Button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700" :disabled="transferForm.processing">
+                                <CheckCircle class="w-4 h-4 mr-2" /> Setujui & Transfer
+                            </Button>
+                            <Button type="button" variant="outline" class="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200" @click="isRejecting = true">
+                                <XCircle class="w-4 h-4 mr-2" /> Tolak Penarikan
+                            </Button>
+                        </div>
+                    </form>
 
-            <Card v-else-if="withdrawal.status === 'disetujui'">
-                <CardHeader><CardTitle>Konfirmasi Transfer Manual</CardTitle></CardHeader>
-                <CardContent>
-                    <form class="space-y-4" @submit.prevent="complete">
-                        <div><Label for="transfer_reference">Nomor referensi transfer</Label><Input id="transfer_reference" v-model="transferForm.transfer_reference" class="mt-1" /><p v-if="transferForm.errors.transfer_reference" class="text-sm text-red-600 mt-1">{{ transferForm.errors.transfer_reference }}</p></div>
-                        <div><Label for="transfer_proof">Bukti transfer</Label><Input id="transfer_proof" class="mt-1" type="file" accept="image/*" @change="transferForm.transfer_proof = $event.target.files[0]" /><p v-if="transferForm.errors.transfer_proof" class="text-sm text-red-600 mt-1">{{ transferForm.errors.transfer_proof }}</p></div>
-                        <Button class="w-full" :disabled="transferForm.processing"><Landmark class="w-4 h-4 mr-2" /> {{ transferForm.processing ? 'Menyimpan...' : 'Tandai Transfer Selesai' }}</Button>
+                    <form v-else class="space-y-4" @submit.prevent="reject">
+                        <div>
+                            <Label for="review_note" class="text-red-600">Alasan Penolakan</Label>
+                            <Textarea id="review_note" v-model="reviewForm.review_note" rows="4" class="mt-1 border-red-300 focus-visible:ring-red-500" placeholder="Jelaskan alasan penolakan..." />
+                            <p v-if="reviewForm.errors.review_note" class="text-sm text-red-600 mt-1">{{ reviewForm.errors.review_note }}</p>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <Button type="submit" variant="destructive" class="flex-1" :disabled="reviewForm.processing">
+                                <XCircle class="w-4 h-4 mr-2" /> Konfirmasi Tolak
+                            </Button>
+                            <Button type="button" variant="outline" class="flex-1" @click="isRejecting = false">
+                                Batal
+                            </Button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>

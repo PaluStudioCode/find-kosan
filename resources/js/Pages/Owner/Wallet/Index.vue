@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import StatusBadge from '@/Components/StatusBadge.vue';
-import { Landmark, WalletCards, ArrowDownToLine, Clock } from 'lucide-vue-next';
+import { Landmark, WalletCards, ArrowDownToLine, Clock, X } from 'lucide-vue-next';
 
 const props = defineProps({
     wallet: Object,
@@ -34,6 +34,7 @@ const form = useForm({
 });
 
 const isDialogOpen = ref(false);
+const selectedProofImage = ref(null);
 
 const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR', maximumFractionDigits: 0,
@@ -141,10 +142,21 @@ const inputStyles = "mt-1.5 shadow-sm border border-gray-300 hover:border-emeral
                 <CardContent class="p-0">
                     <div v-if="withdrawals.length" class="divide-y">
                         <div v-for="withdrawal in withdrawals" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                            <div>
-                                <p class="font-semibold">{{ formatRupiah(withdrawal.amount) }}</p>
-                                <p class="text-sm text-gray-500">{{ withdrawal.bank_name }} · {{ withdrawal.account_number }} · {{ withdrawal.account_holder_name }}</p>
-                            </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold">{{ formatRupiah(withdrawal.amount) }}</p>
+                                    <p class="text-sm text-gray-500">{{ withdrawal.bank_name }} · {{ withdrawal.account_number }} · {{ withdrawal.account_holder_name }}</p>
+                                    
+                                    <div v-if="withdrawal.status === 'ditolak' && withdrawal.review_note" class="mt-2 p-2.5 bg-red-50 border border-red-100 rounded-md">
+                                        <p class="text-sm text-red-700 font-medium">Alasan Penolakan:</p>
+                                        <p class="text-sm text-red-600">{{ withdrawal.review_note }}</p>
+                                    </div>
+
+                                    <div v-if="withdrawal.status === 'selesai'" class="mt-1 flex items-center gap-2">
+                                        <p v-if="withdrawal.transfer_reference" class="text-xs text-gray-500">Ref: {{ withdrawal.transfer_reference }}</p>
+                                        <span v-if="withdrawal.transfer_reference && withdrawal.transfer_proof_path" class="text-gray-300">|</span>
+                                        <button v-if="withdrawal.transfer_proof_path" @click="selectedProofImage = withdrawal.transfer_proof_path" class="text-xs text-emerald-600 hover:text-emerald-700 hover:underline">Lihat Bukti</button>
+                                    </div>
+                                </div>
                             <StatusBadge :status="withdrawal.status" />
                         </div>
                     </div>
@@ -170,5 +182,15 @@ const inputStyles = "mt-1.5 shadow-sm border border-gray-300 hover:border-emeral
                 </CardContent>
             </Card>
         </div>
+
+        <!-- Image Lightbox Modal -->
+        <Teleport to="body">
+            <div v-if="selectedProofImage" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md transition-all duration-300" @click="selectedProofImage = null">
+                <button class="absolute top-6 right-6 text-white/80 hover:text-white transition-colors" @click="selectedProofImage = null">
+                    <X class="w-8 h-8" />
+                </button>
+                <img :src="selectedProofImage" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl" @click.stop />
+            </div>
+        </Teleport>
     </AppLayout>
 </template>

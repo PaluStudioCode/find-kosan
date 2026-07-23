@@ -26,6 +26,7 @@ class WalletController extends Controller
             'wallet' => $wallet,
             'transactions' => OwnerWalletTransaction::with('invoice')
                 ->where('owner_wallet_id', $wallet->id)
+                ->whereNotIn('type', ['withdrawal_hold', 'withdrawal_release'])
                 ->latest()
                 ->paginate(10)
                 ->withQueryString(),

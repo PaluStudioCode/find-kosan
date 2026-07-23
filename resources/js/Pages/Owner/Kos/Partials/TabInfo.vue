@@ -39,8 +39,6 @@ const form = useForm({
     longitude: sourceData.value.longitude || null,
     public_contact_name: sourceData.value.public_contact_name || '',
     public_contact_whatsapp_number: sourceData.value.public_contact_whatsapp_number || '',
-    payment_instructions: sourceData.value.payment_instructions || '',
-    payment_proof_required: Boolean(sourceData.value.payment_proof_required),
     facilities: sourceData.value.facilities ? sourceData.value.facilities.map(f => f.id) : []
 });
 
@@ -400,20 +398,7 @@ const handleLocationSelected = async (location) => {
                     <div v-else class="text-sm text-gray-500 italic">Belum ada master data fasilitas kos.</div>
                 </div>
 
-                <!-- Pengaturan Pembayaran -->
-                <div class="space-y-4 pt-4">
-                    <h3 class="text-lg font-semibold border-b pb-2">Pengaturan Pembayaran</h3>
-                    <div class="space-y-2">
-                        <Label for="payment_instructions">Instruksi Pembayaran (Transfer Bank, dll)</Label>
-                        <Textarea id="payment_instructions" v-model="form.payment_instructions" rows="3" />
-                        <p v-if="form.errors.payment_instructions" class="text-sm text-red-500">{{ form.errors.payment_instructions }}</p>
-                    </div>
-                    
-                    <div class="flex items-center space-x-2 mt-4">
-                        <Checkbox id="payment_proof_required" :modelValue="form.payment_proof_required" @update:modelValue="v => form.payment_proof_required = v" />
-                        <Label for="payment_proof_required" class="font-normal cursor-pointer">Wajib unggah bukti transfer/pembayaran</Label>
-                    </div>
-                </div>
+
 
                 <div class="flex justify-end pt-6 border-t mt-8">
                     <Button type="submit" :disabled="form.processing || isLocked">

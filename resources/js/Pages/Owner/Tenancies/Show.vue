@@ -26,33 +26,8 @@ const formatPrice = (price) => {
 };
 
 const activeInvoice = computed(() => props.tenancy.invoices[0]);
-const pendingPayment = computed(() => activeInvoice.value?.payments?.find(p => p.status === 'menunggu_konfirmasi'));
 
-const form = useForm({
-    action: 'approve',
-    review_note: ''
-});
-
-const isRejecting = ref(false);
-const showLightbox = ref(false);
 const showEndTenancyDialog = ref(false);
-const showApproveDialog = ref(false);
-
-const confirmAction = (action) => {
-    if (action === 'reject' && !isRejecting.value) {
-        isRejecting.value = true;
-        return;
-    }
-
-    form.action = action;
-    form.post(route('owner.payments.confirm', pendingPayment.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            isRejecting.value = false;
-            if (action === 'approve') showApproveDialog.value = false;
-        }
-    });
-};
 
 const submitEndTenancy = () => {
     useForm({}).post(route('owner.tenancies.end', props.tenancy.id), {
@@ -106,50 +81,8 @@ const submitEndTenancy = () => {
                 </Card>
             </div>
 
-            <!-- Konfirmasi Pembayaran -->
             <div class="space-y-6">
-                <Card v-if="pendingPayment" class="border-orange-200 shadow-md">
-                    <CardHeader class="bg-orange-50 border-b border-orange-100">
-                        <CardTitle class="text-orange-900">Perlu Konfirmasi Pembayaran</CardTitle>
-                    </CardHeader>
-                    <CardContent class="pt-6 space-y-4">
-                        <div class="flex justify-between border-b pb-4">
-                            <div>
-                                <p class="text-sm text-gray-500">Nominal</p>
-                                <p class="font-bold text-lg">{{ formatPrice(pendingPayment.amount) }}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm text-gray-500">Tanggal Upload</p>
-                                <p class="font-medium text-sm">{{ formatDate(pendingPayment.payment_date) }}</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <p class="text-sm text-gray-500 mb-2">Bukti Transfer:</p>
-                            <div class="relative group cursor-pointer inline-block w-full" @click="showLightbox = true">
-                                <img :src="pendingPayment.proof_file_path" class="w-full h-48 object-cover rounded-lg border shadow-sm" />
-                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex flex-col items-center justify-center gap-2">
-                                    <span class="text-white text-sm font-medium">Perbesar Bukti</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-if="isRejecting" class="pt-2">
-                            <Label for="note">Catatan Penolakan</Label>
-                            <Textarea id="note" v-model="form.review_note" placeholder="Misal: Bukti transfer tidak jelas" rows="2" class="mt-1" />
-                            <div class="flex justify-end gap-2 mt-2">
-                                <Button variant="ghost" size="sm" @click="isRejecting = false">Batal</Button>
-                                <Button variant="destructive" size="sm" :disabled="form.processing" @click="confirmAction('reject')">Konfirmasi Tolak</Button>
-                            </div>
-                        </div>
-                        <div v-else class="flex gap-2 pt-2">
-                            <Button variant="outline" class="flex-1 border-red-200 text-red-600 hover:bg-red-50" @click="confirmAction('reject')">Tolak</Button>
-                            <Button class="flex-1 bg-green-600 hover:bg-green-700" :disabled="form.processing" @click="showApproveDialog = true">Terima Pembayaran</Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card v-else-if="tenancy.status === 'selesai'" class="bg-gradient-to-br from-gray-50 to-slate-100 border-gray-200 shadow-sm relative overflow-hidden">
+                <Card v-if="tenancy.status === 'selesai'" class="bg-gradient-to-br from-gray-50 to-slate-100 border-gray-200 shadow-sm relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gray-400"></div>
                     <CardContent class="py-10">
                         <div class="text-center space-y-3">
@@ -201,15 +134,7 @@ const submitEndTenancy = () => {
             </div>
         </div>
 
-        <!-- Image Lightbox -->
-        <div v-if="showLightbox" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm" @click="showLightbox = false">
-            <div class="relative max-w-[90vw] max-h-[90vh]">
-                <button class="absolute -top-10 right-0 text-white hover:text-gray-300" @click="showLightbox = false">
-                    <XCircle class="w-8 h-8" />
-                </button>
-                <img :src="pendingPayment.proof_file_path" alt="Bukti Pembayaran" class="max-w-full max-h-[90vh] object-contain rounded-sm" @click.stop />
-            </div>
-        </div>
+
 
         <!-- Confirm End Tenancy Dialog -->
         <Dialog :open="showEndTenancyDialog" @update:open="showEndTenancyDialog = $event">
@@ -227,21 +152,7 @@ const submitEndTenancy = () => {
             </DialogContent>
         </Dialog>
 
-        <!-- Confirm Approve Payment Dialog -->
-        <Dialog :open="showApproveDialog" @update:open="showApproveDialog = $event">
-            <DialogContent class="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Terima Pembayaran</DialogTitle>
-                    <DialogDescription class="pt-3">
-                        Apakah Anda yakin ingin menyetujui pembayaran ini? Pastikan Anda telah mengecek bukti transfer dan dana sudah masuk ke rekening Anda. Tindakan ini akan mengaktifkan sewa dan menandai tagihan sebagai lunas.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter class="mt-4 flex gap-2 sm:justify-end">
-                    <Button variant="outline" @click="showApproveDialog = false">Batal</Button>
-                    <Button class="bg-green-600 hover:bg-green-700 text-white" :disabled="form.processing" @click="confirmAction('approve')">Ya, Terima Pembayaran</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+
 
     </AppLayout>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import StatusBadge from '@/Components/StatusBadge.vue';
-import { ChevronLeft, UploadCloud, Clock, CheckCircle, Home, User, Users, Calendar, Hash, Maximize2, Download } from 'lucide-vue-next';
+import { ChevronLeft, UploadCloud, Clock, CheckCircle, Home, User, Users, Calendar, Hash, Maximize2, Download, CreditCard } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import axios from 'axios';
 
 const props = defineProps({
     tenancy: Object
@@ -23,10 +24,6 @@ const formatDate = (date) => {
 const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
 };
-
-const form = useForm({
-    proof_file: null
-});
 
 const activeInvoice = computed(() => {
     if (!props.tenancy.invoices) return null;
@@ -51,18 +48,64 @@ const nextBillingDate = computed(() => {
 
 const isInitialPayment = computed(() => props.tenancy.status === 'nonaktif');
 
-const uploadPayment = () => {
-    if (!activeInvoice.value) return;
-    
-    form.post(route('tenant.invoices.payment', activeInvoice.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            form.reset('proof_file');
-        },
-        onError: (err) => {
-            if (err.proof_file) toast({ title: 'Gagal', description: err.proof_file, variant: 'destructive' });
+const isPaying = ref(false);
+const paymentSucceeded = ref(false);
+
+const payWithDuitku = async () => {
+    if (!activeInvoice.value || isPaying.value) return;
+
+    isPaying.value = true;
+    paymentSucceeded.value = false;
+    try {
+        const response = await axios.post(route('duitku.create-invoice'), {
+            invoice_id: activeInvoice.value.id
+        });
+
+        const reference = response.data.reference;
+
+        if (typeof checkout === 'undefined') {
+            alert('Library Duitku belum dimuat, silakan muat ulang halaman.');
+            isPaying.value = false;
+            return;
         }
-    });
+
+        checkout.process(reference, {
+            successEvent: async function(result){
+                paymentSucceeded.value = true;
+                try {
+                    const verification = await axios.post(route('duitku.verify-local'), {
+                        reference: reference,
+                        merchant_order_id: result.merchantOrderId,
+                    });
+
+                    if (verification.data.paid) {
+                        router.reload();
+                        return;
+                    }
+                } catch (error) {
+                    alert(error.response?.data?.message || 'Pembayaran berhasil, tetapi status belum dapat disinkronkan. Silakan muat ulang halaman dalam beberapa saat.');
+                } finally {
+                    isPaying.value = false;
+                }
+            },
+            pendingEvent: function(result){
+                isPaying.value = false;
+                router.reload();
+            },
+            errorEvent: function(result){
+                alert('Pembayaran gagal atau dibatalkan');
+                isPaying.value = false;
+            },
+            closeEvent: function(result){
+                if (!paymentSucceeded.value) {
+                    isPaying.value = false;
+                }
+            }
+        });
+    } catch (error) {
+        alert(error.response?.data?.error || 'Terjadi kesalahan saat memproses pembayaran');
+        isPaying.value = false;
+    }
 };
 
 const expirationTime = computed(() => {
@@ -102,6 +145,12 @@ const updateCountdown = () => {
 };
 
 onMounted(() => {
+    if (!document.querySelector('script[src="https://app-sandbox.duitku.com/lib/js/duitku.js"]')) {
+        const script = document.createElement('script');
+        script.src = "https://app-sandbox.duitku.com/lib/js/duitku.js";
+        document.head.appendChild(script);
+    }
+
     updateCountdown();
     if (expirationTime.value && !isExpired.value) {
         timerInterval = setInterval(updateCountdown, 1000);
@@ -223,60 +272,19 @@ onUnmounted(() => {
                             <p class="text-sm text-red-700 ml-7">{{ activeInvoice.payments[0].review_note || 'Mohon unggah bukti pembayaran yang lebih jelas atau valid.' }}</p>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <!-- Instructions & QRIS -->
-                            <div class="space-y-4">
-                                <div v-if="tenancy.boarding_house?.payment_instructions" class="bg-indigo-50/50 p-4 rounded-lg text-sm whitespace-pre-line border border-indigo-100/50 text-indigo-900">
-                                    <strong class="block mb-2 text-indigo-950">Instruksi Pembayaran:</strong>
-                                    {{ tenancy.boarding_house.payment_instructions }}
-                                </div>
-                                
-                                <div v-if="tenancy.boarding_house?.payment_qris_image_path" class="text-center p-4 border rounded-lg bg-white shadow-sm">
-                                    <p class="text-sm font-bold mb-3 text-gray-700">QRIS Tersedia</p>
-                                    
-                                    <Dialog>
-                                        <DialogTrigger as-child>
-                                            <div class="relative group cursor-pointer inline-block bg-gray-50 p-2 rounded-lg border">
-                                                <img :src="tenancy.boarding_house.payment_qris_image_path" alt="QRIS" class="w-40 h-40 object-contain rounded bg-white" />
-                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded flex flex-col items-center justify-center gap-2">
-                                                    <Maximize2 class="w-6 h-6 text-white" />
-                                                    <span class="text-white text-xs font-medium">Perbesar</span>
-                                                </div>
-                                            </div>
-                                        </DialogTrigger>
-                                        <DialogContent class="sm:max-w-md flex flex-col items-center p-6">
-                                            <DialogHeader>
-                                                <DialogTitle class="text-center">Scan QRIS Pembayaran</DialogTitle>
-                                            </DialogHeader>
-                                            <div class="bg-gray-50 p-3 rounded-xl border mt-4 mb-6">
-                                                <img :src="tenancy.boarding_house.payment_qris_image_path" alt="QRIS" class="w-64 h-64 object-contain rounded bg-white shadow-sm border p-2" />
-                                            </div>
-                                            
-                                            <a :href="tenancy.boarding_house.payment_qris_image_path" download class="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors w-full justify-center">
-                                                <Download class="w-4 h-4" /> Unduh QRIS
-                                            </a>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-                            </div>
+                        <div class="grid grid-cols-1 gap-6 max-w-md mx-auto">
+                            <!-- Payment Action -->
+                            <div class="bg-gray-50 border rounded-xl p-5 text-center shadow-sm">
+                                <h4 class="font-bold text-gray-900 mb-2">Metode Pembayaran</h4>
+                                <p class="text-sm text-gray-500 mb-6">Pilih dan selesaikan pembayaran Anda menggunakan berbagai metode yang tersedia via Duitku Payment Gateway.</p>
 
-                            <!-- Upload Form -->
-                            <div class="bg-gray-50 border rounded-xl p-5">
-                                <h4 class="font-bold text-gray-900 mb-4">Konfirmasi Pembayaran</h4>
-                                <form @submit.prevent="uploadPayment" class="space-y-5">
-                                    <div>
-                                        <Label for="proof" class="mb-2 block">Unggah Bukti Transfer / Resi</Label>
-                                        <Input id="proof" type="file" accept="image/*" @change="e => form.proof_file = e.target.files[0]" required class="bg-white cursor-pointer" :disabled="isExpired" />
-                                        <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Maksimal 2MB.</p>
-                                    </div>
-                                    <Button v-if="isExpired" type="button" class="w-full h-11 bg-gray-300 text-gray-600 font-medium shadow-sm cursor-not-allowed" disabled>
-                                        Booking Kadaluarsa
-                                    </Button>
-                                    <Button v-else type="submit" class="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-all" :disabled="form.processing || !form.proof_file">
-                                        <UploadCloud class="w-4 h-4 mr-2" /> 
-                                        {{ form.processing ? 'Mengunggah...' : 'Kirim Bukti Pembayaran' }}
-                                    </Button>
-                                </form>
+                                <Button v-if="isExpired" type="button" class="w-full h-12 bg-gray-300 text-gray-600 font-medium shadow-sm cursor-not-allowed" disabled>
+                                    Booking Kadaluarsa
+                                </Button>
+                                <Button v-else @click="payWithDuitku" :disabled="isPaying" type="button" class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-all text-base">
+                                    <CreditCard class="w-5 h-5 mr-2" />
+                                    {{ isPaying ? 'Memproses...' : 'Bayar Sekarang' }}
+                                </Button>
                             </div>
                         </div>
                     </div>

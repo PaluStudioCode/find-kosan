@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenancy;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Services\OwnerWalletService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -74,6 +75,7 @@ class TenancyController extends Controller
                 'review_note' => $request->review_note,
             ]);
             $invoice->update(['status' => 'lunas']);
+            app(OwnerWalletService::class)->creditPaidInvoice($invoice);
             
             if ($tenancy->status === 'nonaktif') {
                 $tenancy->update(['status' => 'aktif']);

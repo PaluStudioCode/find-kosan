@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tenancy::class, 'owner_id');
     }
+
+    public function wallet()
+    {
+        return $this->hasOne(OwnerWallet::class, 'owner_id');
+    }
+
+    public function withdrawalRequests()
+    {
+        return $this->hasMany(WithdrawalRequest::class, 'owner_id');
+    }
 }

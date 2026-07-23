@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => \App\Http\Middleware\ActiveAccountMiddleware::class,
             'must_change_password' => \App\Http\Middleware\MustChangePasswordMiddleware::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'duitku/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {

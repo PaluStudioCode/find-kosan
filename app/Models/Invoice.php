@@ -18,7 +18,7 @@ class Invoice extends Model
     }
     protected $fillable = [
         'tenancy_id', 'tenant_id', 'owner_id', 'period_start', 'period_end',
-        'amount', 'due_date', 'status',
+        'amount', 'due_date', 'status', 'payment_reference', 'payment_method', 'payment_url',
     ];
 
     protected $casts = [

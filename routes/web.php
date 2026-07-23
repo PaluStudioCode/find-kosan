@@ -58,6 +58,11 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['create', 'edit', 'show']);
             Route::resource('reports', App\Http\Controllers\Admin\ReportController::class)->only(['index', 'show', 'update']);
             Route::resource('facilities', App\Http\Controllers\Admin\FacilityController::class)->except(['create', 'edit', 'show']);
+            Route::get('/withdrawals', [\App\Http\Controllers\Admin\WithdrawalController::class, 'index'])->name('withdrawals.index');
+            Route::get('/withdrawals/{withdrawal}', [\App\Http\Controllers\Admin\WithdrawalController::class, 'show'])->name('withdrawals.show');
+            Route::post('/withdrawals/{withdrawal}/approve', [\App\Http\Controllers\Admin\WithdrawalController::class, 'approve'])->name('withdrawals.approve');
+            Route::post('/withdrawals/{withdrawal}/reject', [\App\Http\Controllers\Admin\WithdrawalController::class, 'reject'])->name('withdrawals.reject');
+            Route::post('/withdrawals/{withdrawal}/complete', [\App\Http\Controllers\Admin\WithdrawalController::class, 'complete'])->name('withdrawals.complete');
         });
 
         // Role Pemilik Kos
@@ -81,6 +86,9 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/tenancies/{tenancy}', [\App\Http\Controllers\Owner\TenancyController::class, 'show'])->name('tenancies.show');
             Route::post('/tenancies/{tenancy}/end', [\App\Http\Controllers\Owner\TenancyController::class, 'endTenancy'])->name('tenancies.end');
             Route::post('/payments/{payment}/confirm', [\App\Http\Controllers\Owner\TenancyController::class, 'confirmPayment'])->name('payments.confirm');
+
+            Route::get('/wallet', [\App\Http\Controllers\Owner\WalletController::class, 'index'])->name('wallet.index');
+            Route::post('/wallet/withdrawals', [\App\Http\Controllers\Owner\WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
         });
 
         // Role Penyewa
@@ -111,5 +119,12 @@ Route::prefix('api/regions')->group(function () {
     Route::get('/villages', [\App\Http\Controllers\RegionController::class, 'villages']);
     Route::post('/match', [\App\Http\Controllers\RegionController::class, 'reverseGeocodeMatch']);
 });
+
+// Duitku API
+Route::middleware(['auth', 'active', 'must_change_password', 'role:penyewa'])->group(function () {
+    Route::post('/duitku/create-invoice', [\App\Http\Controllers\PaymentGatewayController::class, 'createInvoice'])->name('duitku.create-invoice');
+    Route::post('/duitku/verify-local', [\App\Http\Controllers\PaymentGatewayController::class, 'verifyLocal'])->name('duitku.verify-local');
+});
+Route::post('/duitku/callback', [\App\Http\Controllers\PaymentGatewayController::class, 'callback'])->name('duitku.callback');
 
 require __DIR__.'/auth.php';

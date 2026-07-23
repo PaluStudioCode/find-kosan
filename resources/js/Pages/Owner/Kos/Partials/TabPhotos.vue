@@ -120,45 +120,7 @@ const deletePhoto = () => {
     });
 };
 
-// --- QRIS (Single) ---
-const qrisForm = useForm({
-    qris_image: null,
-});
 
-const uploadQris = () => {
-    qrisForm.post(route('owner.kos.qris', props.kos.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            qrisForm.reset('qris_image');
-        },
-        onError: (err) => {
-            if (err.qris_image) toast({ title: 'Gagal', description: err.qris_image, variant: 'destructive' });
-        }
-    });
-};
-
-const confirmingQrisDeletion = ref(false);
-
-const confirmQrisDeletion = () => {
-    confirmingQrisDeletion.value = true;
-};
-
-const closeQrisModal = () => {
-    confirmingQrisDeletion.value = false;
-};
-
-const deleteQris = () => {
-    router.delete(route('owner.kos.qris.destroy', props.kos.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeQrisModal();
-        },
-        onError: () => {
-            toast({ title: 'Gagal', description: 'Gagal menghapus QRIS.', variant: 'destructive' });
-            closeQrisModal();
-        }
-    });
-};
 </script>
 
 <template>
@@ -241,43 +203,7 @@ const deleteQris = () => {
                 </div>
             </div>
 
-        <!-- Gambar QRIS -->
-        <div class="pt-8 border-t">
-            <h3 class="text-lg font-semibold mb-2">QRIS Pembayaran</h3>
-            <p class="text-sm text-gray-500 mb-4 border-b pb-4">Unggah gambar QRIS Anda agar penyewa bisa memindai saat melakukan pembayaran. QRIS ini aman dan tidak tampil di halaman publik (hanya untuk penyewa Anda).</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <form @submit.prevent="uploadQris" class="flex flex-col md:flex-row gap-4 items-end">
-                        <div class="space-y-2 flex-grow">
-                            <Label for="qris">Pilih Gambar QRIS</Label>
-                            <Input id="qris" type="file" accept="image/*" @change="e => qrisForm.qris_image = e.target.files[0]" />
-                            <p v-if="qrisForm.errors.qris_image" class="text-sm text-red-500">{{ qrisForm.errors.qris_image }}</p>
-                        </div>
-                        <Button type="submit" :disabled="qrisForm.processing || !qrisForm.qris_image || isLocked" class="shrink-0">
-                            <UploadCloud class="w-4 h-4 mr-2" /> Unggah QRIS
-                        </Button>
-                    </form>
-                </div>
-                
-                <div class="flex items-center justify-center border-2 border-dashed rounded p-4 bg-gray-50">
-                    <div v-if="kos.payment_qris_image_path" class="text-center w-full">
-                        <div class="flex justify-between items-center mb-2 px-2">
-                            <p class="text-sm font-medium text-green-600">QRIS Tersimpan</p>
-                            <Button size="sm" variant="destructive" class="h-7 text-xs px-2" @click="confirmQrisDeletion" :disabled="isLocked">
-                                Hapus
-                            </Button>
-                        </div>
-                        <div class="w-48 h-48 mx-auto flex items-center justify-center rounded border overflow-hidden bg-white">
-                            <img :src="kos.payment_qris_image_path" alt="QRIS" class="w-full h-full object-contain" />
-                        </div>
-                    </div>
-                    <div v-else class="text-gray-400 text-sm text-center">
-                        Belum ada gambar QRIS.
-                    </div>
-                </div>
-            </div>
-        </div>
         </fieldset>
     </div>
 
@@ -304,26 +230,5 @@ const deleteQris = () => {
         </DialogContent>
     </Dialog>
 
-    <!-- Modal Dialog Hapus QRIS -->
-    <Dialog :open="confirmingQrisDeletion" @update:open="val => { if(!val) closeQrisModal(); }">
-        <DialogContent class="sm:max-w-[425px]">
-            <DialogHeader>
-                <div class="flex items-center gap-4 mb-2 text-destructive">
-                    <div class="p-3 bg-destructive/10 rounded-full shrink-0">
-                        <AlertTriangle class="w-6 h-6" />
-                    </div>
-                    <DialogTitle>Hapus QRIS?</DialogTitle>
-                </div>
-            </DialogHeader>
-            
-            <DialogDescription class="text-sm">
-                Apakah Anda yakin ingin menghapus gambar QRIS ini? Tindakan ini tidak dapat dibatalkan dan penyewa tidak akan bisa memindai QRIS untuk pembayaran sampai Anda mengunggah yang baru.
-            </DialogDescription>
 
-            <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
-                <Button variant="outline" @click="closeQrisModal">Batal</Button>
-                <Button variant="destructive" @click="deleteQris">Ya, Hapus QRIS</Button>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
 </template>

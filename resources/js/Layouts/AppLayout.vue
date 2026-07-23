@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards } from 'lucide-vue-next';
 
 const isMobileMenuOpen = ref(false);
 
@@ -36,11 +36,13 @@ const navItems = computed(() => {
         items.push({ name: 'Verifikasi Kos', route: 'admin.verifications.index', icon: Building2 });
         items.push({ name: 'Master Fasilitas', route: 'admin.facilities.index', icon: LayoutList });
         items.push({ name: 'Laporan', route: 'admin.reports.index', icon: Flag });
+        items.push({ name: 'Penarikan Pemilik', route: 'admin.withdrawals.index', icon: Landmark });
         items.push({ name: 'Manajemen Pengguna', route: 'admin.users.index', icon: UserCog });
     } else if (role === 'pemilik_kos') {
         items.push({ name: 'Dashboard', route: 'owner.dashboard', icon: LayoutDashboard });
         items.push({ name: 'Properti Kos', route: 'owner.kos.index', icon: Building2 });
         items.push({ name: 'Sewa & Pembayaran', route: 'owner.tenancies.index', icon: Users });
+        items.push({ name: 'Saldo & Penarikan', route: 'owner.wallet.index', icon: WalletCards });
         items.push({ name: 'Laporan & Pengaduan', route: 'reports.index', icon: Flag });
     } else if (role === 'penyewa') {
         items.push({ name: 'Beranda Kos', route: 'public.kos.index', icon: LayoutDashboard });

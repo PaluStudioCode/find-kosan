@@ -31,8 +31,6 @@ const form = useForm({
     longitude: null,
     public_contact_name: '',
     public_contact_whatsapp_number: '',
-    payment_instructions: '',
-    payment_proof_required: true,
     facilities: []
 });
 
@@ -376,24 +374,7 @@ const handleLocationSelected = async (location) => {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Pengaturan Pembayaran (Opsional)</CardTitle>
-                    <CardDescription>Instruksi pembayaran manual untuk penyewa.</CardDescription>
-                </CardHeader>
-                <CardContent class="space-y-4">
-                    <div class="space-y-2">
-                        <Label for="payment_instructions">Instruksi Pembayaran (Transfer Bank, dll)</Label>
-                        <Textarea id="payment_instructions" v-model="form.payment_instructions" rows="3" placeholder="Misal: Transfer ke BCA 1234567890 a.n Budi. Harap tambahkan berita transfer nomor kamar." />
-                        <p v-if="form.errors.payment_instructions" class="text-sm text-red-500">{{ form.errors.payment_instructions }}</p>
-                    </div>
-                    
-                    <div class="flex items-center space-x-2 mt-4">
-                        <Checkbox id="payment_proof_required" :modelValue="form.payment_proof_required" @update:modelValue="v => form.payment_proof_required = v" />
-                        <Label for="payment_proof_required" class="font-normal cursor-pointer">Wajib unggah bukti transfer/pembayaran</Label>
-                    </div>
-                </CardContent>
-            </Card>
+
 
             <div class="flex justify-end gap-3">
                 <Link :href="route('owner.kos.index')">

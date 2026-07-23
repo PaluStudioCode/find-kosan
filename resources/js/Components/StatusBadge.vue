@@ -19,6 +19,9 @@ const statusConfig = computed(() => {
         'aktif': { label: 'Aktif', variant: 'success' },
         'menunggu_aktivasi': { label: 'Menunggu Aktivasi', variant: 'warning' },
         'lunas': { label: 'Lunas', variant: 'success' },
+        'menunggu_persetujuan': { label: 'Menunggu Persetujuan', variant: 'warning' },
+        'disetujui': { label: 'Disetujui', variant: 'success' },
+        'selesai': { label: 'Selesai', variant: 'success' },
         'belum_dibayar': { label: 'Belum Dibayar', variant: 'destructive' },
         'menunggu_konfirmasi': { label: 'Menunggu Konfirmasi', variant: 'warning' },
     };

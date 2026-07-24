@@ -14,6 +14,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, FileText, LayoutDashboard, Home } from 'lucide-vue-next';
 
+const props = defineProps({
+    landing: {
+        type: Boolean,
+        default: false,
+    },
+    hideFooter: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const page = usePage();
 
 watch(() => page.props.flash, (flash) => {
@@ -25,7 +36,7 @@ watch(() => page.props.flash, (flash) => {
 
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white/90 border-b border-gray-100 backdrop-blur-xl sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <div class="flex items-center gap-6">
@@ -33,12 +44,21 @@ watch(() => page.props.flash, (flash) => {
                 <Home class="w-6 h-6" /> Kos Online
             </Link>
             <nav class="hidden md:flex gap-4 ml-4">
-                <Link :href="route('public.kos.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-                    Cari Kos
-                </Link>
-                <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'" :href="route('tenant.tenancies.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-                    Sewa Kos Saya
-                </Link>
+                <template v-if="landing">
+                    <a href="#peta-kos" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Peta Kos</a>
+                    <a href="#cara-kerja" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Cara Kerja</a>
+                    <a href="#keamanan" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Keamanan</a>
+                    <a href="#pemilik" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Untuk Pemilik</a>
+                    <a href="#ulasan" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Ulasan</a>
+                </template>
+                <template v-else>
+                    <Link :href="route('public.kos.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+                        Cari Kos
+                    </Link>
+                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'" :href="route('tenant.tenancies.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+                        Sewa Kos Saya
+                    </Link>
+                </template>
             </nav>
           </div>
           
@@ -94,7 +114,7 @@ watch(() => page.props.flash, (flash) => {
       <slot />
     </main>
     
-    <footer class="bg-white border-t py-12">
+    <footer v-if="!hideFooter" class="bg-white border-t py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
             <div class="flex items-center gap-2">
                 <Home class="w-5 h-5 text-gray-400" />

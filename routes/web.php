@@ -1,21 +1,13 @@
 <?php
 
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicKosController;
 use App\Http\Middleware\GuestOrTenant;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware([GuestOrTenant::class])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
-        ]);
-    })->name('home');
+    Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
     Route::get('/kos', [PublicKosController::class, 'index'])->name('public.kos.index');
     Route::get('/kos/{kos}', [PublicKosController::class, 'show'])->name('public.kos.show');

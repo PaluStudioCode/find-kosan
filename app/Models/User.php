@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
@@ -58,5 +58,10 @@ class User extends Authenticatable
     public function withdrawalRequests()
     {
         return $this->hasMany(WithdrawalRequest::class, 'owner_id');
+    }
+
+    public function boardingHouseReviews()
+    {
+        return $this->hasMany(BoardingHouseReview::class);
     }
 }

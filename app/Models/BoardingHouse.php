@@ -17,6 +17,7 @@ class BoardingHouse extends Model
             $boardingHouse->tenancies()->delete();
         });
     }
+
     protected $fillable = [
         'owner_id', 'name', 'description', 'address', 'public_contact_name',
         'public_contact_whatsapp_number', 'payment_instructions', 'payment_qris_image_path',
@@ -70,5 +71,10 @@ class BoardingHouse extends Model
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(BoardingHouseReview::class);
     }
 }

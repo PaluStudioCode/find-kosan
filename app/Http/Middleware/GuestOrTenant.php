@@ -17,6 +17,10 @@ class GuestOrTenant
     {
         if (auth()->check()) {
             $role = auth()->user()->role;
+            // Izinkan Admin untuk melihat halaman detail kos publik (untuk keperluan review laporan)
+            if ($role === 'super_admin' && $request->routeIs('public.kos.show')) {
+                return $next($request);
+            }
             if ($role === 'super_admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($role === 'pemilik_kos') {

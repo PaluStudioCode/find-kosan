@@ -22,7 +22,7 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['reporter', 'boardingHouse', 'handler']);
+        $report->load(['reporter', 'boardingHouse.owner', 'handler']);
         return Inertia::render('Admin/Reports/Show', [
             'report' => $report
         ]);
@@ -31,8 +31,9 @@ class ReportController extends Controller
     public function update(Request $request, Report $report)
     {
         $validated = $request->validate([
-            'status' => 'required|in:menunggu,diproses,selesai,ditolak',
+            'status' => 'required|in:menunggu,selesai',
             'resolution_note' => 'nullable|string|max:1000',
+            'sanction' => 'nullable|in:none,suspend_kos,ban_kos,ban_owner',
         ]);
 
         $report->update([
@@ -41,8 +42,36 @@ class ReportController extends Controller
             'handled_by' => auth()->id(),
             'handled_at' => now(),
         ]);
+        
+        // Execute Sanction Logic
+        $sanction = $validated['sanction'] ?? 'none';
+        if ($sanction !== 'none') {
+            $kos = $report->boardingHouse;
+            
+            if ($sanction === 'suspend_kos') {
+                // Change status to suspended so it hides from public search
+                $kos->update(['status' => 'suspended']);
+            } elseif ($sanction === 'ban_kos') {
+                // Soft delete the boarding house
+                $kos->delete();
+            } elseif ($sanction === 'ban_owner') {
+                // Change owner status to banned/inactive and soft delete their kos
+                if ($kos->owner) {
+                    $kos->owner->update(['status' => 'banned']); // Or inactive depending on user statuses
+                }
+                $kos->delete();
+            }
+            
+            \App\Models\ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'report.sanction_applied',
+                'description' => "Menerapkan sanksi '{$sanction}' berdasarkan laporan #{$report->id}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent()
+            ]);
+        }
 
-        if (in_array($validated['status'], ['selesai', 'ditolak'])) {
+        if ($validated['status'] === 'selesai') {
             \App\Models\ActivityLog::create([
                 'user_id' => auth()->id(),
                 'action' => 'report.resolved',
@@ -52,6 +81,22 @@ class ReportController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Status laporan berhasil diperbarui.');
+        return back()->with('success', 'Status laporan dan sanksi berhasil diperbarui.');
+    }
+
+    public function destroy(Report $report)
+    {
+        // Activity log for deletion
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'report.deleted',
+            'description' => "Menghapus laporan #{$report->id} (dianggap tidak valid/ngawur)",
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ]);
+
+        $report->forceDelete(); // Menghapus secara permanen dari sistem
+
+        return redirect()->route('admin.reports.index')->with('success', 'Laporan tidak valid berhasil dihapus dari sistem.');
     }
 }

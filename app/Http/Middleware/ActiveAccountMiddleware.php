@@ -15,7 +15,7 @@ class ActiveAccountMiddleware
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('login')->withErrors(['email' => 'Akun Anda tidak aktif.']);
+            return redirect()->route('login')->withErrors(['email' => 'Akun Anda telah diblokir atau tidak aktif. Hubungi admin.']);
         }
 
         return $next($request);

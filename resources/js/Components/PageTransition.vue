@@ -8,8 +8,20 @@ let timeout = null;
 
 onMounted(() => {
     router.on('start', (event) => {
+        const visit = event.detail.visit;
+        
+        // Jangan tampilkan transisi jika ini adalah form submission (POST/PUT/DELETE)
+        if (visit.method !== 'get') {
+            return;
+        }
+        
+        // Jangan tampilkan transisi jika preserveState aktif (biasanya untuk filter/search/pagination)
+        if (visit.preserveState) {
+            return;
+        }
+
         // Cek URL tujuan
-        const targetPath = event.detail.visit.url.pathname;
+        const targetPath = visit.url.pathname;
         
         // Jangan tampilkan transisi jika berada di area admin atau owner
         if (targetPath.startsWith('/admin') || targetPath.startsWith('/owner')) {

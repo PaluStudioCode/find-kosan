@@ -25,7 +25,10 @@ class PublicKosController extends Controller
     public function show(Request $request, BoardingHouse $kos)
     {
         if ($kos->status !== 'dipublikasikan') {
-            abort(404);
+            // Izinkan Admin melihat kos yang berstatus selain dipublikasikan (seperti suspended/menunggu_verifikasi)
+            if (! $request->user() || $request->user()->role !== 'admin') {
+                abort(404);
+            }
         }
 
         $kos->load([

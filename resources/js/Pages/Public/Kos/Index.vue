@@ -5,7 +5,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { MapPin, Navigation, Map } from 'lucide-vue-next';
+import { MapPin, Navigation, Map, Settings2, X } from 'lucide-vue-next';
 import EmptyState from '@/Components/EmptyState.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -22,6 +22,7 @@ const mapContainer = ref(null);
 const cardRef = ref(null);
 const dragHandleRef = ref(null);
 const detectingLocation = ref(false);
+const isSettingsOpen = ref(false);
 
 const { style: cardStyle } = useDraggable(cardRef, {
     initialValue: { x: 20, y: 100 },
@@ -127,26 +128,26 @@ const updateMapMarkers = () => {
             }).addTo(map);
 
             const photoHtml = kos.photos && kos.photos.length > 0 
-                ? `<img src="${kos.photos[0].file_path}" class="w-full h-32 object-cover" />`
-                : `<div class="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs">Tidak ada foto</div>`;
+                ? `<img src="${kos.photos[0].file_path}" class="w-full h-24 sm:h-32 object-cover" />`
+                : `<div class="w-full h-24 sm:h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs">Tidak ada foto</div>`;
             
-            const facilitiesHtml = kos.facilities.slice(0, 2).map(f => `<span class="px-1.5 py-0.5 bg-slate-100 text-[10px] font-medium rounded text-slate-600">${f.name}</span>`).join('');
-            const moreFacilitiesHtml = kos.facilities.length > 2 ? `<span class="px-1.5 py-0.5 bg-slate-100 text-[10px] font-medium rounded text-slate-600">+${kos.facilities.length - 2}</span>` : '';
+            const facilitiesHtml = kos.facilities.slice(0, 2).map(f => `<span class="px-1 sm:px-1.5 py-0.5 bg-slate-100 text-[9px] sm:text-[10px] font-medium rounded text-slate-600">${f.name}</span>`).join('');
+            const moreFacilitiesHtml = kos.facilities.length > 2 ? `<span class="px-1 sm:px-1.5 py-0.5 bg-slate-100 text-[9px] sm:text-[10px] font-medium rounded text-slate-600">+${kos.facilities.length - 2}</span>` : '';
 
             marker.bindPopup(`
-                <div class="flex flex-col w-[240px] overflow-hidden rounded-xl">
+                <div class="flex flex-col w-full overflow-hidden rounded-xl">
                     ${photoHtml}
-                    <div class="p-4 bg-white">
-                        <h3 class="font-bold text-[15px] mb-1 leading-tight text-slate-900">${kos.name}</h3>
-                        <p class="text-[12px] text-slate-500 mb-3 flex items-center gap-1 font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            ${kos.city}, ${kos.district}
+                    <div class="p-3 sm:p-4 bg-white">
+                        <h3 class="font-bold text-[13px] sm:text-[15px] mb-0.5 sm:mb-1 leading-tight text-slate-900">${kos.name}</h3>
+                        <p class="text-[10px] sm:text-[12px] text-slate-500 mb-2 sm:mb-3 flex items-center gap-1 font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span class="truncate">${kos.city}, ${kos.district}</span>
                         </p>
-                        <div class="flex flex-wrap gap-1.5 mb-4">
+                        <div class="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4">
                             ${facilitiesHtml}
                             ${moreFacilitiesHtml}
                         </div>
-                        <a href="${route('public.kos.show', kos.id)}" class="flex items-center justify-center gap-1 text-[13px] font-bold bg-teal-500 hover:bg-teal-600 !text-white px-3 py-2 rounded-lg transition-all w-full hover:-translate-y-0.5 shadow-sm">
+                        <a href="${route('public.kos.show', kos.id)}" class="flex items-center justify-center gap-1 text-[11px] sm:text-[13px] font-bold bg-teal-500 hover:bg-teal-600 !text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all w-full hover:-translate-y-0.5 shadow-sm">
                             Lihat Detail
                         </a>
                     </div>
@@ -210,12 +211,31 @@ onMounted(() => {
         <Head title="Cari Kos Terdekat" />
 
         <div class="w-full h-[calc(100vh-65px)] relative z-0">
+            <!-- Settings Toggle Button (Mobile Only) -->
+            <button 
+                :class="[
+                    'md:hidden fixed bottom-6 right-6 z-[400] items-center justify-center w-14 h-14 bg-teal-600 text-white rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.2)] hover:bg-teal-700 active:scale-95 transition-all',
+                    isSettingsOpen ? 'hidden' : 'flex'
+                ]"
+                @click="isSettingsOpen = true"
+            >
+                <Settings2 class="w-6 h-6" />
+            </button>
+
             <!-- Floating Controls Overlay -->
             <div 
                 ref="cardRef"
                 :style="cardStyle"
-                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex flex-col gap-5"
+                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex-col gap-5 md:flex"
+                :class="isSettingsOpen ? 'flex' : 'hidden'"
             >
+                <button 
+                    @click="isSettingsOpen = false" 
+                    class="md:hidden absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors"
+                >
+                    <X class="w-4 h-4" />
+                </button>
+
                 <div ref="dragHandleRef" class="w-full cursor-grab active:cursor-grabbing flex justify-center pb-1 -mt-2 opacity-50 hover:opacity-100 transition-opacity">
                     <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
                 </div>
@@ -278,7 +298,12 @@ onMounted(() => {
 }
 .leaflet-popup-content {
     margin: 0 !important;
-    width: 240px !important;
+    width: 200px !important;
+}
+@media (min-width: 640px) {
+    .leaflet-popup-content {
+        width: 240px !important;
+    }
 }
 .leaflet-popup-close-button {
     color: white !important;

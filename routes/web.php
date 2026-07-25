@@ -59,7 +59,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/verifications/{kos}/document/{document}', [AdminVerificationController::class, 'downloadLegalDoc'])->name('verifications.document');
 
             Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
-            Route::resource('reports', App\Http\Controllers\Admin\ReportController::class)->only(['index', 'show', 'update']);
+            Route::resource('reports', App\Http\Controllers\Admin\ReportController::class)->only(['index', 'show', 'update', 'destroy']);
             Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show']);
             Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
             Route::get('/withdrawals/{withdrawal}', [WithdrawalController::class, 'show'])->name('withdrawals.show');

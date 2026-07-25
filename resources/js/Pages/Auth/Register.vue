@@ -100,7 +100,7 @@ const submit = () => {
         </div>
 
         <!-- Step 2: Registration Form -->
-        <Card v-else class="border-0 shadow-lg sm:rounded-xl overflow-hidden">
+        <Card v-else class="border-0 shadow-none bg-transparent">
             <CardHeader class="space-y-2 text-center pb-6">
                 <CardTitle class="text-2xl font-bold tracking-tight">
                     {{ form.role === 'penyewa' ? 'Daftar Sebagai Penyewa' : 'Daftar Sebagai Pemilik Kos' }}
@@ -221,7 +221,7 @@ const submit = () => {
                     </Button>
                 </form>
             </CardContent>
-            <CardFooter class="flex flex-col gap-3 border-t p-4">
+            <CardFooter class="flex flex-col gap-3 pt-6">
                 <Button variant="ghost" class="w-full text-muted-foreground" @click="goBack">
                     <ArrowLeft class="w-4 h-4 mr-2" /> Pilih jenis akun lain
                 </Button>

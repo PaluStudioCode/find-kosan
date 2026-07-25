@@ -4,8 +4,9 @@ import 'vue-sonner/style.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createApp, h } from 'vue';
+import { createApp, h, Fragment } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import PageTransition from './Components/PageTransition.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,7 +18,12 @@ createInertiaApp({
             import.meta.glob('./Pages/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
+        return createApp({ 
+            render: () => h(Fragment, [
+                h(App, props),
+                h(PageTransition)
+            ]) 
+        })
             .use(plugin)
             .use(ZiggyVue)
             .mount(el);

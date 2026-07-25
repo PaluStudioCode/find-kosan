@@ -37,7 +37,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
-        <Card>
+        <Card class="border-0 shadow-none bg-transparent">
             <CardHeader class="space-y-1 text-center">
                 <CardTitle class="text-2xl font-bold">Masuk</CardTitle>
                 <CardDescription>
@@ -112,9 +112,9 @@ const submit = () => {
                     </Button>
                 </form>
             </CardContent>
-            <CardFooter class="flex justify-center border-t p-4">
+            <CardFooter class="flex justify-center pt-6">
                 <p class="text-sm text-muted-foreground">
-                    Belum punya akun pemilik kos?
+                    Belum punya akun?
                     <Link :href="route('register')" class="font-semibold text-primary hover:underline">
                         Daftar sekarang
                     </Link>

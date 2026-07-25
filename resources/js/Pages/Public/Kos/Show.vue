@@ -215,48 +215,28 @@ const cheapestPrice = computed(() => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left: Info -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-2 space-y-8">
                     <!-- Title & Location -->
-                    <div>
-                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">{{ kos.name }}</h1>
-                        <p class="text-slate-500 mt-1.5 flex items-start gap-1.5 text-sm">
-                            <MapPin class="w-4 h-4 mt-0.5 shrink-0" />
+                    <div class="border-b border-slate-200 pb-6">
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">{{ kos.name }}</h1>
+                        <p class="text-slate-500 mt-2 flex items-start gap-1.5 text-sm font-medium">
+                            <MapPin class="w-4 h-4 mt-0.5 shrink-0 text-teal-600" />
                             <span>{{ [kos.address, kos.subdistrict, kos.district, kos.city].filter(Boolean).join(', ') }}</span>
                         </p>
                     </div>
 
-                    <!-- Quick Stats -->
-                    <div class="flex flex-wrap gap-3">
-                        <div class="flex items-center gap-2 px-3 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium">
-                            <DoorOpen class="w-4 h-4" />
-                            {{ kos.rooms.length }} Kamar
-                        </div>
-                        <div v-if="availableRooms.length > 0" class="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium">
-                            <CheckCircle2 class="w-4 h-4" />
-                            {{ availableRooms.length }} Tersedia
-                        </div>
-                        <div v-if="cheapestPrice" class="flex items-center gap-2 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium">
-                            Mulai {{ formatRupiah(cheapestPrice) }}
-                        </div>
-                        <a href="#ulasan" class="flex items-center gap-1.5 px-3 py-2 bg-yellow-50 text-yellow-700 rounded-lg text-sm font-medium">
-                            <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            {{ reviewSummary.average ?? 'Baru' }}
-                            <span class="font-normal">({{ reviewSummary.total }} ulasan)</span>
-                        </a>
-                    </div>
-
                     <!-- Description -->
-                    <div>
-                        <h2 class="text-lg font-semibold text-slate-900 mb-2">Tentang Kos Ini</h2>
+                    <div class="border-b border-slate-200 pb-6">
+                        <h2 class="text-lg font-bold text-slate-900 mb-3">Tentang Kos Ini</h2>
                         <div class="text-slate-600 text-[15px] leading-relaxed whitespace-pre-wrap">{{ kos.description }}</div>
                     </div>
 
                     <!-- Facilities -->
                     <div v-if="kos.facilities.length > 0">
-                        <h2 class="text-lg font-semibold text-slate-900 mb-3">Fasilitas Umum</h2>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            <div v-for="fac in kos.facilities" :key="fac.id" class="flex items-center gap-2 text-sm text-slate-600 py-1.5">
-                                <CheckCircle2 class="w-4 h-4 text-teal-500 shrink-0" />
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">Fasilitas Umum</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div v-for="fac in kos.facilities" :key="fac.id" class="flex items-center gap-3 text-sm text-slate-700 font-medium">
+                                <CheckCircle2 class="w-5 h-5 text-teal-500 shrink-0" />
                                 <span>{{ fac.name }}</span>
                             </div>
                         </div>
@@ -265,93 +245,103 @@ const cheapestPrice = computed(() => {
 
                 <!-- Right: Sticky Summary Card -->
                 <div>
-                    <div class="sticky top-20 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+                    <div class="sticky top-24 bg-white border border-slate-200 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] space-y-6">
                         <div v-if="cheapestPrice">
-                            <p class="text-sm text-slate-500">Harga mulai</p>
-                            <p class="text-2xl font-bold text-slate-900">{{ formatRupiah(cheapestPrice) }}<span class="text-sm font-normal text-slate-500"> /bulan</span></p>
+                            <p class="text-sm text-slate-500 font-medium">Harga mulai</p>
+                            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ formatRupiah(cheapestPrice) }}<span class="text-base font-medium text-slate-500"> /bulan</span></p>
                         </div>
-                        <div class="flex items-center justify-between text-sm border-t pt-3">
-                            <span class="text-slate-500">Kamar tersedia</span>
-                            <span class="font-semibold text-emerald-600">{{ availableRooms.length }} dari {{ kos.rooms.length }}</span>
+                        
+                        <div class="flex items-center justify-between text-sm border-y border-slate-100 py-4">
+                            <span class="text-slate-600 font-medium">Kamar tersedia</span>
+                            <span class="font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">{{ availableRooms.length }} kamar</span>
                         </div>
-                        <a href="#daftar-kamar" class="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white py-2.5 rounded-lg font-medium transition-colors text-sm">
-                            Lihat Pilihan Kamar
-                        </a>
-                        <a href="#ulasan" class="flex w-full items-center justify-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 py-2.5 rounded-lg font-medium transition-colors text-sm">
-                            <MessageSquare class="w-4 h-4" />
-                            Lihat Rating & Komentar
-                        </a>
-                        <Button
-                            v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'"
-                            type="button"
-                            variant="ghost"
-                            class="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
-                            @click="openReportDialog"
-                        >
-                            <Flag class="w-4 h-4" />
-                            Laporkan Kos Ini
-                        </Button>
-                        <Link v-else :href="route('login')" class="block">
-                            <Button type="button" variant="ghost" class="w-full text-red-600 hover:bg-red-50 hover:text-red-700">
-                                <Flag class="w-4 h-4" />
-                                Login untuk Melapor
+                        
+                        <div class="flex items-center justify-between text-sm pb-2">
+                             <a href="#ulasan" class="flex items-center gap-1.5 text-slate-700 hover:text-teal-600 font-bold transition-colors">
+                                 <Star class="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                                 {{ reviewSummary.average ?? 'Baru' }} <span class="font-medium text-slate-500">({{ reviewSummary.total }} ulasan)</span>
+                             </a>
+                        </div>
+                        
+                        <div class="space-y-3 pt-2">
+                            <a href="#daftar-kamar" class="flex w-full justify-center items-center bg-teal-500 hover:bg-teal-600 text-white h-12 rounded-full font-bold transition-all hover:-translate-y-0.5 shadow-md">
+                                Lihat Pilihan Kamar
+                            </a>
+                        </div>
+                        
+                        <!-- Report Button -->
+                        <div class="pt-2 flex justify-center">
+                            <Button
+                                v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'"
+                                type="button"
+                                variant="ghost"
+                                class="text-xs text-slate-400 hover:text-slate-600 hover:bg-slate-50 h-auto py-1.5 px-3 rounded-full transition-colors"
+                                @click="openReportDialog"
+                            >
+                                <Flag class="w-3 h-3 mr-1.5" />
+                                Laporkan Kos Ini
                             </Button>
-                        </Link>
-                        <div v-if="!$page.props.auth.user" class="text-center text-xs text-slate-400">
-                            <Link :href="route('login')" class="text-teal-600 hover:underline">Masuk</Link> untuk memesan kamar
+                            <Link v-else :href="route('login')" class="text-xs text-slate-400 hover:text-slate-600 hover:underline inline-flex items-center py-1.5 px-3">
+                                <Flag class="w-3 h-3 mr-1.5" />
+                                Login untuk Melapor
+                            </Link>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Rooms Section -->
-            <div id="daftar-kamar" class="mt-10 scroll-mt-20">
-                <h2 class="text-xl font-bold text-slate-900 mb-5">Pilihan Kamar</h2>
+            <div id="daftar-kamar" class="mt-12 scroll-mt-24 border-t border-slate-200 pt-8">
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-6">Pilihan Kamar</h2>
 
-                <div v-if="kos.rooms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div v-if="kos.rooms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div 
                         v-for="room in kos.rooms" 
                         :key="room.id" 
-                        class="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-teal-200 transition-all duration-200 flex flex-col"
-                        :class="{ 'opacity-50': room.status !== 'tersedia' }"
+                        class="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-lg hover:border-teal-200 transition-all duration-300 flex flex-col"
+                        :class="{ 'opacity-60': room.status !== 'tersedia' }"
                     >
                         <!-- Header: Name + Status -->
-                        <div class="flex items-start justify-between gap-2 mb-3">
+                        <div class="flex items-start justify-between gap-3 mb-4">
                             <div>
-                                <h3 class="font-semibold text-slate-900 leading-tight">{{ room.name || `Kamar ${room.room_number}` }}</h3>
-                                <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                                    No. {{ room.room_number }} · <Users class="w-3 h-3" /> {{ room.capacity }} orang
+                                <h3 class="font-bold text-lg text-slate-900 leading-tight">{{ room.name || `Kamar ${room.room_number}` }}</h3>
+                                <p class="text-sm text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
+                                    No. {{ room.room_number }} · <Users class="w-4 h-4 text-slate-400" /> {{ room.capacity }} org
                                 </p>
                             </div>
-                            <span v-if="room.status !== 'tersedia'" class="shrink-0 bg-red-100 text-red-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                            <span v-if="room.status !== 'tersedia'" class="shrink-0 bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg">
                                 Penuh
                             </span>
-                            <span v-else class="shrink-0 bg-emerald-100 text-emerald-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                            <span v-else class="shrink-0 bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-lg">
                                 Tersedia
                             </span>
                         </div>
 
                         <!-- Price -->
-                        <div class="mb-3">
-                            <span class="text-xl font-bold text-teal-600">{{ formatRupiah(room.price) }}</span>
-                            <span class="text-xs text-slate-400 ml-0.5">/ {{ room.price_period }}</span>
+                        <div class="mb-4">
+                            <span class="text-2xl font-extrabold text-slate-900">{{ formatRupiah(room.price) }}</span>
+                            <span class="text-sm font-medium text-slate-500 ml-1">/ {{ room.price_period }}</span>
                         </div>
 
                         <!-- Description -->
-                        <p v-if="room.description" class="text-sm text-slate-500 mb-3 line-clamp-2">{{ room.description }}</p>
+                        <p v-if="room.description" class="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">{{ room.description }}</p>
 
                         <!-- Room Facilities -->
-                        <div v-if="room.facilities.length > 0" class="mb-4">
-                            <Popover>
+                        <div v-if="room.facilities.length > 0" class="mb-6 flex flex-wrap gap-2">
+                            <!-- Display first 3, then popover for rest to save space -->
+                            <span v-for="fac in room.facilities.slice(0, 3)" :key="fac.id" class="inline-flex items-center gap-1 bg-slate-50 text-slate-600 text-[11px] font-semibold px-2.5 py-1 rounded-md border border-slate-100">
+                                {{ fac.name }}
+                            </span>
+                            <Popover v-if="room.facilities.length > 3">
                                 <PopoverTrigger as-child>
-                                    <button type="button" class="text-xs text-teal-600 font-medium hover:text-teal-700 transition-colors">
-                                        Lihat {{ room.facilities.length }} Fasilitas
+                                    <button type="button" class="inline-flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-teal-600 text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-100 transition-colors">
+                                        +{{ room.facilities.length - 3 }} lainnya
                                     </button>
                                 </PopoverTrigger>
-                                <PopoverContent class="w-56 p-3" align="start">
-                                    <p class="text-xs font-semibold text-slate-900 mb-2">Fasilitas Kamar</p>
+                                <PopoverContent class="w-56 p-3 rounded-xl border-slate-100 shadow-xl" align="start">
+                                    <p class="text-xs font-bold text-slate-900 mb-2">Fasilitas Kamar</p>
                                     <div class="flex flex-col gap-1.5">
-                                        <div v-for="fac in room.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-slate-600">
+                                        <div v-for="fac in room.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                             <CheckCircle2 class="w-3 h-3 text-teal-500 shrink-0" />
                                             {{ fac.name }}
                                         </div>
@@ -364,23 +354,28 @@ const cheapestPrice = computed(() => {
                         <div class="mt-auto">
                             <template v-if="room.status === 'tersedia'">
                                 <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'">
-                                    <Button class="w-full" size="sm" @click="openBookModal(room)">
+                                    <Button class="w-full rounded-full font-bold h-11 bg-slate-900 hover:bg-slate-800 text-white transition-all hover:-translate-y-0.5 shadow-md" @click="openBookModal(room)">
                                         Pesan Kamar Ini
                                     </Button>
                                 </template>
                                 <template v-else-if="!$page.props.auth.user">
                                     <Link :href="route('login')" class="block">
-                                        <Button class="w-full" size="sm" variant="outline">
+                                        <Button class="w-full rounded-full font-bold h-11 border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm" variant="outline">
                                             Login untuk Pesan
                                         </Button>
                                     </Link>
                                 </template>
                             </template>
+                            <template v-else>
+                                <Button class="w-full rounded-full font-bold h-11 bg-slate-100 text-slate-400 hover:bg-slate-100 cursor-not-allowed" disabled>
+                                    Tidak Tersedia
+                                </Button>
+                            </template>
                         </div>
                     </div>
                 </div>
 
-                <div v-else class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <div v-else class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                     <BedDouble class="w-10 h-10 text-slate-300 mx-auto mb-3" />
                     <p class="text-slate-500 font-medium">Belum ada kamar yang tersedia saat ini.</p>
                     <p class="text-slate-400 text-sm mt-1">Silakan kembali lagi nanti.</p>

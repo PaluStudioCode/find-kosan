@@ -206,7 +206,7 @@ const showLegalDocsModal = ref(false);
                     </div>
 
                     <!-- Action Bar -->
-                    <div class="p-4 bg-gray-50/80 flex flex-col sm:flex-row items-center justify-between gap-3" v-if="kos.status === 'menunggu_verifikasi'">
+                    <div class="p-4 bg-gray-50/80 flex flex-col sm:flex-row items-center justify-between gap-3" v-if="kos.status === 'menunggu_verifikasi' || kos.pending_revisions">
                         <Button type="button" @click="showRejectForm = true" variant="ghost" class="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm">
                             Tolak Pengajuan
                         </Button>

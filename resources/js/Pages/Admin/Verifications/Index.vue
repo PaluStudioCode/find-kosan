@@ -37,6 +37,7 @@ const formatDate = (date) => {
         <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
             <div class="flex items-center gap-4 border-b pb-4 overflow-x-auto whitespace-nowrap">
                 <button @click="currentStatus = 'menunggu_verifikasi'" class="px-4 py-2 rounded-full text-sm font-medium transition-colors" :class="currentStatus === 'menunggu_verifikasi' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">Menunggu Verifikasi</button>
+                <button @click="currentStatus = 'revisi'" class="px-4 py-2 rounded-full text-sm font-medium transition-colors" :class="currentStatus === 'revisi' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">Revisi Data</button>
                 <button @click="currentStatus = 'dipublikasikan'" class="px-4 py-2 rounded-full text-sm font-medium transition-colors" :class="currentStatus === 'dipublikasikan' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">Dipublikasikan</button>
                 <button @click="currentStatus = 'ditolak'" class="px-4 py-2 rounded-full text-sm font-medium transition-colors" :class="currentStatus === 'ditolak' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">Ditolak</button>
                 <button @click="currentStatus = 'nonaktif'" class="px-4 py-2 rounded-full text-sm font-medium transition-colors" :class="currentStatus === 'nonaktif' ? 'bg-red-200 text-red-900' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">Nonaktif (Sanksi)</button>
@@ -66,7 +67,7 @@ const formatDate = (date) => {
                             </TableCell>
                             <TableCell>{{ formatDate(kos.updated_at) }}</TableCell>
                             <TableCell>
-                                <span v-if="kos.pending_revisions && kos.status === 'menunggu_verifikasi'" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                <span v-if="kos.pending_revisions" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                     Revisi Data
                                 </span>
                                 <span v-else class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
@@ -75,8 +76,8 @@ const formatDate = (date) => {
                             </TableCell>
                             <TableCell class="text-right">
                                 <Link :href="route('admin.verifications.show', kos.id)">
-                                    <Button size="sm" :variant="kos.status === 'menunggu_verifikasi' ? 'default' : 'secondary'">
-                                        {{ kos.status === 'menunggu_verifikasi' ? 'Tinjau' : 'Detail' }}
+                                    <Button size="sm" :variant="(kos.status === 'menunggu_verifikasi' || kos.pending_revisions) ? 'default' : 'secondary'">
+                                        {{ (kos.status === 'menunggu_verifikasi' || kos.pending_revisions) ? 'Tinjau' : 'Detail' }}
                                     </Button>
                                 </Link>
                             </TableCell>

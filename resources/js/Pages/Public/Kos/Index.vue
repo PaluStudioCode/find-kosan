@@ -81,6 +81,13 @@ const initMap = () => {
         maxZoom: 20
     }).addTo(map);
 
+    // Allow user to click anywhere on the map to set location
+    map.on('click', (e) => {
+        latitude.value = e.latlng.lat;
+        longitude.value = e.latlng.lng;
+        updateMapMarkers();
+    });
+
     updateMapMarkers();
 };
 
@@ -97,13 +104,22 @@ const updateMapMarkers = () => {
 
     if (latitude.value && longitude.value) {
         userMarker = L.marker([latitude.value, longitude.value], {
+            draggable: true,
             icon: L.divIcon({
                 className: 'custom-user-marker',
-                html: `<div style="width: 20px; height: 20px; background-color: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
+                html: `<div style="width: 20px; height: 20px; background-color: #3b82f6; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5); cursor: grab;"></div>`,
                 iconSize: [20, 20],
                 iconAnchor: [10, 10]
             })
-        }).addTo(map).bindPopup('Lokasi Anda');
+        }).addTo(map).bindPopup('Lokasi Anda (Bisa digeser/klik peta)');
+
+        // Update location when the marker is dragged and dropped
+        userMarker.on('dragend', (e) => {
+            const position = e.target.getLatLng();
+            latitude.value = position.lat;
+            longitude.value = position.lng;
+            updateMapMarkers();
+        });
 
         radiusCircle = L.circle([latitude.value, longitude.value], {
             color: '#3b82f6',
@@ -246,7 +262,7 @@ onMounted(() => {
                         </span>
                         Cari Kos Sekitar
                     </h2>
-                    <p class="text-xs text-slate-500 leading-relaxed font-medium">Aktifkan GPS Anda dan geser slider untuk menemukan kos yang masuk dalam area radius.</p>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">Gunakan GPS, klik area peta, atau geser pin biru untuk menentukan titik tengah pencarian Anda.</p>
                 </div>
 
                 <Button @click="getLocation(false)" size="default" class="w-full gap-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-md h-12 transition-all hover:-translate-y-0.5" :disabled="detectingLocation">

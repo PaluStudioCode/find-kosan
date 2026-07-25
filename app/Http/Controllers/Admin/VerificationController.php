@@ -17,9 +17,16 @@ class VerificationController extends Controller
 
         // Default to pending verifications if no status selected
         if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+            if ($request->status === 'revisi') {
+                $query->whereNotNull('pending_revisions');
+            } else {
+                $query->where('status', $request->status);
+            }
         } else if (!$request->has('status')) {
-            $query->where('status', 'menunggu_verifikasi');
+            $query->where(function($q) {
+                $q->where('status', 'menunggu_verifikasi')
+                  ->orWhereNotNull('pending_revisions');
+            });
         }
 
         $verifications = $query->paginate(15)->withQueryString();
@@ -41,7 +48,7 @@ class VerificationController extends Controller
 
     public function approve(BoardingHouse $kos)
     {
-        if ($kos->status === 'menunggu_verifikasi') {
+        if ($kos->status === 'menunggu_verifikasi' || $kos->pending_revisions) {
             // Check for shadow revision
             if ($kos->pending_revisions) {
                 // Apply pending revisions
@@ -55,7 +62,7 @@ class VerificationController extends Controller
             $kos->verification_note = null;
             $kos->save();
 
-            return redirect()->route('admin.verifications.index')->with('success', 'Kos berhasil disetujui dan dipublikasikan.');
+            return redirect()->route('admin.verifications.index')->with('success', 'Kos / Revisi berhasil disetujui dan dipublikasikan.');
         }
 
         return back()->with('error', 'Status kos tidak valid untuk disetujui.');
@@ -67,11 +74,9 @@ class VerificationController extends Controller
             'note' => 'required|string|min:5'
         ]);
 
-        if ($kos->status === 'menunggu_verifikasi') {
+        if ($kos->status === 'menunggu_verifikasi' || $kos->pending_revisions) {
             if ($kos->pending_revisions) {
-                // If rejecting a shadow revision, we just clear the pending revisions and revert status back to dipublikasikan?
-                // Or maybe set status to dipublikasikan but add a verification note?
-                // PRD: "Data lama yang valid tetap akan tampil di publik sampai revisi disetujui". If rejected, it stays dipublikasikan but revision is cleared.
+                // If rejecting a shadow revision, clear the pending revisions and revert status back to dipublikasikan
                 $kos->pending_revisions = null;
                 $kos->status = 'dipublikasikan';
                 $kos->verification_note = 'Revisi ditolak: ' . $request->note;

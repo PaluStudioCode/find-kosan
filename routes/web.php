@@ -92,6 +92,8 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
+            
+            Route::get('/reports', [App\Http\Controllers\Owner\ReportController::class, 'index'])->name('reports.index');
         });
 
         // Role Penyewa

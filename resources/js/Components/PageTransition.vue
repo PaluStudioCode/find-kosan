@@ -7,11 +7,21 @@ const isTransitioning = ref(false);
 let timeout = null;
 
 onMounted(() => {
-    router.on('start', () => {
+    router.on('start', (event) => {
+        // Cek URL tujuan
+        const targetPath = event.detail.visit.url.pathname;
+        
+        // Jangan tampilkan transisi jika berada di area admin atau owner
+        if (targetPath.startsWith('/admin') || targetPath.startsWith('/owner')) {
+            return;
+        }
+        
         isTransitioning.value = true;
     });
 
     router.on('finish', () => {
+        if (!isTransitioning.value) return;
+        
         // Keep the splash screen up for a fraction of a second after load to ensure DOM is ready and it looks smooth
         timeout = setTimeout(() => {
             isTransitioning.value = false;

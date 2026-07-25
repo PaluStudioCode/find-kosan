@@ -24,7 +24,7 @@ const activeTab = ref('info');
 const tabs = [
     { id: 'info', name: 'Info Utama' },
     { id: 'rooms', name: 'Manajemen Kamar' },
-    { id: 'photos', name: 'Galeri & Pembayaran' },
+    { id: 'photos', name: 'Galeri' },
     { id: 'legal', name: 'Dokumen Legalitas' },
     { id: 'verification', name: 'Status & Verifikasi' },
 ];

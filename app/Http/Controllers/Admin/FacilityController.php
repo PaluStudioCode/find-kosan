@@ -27,7 +27,7 @@ class FacilityController extends Controller
 
         $facilities = $query->orderBy('type')
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return Inertia::render('Admin/Facilities/Index', [

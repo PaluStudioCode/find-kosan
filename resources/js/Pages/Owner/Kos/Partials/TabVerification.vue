@@ -43,14 +43,26 @@ const canSubmit = hasLegalDocs && hasPhotos && ['draft', 'ditolak', 'nonaktif'].
 </script>
 
 <template>
-    <div class="max-w-3xl mx-auto space-y-8 py-4">
+    <div class="max-w-3xl mx-auto space-y-6 py-4">
         
-        <div class="text-center space-y-4 mb-8">
-            <h3 class="text-2xl font-bold">Status Publikasi Properti</h3>
-            <div class="flex justify-center items-center gap-2 text-lg">
-                Status Saat Ini: <StatusBadge :status="kos.status" class="text-lg px-3 py-1" />
+        <div class="text-center space-y-3 mb-6">
+            <h3 class="text-xl font-bold">Status Publikasi Properti</h3>
+            <div class="flex justify-center items-center gap-2 text-base">
+                Status Saat Ini: <StatusBadge :status="kos.status" class="px-2 py-0.5" />
             </div>
-            <p v-if="kos.status === 'dipublikasikan'" class="text-green-600 font-medium">Properti Anda sedang aktif dan dapat dilihat oleh publik.</p>
+            <p v-if="kos.status === 'dipublikasikan'" class="text-green-600 font-medium text-sm">Properti Anda sedang aktif dan dapat dilihat oleh publik.</p>
+        </div>
+
+        <!-- BANNER SANKSI COMPACT -->
+        <div v-if="kos.status === 'nonaktif' && kos.reports && kos.reports.length > 0" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <ShieldAlert class="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div>
+                <h4 class="font-bold text-red-800 text-sm">Ditangguhkan oleh Admin</h4>
+                <p class="text-xs text-red-700 mt-1">Kos diturunkan dari publik akibat pelanggaran/laporan. Silakan perbaiki data dan ajukan verifikasi ulang.</p>
+                <div class="mt-2 bg-white/60 p-2.5 rounded text-xs text-red-900 border border-red-100">
+                    <span class="font-bold">Catatan Admin:</span> {{ kos.reports[0].resolution_note }}
+                </div>
+            </div>
         </div>
 
         <div v-if="kos.status === 'ditolak'" class="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-4">

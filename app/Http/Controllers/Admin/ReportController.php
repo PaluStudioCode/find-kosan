@@ -9,14 +9,36 @@ use Inertia\Inertia;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reports = Report::with(['reporter', 'boardingHouse'])
-            ->latest()
-            ->paginate(15);
+        $query = Report::with(['reporter', 'boardingHouse.owner']);
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('boardingHouse.owner', function($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                })->orWhereHas('boardingHouse', function($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                })->orWhereHas('reporter', function($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($request->has('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('category') && $request->category != 'all') {
+            $query->where('category', $request->category);
+        }
+
+        $reports = $query->latest()->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Reports/Index', [
-            'reports' => $reports
+            'reports' => $reports,
+            'filters' => request()->all(['search', 'status', 'category'])
         ]);
     }
 
@@ -32,7 +54,7 @@ class ReportController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:menunggu,selesai',
-            'resolution_note' => 'nullable|string|max:1000',
+            'resolution_note' => 'required|string|min:5|max:1000',
             'sanction' => 'nullable|in:none,suspend_kos,ban_kos,ban_owner',
         ]);
 
@@ -49,8 +71,8 @@ class ReportController extends Controller
             $kos = $report->boardingHouse;
             
             if ($sanction === 'suspend_kos') {
-                // Change status to suspended so it hides from public search
-                $kos->update(['status' => 'suspended']);
+                // Change status to nonaktif so it hides from public search
+                $kos->update(['status' => 'nonaktif']);
             } elseif ($sanction === 'ban_kos') {
                 // Soft delete the boarding house
                 $kos->delete();
@@ -69,6 +91,19 @@ class ReportController extends Controller
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent()
             ]);
+
+            // Auto-resolve laporan lain yang masih menunggu untuk kos ini
+            if ($kos) {
+                Report::where('boarding_house_id', $kos->id)
+                    ->where('id', '!=', $report->id)
+                    ->where('status', 'menunggu')
+                    ->update([
+                        'status' => 'selesai',
+                        'resolution_note' => "Laporan ditutup otomatis karena properti telah dijatuhi sanksi '{$sanction}' berdasarkan Laporan #{$report->id}.",
+                        'handled_by' => auth()->id(),
+                        'handled_at' => now(),
+                    ]);
+            }
         }
 
         if ($validated['status'] === 'selesai') {

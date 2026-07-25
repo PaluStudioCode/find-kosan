@@ -26,7 +26,7 @@ class Report extends Model
 
     public function boardingHouse()
     {
-        return $this->belongsTo(BoardingHouse::class);
+        return $this->belongsTo(BoardingHouse::class)->withTrashed();
     }
 
     public function handler()

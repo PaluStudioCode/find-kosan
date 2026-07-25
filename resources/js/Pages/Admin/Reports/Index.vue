@@ -1,13 +1,34 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Eye, CheckCircle, AlertCircle, Clock, XCircle } from 'lucide-vue-next';
+import { Eye, CheckCircle, AlertCircle, Clock, XCircle, Search } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-defineProps({
+const props = defineProps({
     reports: Object,
+    filters: Object,
+});
+
+const search = ref(props.filters?.search || '');
+const status = ref(props.filters?.status || 'all');
+const category = ref(props.filters?.category || 'all');
+
+let searchTimeout = null;
+
+watch([search, status, category], ([newSearch, newStatus, newCategory]) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        router.get(
+            route('admin.reports.index'),
+            { search: newSearch, status: newStatus, category: newCategory },
+            { preserveState: true, preserveScroll: true, replace: true }
+        );
+    }, 300);
 });
 
 const statusIcon = (status) => {
@@ -53,7 +74,34 @@ const categoryLabel = (cat) => {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Daftar Laporan Masuk</CardTitle>
+                    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+                        <CardTitle>Daftar Laporan Masuk</CardTitle>
+                        
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                            <div class="relative w-full sm:w-64">
+                                <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                                <Input v-model="search" placeholder="Cari kos, owner, pelapor..." class="pl-9 bg-white" />
+                            </div>
+                            <Select v-model="status">
+                                <SelectTrigger class="w-full sm:w-40 bg-white"><SelectValue placeholder="Status" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Status</SelectItem>
+                                    <SelectItem value="menunggu">Menunggu</SelectItem>
+                                    <SelectItem value="selesai">Selesai</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select v-model="category">
+                                <SelectTrigger class="w-full sm:w-48 bg-white"><SelectValue placeholder="Kategori" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Kategori</SelectItem>
+                                    <SelectItem value="data_kos_tidak_valid">Data Tidak Valid</SelectItem>
+                                    <SelectItem value="kontak_tidak_valid">Kontak Tidak Valid</SelectItem>
+                                    <SelectItem value="foto_tidak_sesuai">Foto Tidak Sesuai</SelectItem>
+                                    <SelectItem value="lainnya">Lainnya</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table v-if="reports.data.length > 0">
@@ -61,6 +109,7 @@ const categoryLabel = (cat) => {
                             <TableRow>
                                 <TableHead>Tgl Lapor</TableHead>
                                 <TableHead>Pelapor</TableHead>
+                                <TableHead>Terlapor (Kos & Owner)</TableHead>
                                 <TableHead>Kategori</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead class="text-right">Aksi</TableHead>
@@ -70,12 +119,20 @@ const categoryLabel = (cat) => {
                             <TableRow v-for="report in reports.data" :key="report.id">
                                 <TableCell>{{ new Date(report.created_at).toLocaleDateString('id-ID') }}</TableCell>
                                 <TableCell>
-                                    <div class="font-medium">{{ report.reporter?.name }}</div>
-                                    <div class="text-xs text-gray-500 capitalize">{{ report.reporter?.role.replace('_', ' ') }}</div>
+                                    <div class="font-medium">{{ report.reporter?.name || 'Anonim' }}</div>
+                                    <div class="text-xs text-gray-500 capitalize">{{ report.reporter?.role?.replace('_', ' ') || '-' }}</div>
                                 </TableCell>
-                                <TableCell>{{ categoryLabel(report.category) }}</TableCell>
                                 <TableCell>
-                                    <div class="flex items-center gap-1 font-medium capitalize" :class="statusColor(report.status)">
+                                    <div class="font-medium text-primary">{{ report.boarding_house?.name || 'Kos Tidak Diketahui' }}</div>
+                                    <div class="text-xs text-gray-500">Pemilik: {{ report.boarding_house?.owner?.name || 'Tidak Ada Data' }}</div>
+                                </TableCell>
+                                <TableCell>
+                                    <span class="inline-flex px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium">
+                                        {{ categoryLabel(report.category) }}
+                                    </span>
+                                </TableCell>
+                                <TableCell>
+                                    <div class="flex items-center gap-1.5 font-medium capitalize text-sm" :class="statusColor(report.status)">
                                         <component :is="statusIcon(report.status)" class="w-4 h-4" />
                                         {{ report.status }}
                                     </div>

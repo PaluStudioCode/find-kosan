@@ -21,7 +21,7 @@ const props = defineProps({
 const { toast } = useToast();
 
 const form = useForm({
-    status: props.report.status,
+    status: 'selesai',
     resolution_note: props.report.resolution_note || '',
     sanction: 'none',
 });
@@ -156,7 +156,7 @@ const categoryLabel = (cat) => {
                     </div>
 
                     <!-- Bottom Action Bar -->
-                    <div class="p-4 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div v-if="report.status !== 'selesai'" class="p-4 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
                         <Button type="button" @click="confirmReportDeletion" variant="ghost" class="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm">
                             Hapus Laporan (Tidak Valid)
                         </Button>
@@ -192,16 +192,7 @@ const categoryLabel = (cat) => {
                 </DialogHeader>
                 
                 <form @submit.prevent="submit" class="space-y-5 py-2">
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Status Laporan</label>
-                        <Select v-model="form.status">
-                            <SelectTrigger class="bg-white"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="menunggu">Menunggu</SelectItem>
-                                <SelectItem value="selesai">Selesai</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-red-600 flex items-center gap-2"><ShieldAlert class="w-4 h-4" /> Jatuhkan Sanksi</label>
@@ -217,8 +208,9 @@ const categoryLabel = (cat) => {
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Catatan Internal Admin (Opsional)</label>
-                        <Textarea v-model="form.resolution_note" rows="4" class="resize-none bg-white" placeholder="Arsip bukti atau catatan alasan keputusan ini..." />
+                        <label class="text-sm font-medium text-gray-700">Catatan Internal Admin <span class="text-red-500">*</span></label>
+                        <Textarea v-model="form.resolution_note" rows="4" required class="resize-none bg-white" :class="{'border-red-500': form.errors.resolution_note}" placeholder="Wajib diisi. Tuliskan alasan keputusan atau arsip bukti..." />
+                        <p v-if="form.errors.resolution_note" class="text-xs text-red-500">{{ form.errors.resolution_note }}</p>
                     </div>
 
                     <DialogFooter class="mt-4 gap-2 sm:gap-0">

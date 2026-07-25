@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare } from 'lucide-vue-next';
 
 const isMobileMenuOpen = ref(false);
 
@@ -43,7 +43,7 @@ const navItems = computed(() => {
         items.push({ name: 'Properti Kos', route: 'owner.kos.index', icon: Building2 });
         items.push({ name: 'Sewa & Pembayaran', route: 'owner.tenancies.index', icon: Users });
         items.push({ name: 'Saldo & Penarikan', route: 'owner.wallet.index', icon: WalletCards });
-        items.push({ name: 'Ulasan & Pengaduan', route: 'owner.reports.index', icon: Flag });
+        items.push({ name: 'Ulasan Penyewa', route: 'owner.reviews.index', icon: MessageSquare });
     } else if (role === 'penyewa') {
         items.push({ name: 'Beranda Kos', route: 'public.kos.index', icon: LayoutDashboard });
         items.push({ name: 'Sewa & Tagihan', route: 'tenant.tenancies.index', icon: ReceiptText });

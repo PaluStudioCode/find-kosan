@@ -2,7 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ChevronLeft } from 'lucide-vue-next';
+import { ChevronLeft, ShieldAlert } from 'lucide-vue-next';
 import StatusBadge from '@/Components/StatusBadge.vue';
 
 // Partials
@@ -42,6 +42,9 @@ const tabs = [
                 <div class="flex items-center gap-3">
                     <h2 class="text-2xl font-bold text-gray-900">{{ kos.name }}</h2>
                     <StatusBadge :status="kos.status" />
+                    <span v-if="kos.status === 'nonaktif' && kos.reports && kos.reports.length > 0" class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold border border-red-200">
+                        ⚠️ CEK TAB VERIFIKASI
+                    </span>
                 </div>
                 <p v-if="kos.pending_revisions" class="text-xs text-blue-600 mt-2 bg-blue-50 px-2 py-1 rounded inline-block border border-blue-200">
                     Perhatian: Properti ini memiliki revisi data yang sedang menunggu persetujuan (Shadow Revision).

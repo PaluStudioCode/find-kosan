@@ -73,7 +73,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/dashboard', [OwnerDashboard::class, 'index'])->name('dashboard');
 
             // Kos Property Management
-            Route::resource('kos', OwnerKosController::class)->parameters(['kos' => 'kos']);
+            Route::resource('kos', OwnerKosController::class)->parameters(['kos' => 'kos'])->withTrashed();
             Route::resource('kos.rooms', OwnerRoomController::class)->except(['index', 'show'])->parameters(['kos' => 'kos', 'rooms' => 'room']);
             Route::post('kos/{kos}/photos', [OwnerKosPhotoController::class, 'store'])->name('kos.photos.store');
             Route::put('kos/{kos}/photos/{photo}', [OwnerKosPhotoController::class, 'update'])->name('kos.photos.update');
@@ -93,7 +93,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
             
-            Route::get('/reports', [App\Http\Controllers\Owner\ReportController::class, 'index'])->name('reports.index');
+            Route::get('/reviews', [App\Http\Controllers\Owner\ReviewController::class, 'index'])->name('reviews.index');
         });
 
         // Role Penyewa

@@ -13,7 +13,7 @@ class KosController extends Controller
 {
     public function index()
     {
-        $boardingHouses = BoardingHouse::where('owner_id', auth()->id())
+        $boardingHouses = BoardingHouse::withTrashed()->where('owner_id', auth()->id())
             ->with(['photos' => function($q) { $q->where('is_primary', true); }])
             ->withCount('rooms')
             ->latest()
@@ -74,7 +74,10 @@ class KosController extends Controller
             'photos' => function($q) {
                 $q->orderBy('is_primary', 'desc');
             }, 
-            'legalDocuments'
+            'legalDocuments',
+            'reports' => function($q) {
+                $q->whereNotNull('resolution_note')->where('status', 'selesai')->latest();
+            }
         ]);
 
         return Inertia::render('Owner/Kos/Show', [

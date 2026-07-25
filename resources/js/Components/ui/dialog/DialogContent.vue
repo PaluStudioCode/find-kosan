@@ -25,6 +25,7 @@ const props = defineProps({
     skipCheck: true,
   },
   showCloseButton: { type: Boolean, required: false, default: true },
+  hideOverlay: { type: Boolean, required: false, default: false },
 });
 const emits = defineEmits([
   "escapeKeyDown",
@@ -35,14 +36,14 @@ const emits = defineEmits([
   "closeAutoFocus",
 ]);
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, "class", "hideOverlay");
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay v-if="!props.hideOverlay" />
     <DialogContent
       data-slot="dialog-content"
       v-bind="{ ...$attrs, ...forwarded }"

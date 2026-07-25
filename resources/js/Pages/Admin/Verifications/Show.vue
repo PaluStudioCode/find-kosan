@@ -81,208 +81,192 @@ const openDocPreview = (doc) => {
     previewDocUrl.value = route('admin.verifications.document', { kos: props.kos.id, document: doc.id });
     showDocPreview.value = true;
 };
+
+// Legal Docs Modal State
+const showLegalDocsModal = ref(false);
 </script>
 
 <template>
     <AppLayout>
-        <Head :title="`Tinjau Kos - ${kos.name}`" />
+        <Head :title="`Verifikasi: ${kos.name}`" />
 
-        <!-- Header Actions -->
-        <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b pb-4 pt-4 mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex flex-col md:flex-row justify-between md:items-center gap-4">
-            <div>
-                <Link :href="route('admin.verifications.index')" class="text-sm text-gray-500 hover:text-primary transition-colors flex items-center mb-1 w-fit">
-                    <ChevronLeft class="w-4 h-4 mr-1" /> Kembali ke Daftar
-                </Link>
+        <div class="max-w-4xl mx-auto space-y-4">
+            <!-- Header Ringkas -->
+            <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ kos.name }}</h2>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                    <Link :href="route('admin.verifications.index')">
+                        <Button variant="ghost" size="icon" class="rounded-full -ml-2 text-gray-500 hover:text-gray-900"><ChevronLeft class="w-5 h-5" /></Button>
+                    </Link>
+                    <h2 class="text-xl font-semibold text-gray-900">Verifikasi: {{ kos.name }}</h2>
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border"
                         :class="{
                             'bg-orange-50 text-orange-700 border-orange-200': kos.status === 'menunggu_verifikasi',
                             'bg-green-50 text-green-700 border-green-200': kos.status === 'disetujui',
                             'bg-red-50 text-red-700 border-red-200': kos.status === 'ditolak'
                         }">
-                        {{ kos.status.replace('_', ' ').toUpperCase() }}
+                        {{ kos.status.replace('_', ' ') }}
                     </span>
                 </div>
             </div>
-            
-            <div v-if="kos.status === 'menunggu_verifikasi'" class="flex flex-wrap gap-2">
-                <Button variant="outline" class="text-red-600 border-red-200 hover:bg-red-50" @click="showRejectForm = !showRejectForm">
-                    <XCircle class="w-4 h-4 mr-2" /> Tolak Pengajuan
-                </Button>
-                <Button class="bg-green-600 hover:bg-green-700 text-white shadow-sm" @click="confirmingApproval = true">
-                    <CheckCircle class="w-4 h-4 mr-2" /> Setujui & Publikasikan
-                </Button>
+
+            <!-- Revisi Warning -->
+            <div v-if="kos.pending_revisions" class="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
+                <AlertTriangle class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                    <h4 class="font-bold text-blue-800 text-sm">Perhatian: Tinjauan Revisi Data</h4>
+                    <p class="text-blue-700 text-xs mt-1">Pengajuan ini merupakan perubahan data dari properti yang sudah ada. Menyetujui pengajuan ini akan memperbarui data publik.</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Reject Form Dropdown -->
-        <div v-if="showRejectForm" class="bg-red-50 p-5 rounded-xl border border-red-200 mb-8 shadow-sm">
-            <h4 class="font-semibold text-red-800 mb-2 flex items-center">
-                <AlertTriangle class="w-5 h-5 mr-2" /> Alasan Penolakan
-            </h4>
-            <Textarea v-model="rejectForm.note" placeholder="Tuliskan alasan penolakan secara spesifik agar pemilik kos dapat memperbaikinya..." rows="3" class="mb-3 bg-white" />
-            <p v-if="rejectForm.errors.note" class="text-sm text-red-500 mb-3">{{ rejectForm.errors.note }}</p>
-            <div class="flex justify-end gap-2">
-                <Button variant="ghost" class="text-red-700 hover:bg-red-100" @click="showRejectForm = false">Batal</Button>
-                <Button variant="destructive" @click="reject" :disabled="rejectForm.processing">Kirim Penolakan</Button>
-            </div>
-        </div>
-
-        <div v-if="kos.pending_revisions" class="bg-blue-50 p-5 rounded-xl border border-blue-200 mb-8 shadow-sm">
-            <h4 class="font-bold text-blue-800 mb-2 flex items-center">
-                <AlertTriangle class="w-5 h-5 mr-2" /> Perhatian: Tinjauan Revisi Data
-            </h4>
-            <p class="text-blue-700 text-sm mb-4">Pengajuan ini merupakan perubahan data dari properti yang sudah dipublikasikan. Menyetujui pengajuan ini akan menimpa data lama dengan data baru yang diajukan.</p>
-        </div>
-
-
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column: Details -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Info Utama -->
-                <Card class="border-none shadow-sm ring-1 ring-gray-100">
-                    <CardHeader class="pb-4">
-                        <CardTitle class="flex items-center text-xl">
-                            <Home class="w-5 h-5 mr-2 text-primary" /> Informasi Properti
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-5 rounded-xl border border-gray-100">
-                            <div>
-                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Pemilik</p>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                        {{ kos.owner?.name.charAt(0) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900">{{ kos.owner?.name }}</p>
-                                        <p class="text-xs text-gray-500">{{ kos.owner?.email }}</p>
-                                    </div>
+            <!-- Single Clean Card -->
+            <Card class="shadow-sm border-gray-200 overflow-hidden">
+                <CardContent class="p-0">
+                    <!-- Pihak Terkait & Wilayah (Grid) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x border-b border-gray-100">
+                        <div class="p-6 hover:bg-gray-50/50 transition-colors">
+                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Data Pemilik</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0">
+                                    {{ kos.owner?.name.charAt(0).toUpperCase() }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ kos.owner?.name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ kos.owner?.email }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ kos.owner?.whatsapp_number || '-' }}</p>
                                 </div>
                             </div>
+                        </div>
+                        <div class="p-6 hover:bg-gray-50/50 transition-colors">
+                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Wilayah Properti</p>
+                            <div class="flex items-start gap-2">
+                                <MapPin class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ kos.city }}</p>
+                                    <p class="text-xs text-gray-500">{{ kos.district }}, {{ kos.subdistrict }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informasi Dasar & Media -->
+                    <div class="p-6 border-b border-gray-100 space-y-4">
+                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Informasi Properti</p>
+                        
+                        <div class="bg-gray-50 rounded-lg border border-gray-100 p-4">
+                            <p class="text-sm font-medium text-gray-800 mb-1">Alamat Lengkap</p>
+                            <p class="text-sm text-gray-600 mb-4">{{ kos.address }}</p>
+                            
+                            <p class="text-sm font-medium text-gray-800 mb-1">Deskripsi</p>
+                            <p class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{{ kos.description }}</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <Button @click="openPhotoSlider(0)" variant="outline" size="sm" class="text-blue-700 border-blue-200 hover:bg-blue-50 bg-blue-50/30">
+                                <ImageIcon class="w-4 h-4 mr-2" /> {{ kos.photos?.length || 0 }} Foto Galeri
+                            </Button>
+                            <Button @click="openMapModal" variant="outline" size="sm" class="text-green-700 border-green-200 hover:bg-green-50 bg-green-50/30">
+                                <Map class="w-4 h-4 mr-2" /> Tinjau Titik Peta
+                            </Button>
+                            <Button @click="showLegalDocsModal = true" variant="outline" size="sm" class="text-purple-700 border-purple-200 hover:bg-purple-50 bg-purple-50/30">
+                                <FileText class="w-4 h-4 mr-2" /> {{ kos.legal_documents?.length || 0 }} Dokumen Legal
+                            </Button>
+                        </div>
+                    </div>
+
+                    <!-- Fasilitas & Kamar -->
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Wilayah</p>
-                                <p class="font-medium text-gray-900 flex items-start">
-                                    <MapPin class="w-4 h-4 mr-1 text-gray-400 shrink-0 mt-0.5" />
-                                    <span>{{ kos.city }}, {{ kos.district }}, {{ kos.subdistrict }}</span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900 mb-2">Alamat Lengkap</p>
-                            <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-100">{{ kos.address }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900 mb-2">Deskripsi</p>
-                            <div class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-100 whitespace-pre-line leading-relaxed mb-6">
-                                {{ kos.description }}
-                            </div>
-                        </div>
-                        
-                        <div class="pt-2 border-t border-gray-100 flex flex-wrap gap-3">
-                            <Button @click="openPhotoSlider(0)" variant="outline" class="flex-1 sm:flex-none border-blue-200 text-blue-700 hover:bg-blue-50">
-                                <ImageIcon class="w-4 h-4 mr-2" /> Lihat Galeri Foto
-                            </Button>
-                            <Button @click="openMapModal" variant="outline" class="flex-1 sm:flex-none border-green-200 text-green-700 hover:bg-green-50">
-                                <Map class="w-4 h-4 mr-2" /> Tinjau Lokasi Peta
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Fasilitas & Kamar -->
-                <Card class="border-none shadow-sm ring-1 ring-gray-100">
-                    <CardHeader class="pb-4">
-                        <CardTitle class="text-xl">Fasilitas & Kamar</CardTitle>
-                    </CardHeader>
-                    <CardContent class="space-y-8">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900 mb-3">Fasilitas Umum Kos</p>
-                            <div v-if="kos.facilities && kos.facilities.length > 0" class="flex flex-wrap gap-2">
-                                <span v-for="f in kos.facilities" :key="f.id" class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 flex items-center gap-1.5 font-medium shadow-sm">
-                                    <span v-html="f.icon" class="w-4 h-4"></span> {{ f.name }}
-                                </span>
-                            </div>
-                            <p v-else class="text-sm text-gray-500 italic">Tidak ada fasilitas umum.</p>
-                        </div>
-                        
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="text-sm font-semibold text-gray-900">Tipe Kamar</p>
-                                <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2 py-1 rounded-md">{{ kos.rooms?.length || 0 }} Tipe</span>
+                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Fasilitas Umum</p>
+                                <div v-if="kos.facilities?.length > 0" class="flex flex-wrap gap-2">
+                                    <span v-for="f in kos.facilities" :key="f.id" class="px-2.5 py-1 bg-gray-50 border border-gray-200 rounded text-xs text-gray-700 flex items-center gap-1.5">
+                                        <span v-html="f.icon" class="w-3.5 h-3.5"></span> {{ f.name }}
+                                    </span>
+                                </div>
+                                <p v-else class="text-xs text-gray-500 italic">Tidak ada fasilitas.</p>
                             </div>
                             
-                            <div class="space-y-3">
-                                <div v-for="room in kos.rooms" :key="room.id" class="p-4 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <p class="font-bold text-gray-900">{{ room.name }}</p>
-                                            <span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">{{ room.room_number }}</span>
+                            <div>
+                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Daftar Kamar ({{ kos.rooms?.length || 0 }} Tipe)</p>
+                                <div class="space-y-2">
+                                    <div v-for="room in kos.rooms" :key="room.id" class="p-3 border border-gray-100 bg-gray-50/50 rounded-lg flex justify-between items-center">
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-900">{{ room.name }}</p>
+                                            <p class="text-xs text-gray-500">Kapasitas {{ room.capacity }} orang</p>
                                         </div>
-                                        <p class="text-sm text-gray-500 flex items-center">
-                                            <User class="w-3.5 h-3.5 mr-1" /> Kapasitas {{ room.capacity }} orang
-                                        </p>
+                                        <div class="text-right">
+                                            <p class="text-sm font-bold text-primary">Rp {{ Number(room.price).toLocaleString('id-ID') }}</p>
+                                            <p class="text-[10px] text-gray-500 uppercase">/ {{ room.price_period }}</p>
+                                        </div>
                                     </div>
-                                    <div class="sm:text-right bg-gray-50 sm:bg-transparent p-3 sm:p-0 rounded-lg">
-                                        <p class="font-bold text-lg text-primary">Rp {{ Number(room.price).toLocaleString('id-ID') }}</p>
-                                        <p class="text-xs text-gray-500 font-medium">/ {{ room.price_period }}</p>
-                                    </div>
-                                </div>
-                                <div v-if="!kos.rooms || kos.rooms.length === 0" class="text-sm text-gray-500 italic text-center p-6 border rounded-xl bg-gray-50">
-                                    Belum ada kamar yang ditambahkan.
+                                    <p v-if="!kos.rooms?.length" class="text-xs text-gray-500 italic">Belum ada kamar yang didaftarkan.</p>
                                 </div>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
-            </div>
+                    </div>
 
-            <!-- Right Column: Legal Docs & Actions -->
-            <div class="space-y-6">
-                <!-- Legal Docs -->
-                <Card class="border-none shadow-sm ring-1 ring-gray-100 sticky top-[100px]">
-                    <CardHeader class="pb-4 bg-gray-50/50 border-b border-gray-100">
-                        <CardTitle class="flex items-center text-lg">
-                            <FileText class="w-5 h-5 mr-2 text-blue-600" /> Dokumen Legalitas
-                        </CardTitle>
-                        <CardDescription>Dokumen verifikasi untuk memeriksa keabsahan properti kos ini.</CardDescription>
-                    </CardHeader>
-                    <CardContent class="pt-6">
-                        <div v-if="!kos.legal_documents || kos.legal_documents.length === 0" class="text-center p-6 bg-red-50 rounded-xl border border-red-100">
-                            <AlertTriangle class="w-8 h-8 text-red-400 mx-auto mb-2" />
-                            <p class="text-sm text-red-700 font-medium">Tidak ada dokumen legalitas terlampir.</p>
-                            <p class="text-xs text-red-500 mt-1">Kos tidak memenuhi syarat verifikasi.</p>
-                        </div>
-                        <div v-else class="space-y-3">
-                            <div v-for="doc in kos.legal_documents" :key="doc.id" 
-                                class="group flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-blue-200 transition-colors cursor-pointer"
-                                @click="openDocPreview(doc)">
-                                <div class="flex items-center gap-3 overflow-hidden">
-                                    <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                                        <FileText class="w-5 h-5" />
-                                    </div>
-                                    <div class="truncate">
-                                        <p class="font-semibold text-sm text-gray-900 truncate">{{ doc.document_type }}</p>
-                                        <p class="text-xs text-gray-500">Ketuk untuk melihat</p>
-                                    </div>
-                                </div>
-                                <Button variant="ghost" size="sm" class="shrink-0 rounded-full w-8 h-8 p-0 text-gray-400 group-hover:text-blue-600 group-hover:bg-blue-100">
-                                    <Eye class="w-4 h-4" />
-                                </Button>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 pt-6 border-t border-gray-100" v-if="kos.status === 'menunggu_verifikasi'">
-                            <p class="text-xs text-gray-500 mb-3 text-center">Pastikan semua dokumen asli dan sah sebelum menyetujui.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+                    <!-- Action Bar -->
+                    <div class="p-4 bg-gray-50/80 flex flex-col sm:flex-row items-center justify-between gap-3" v-if="kos.status === 'menunggu_verifikasi'">
+                        <Button type="button" @click="showRejectForm = true" variant="ghost" class="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm">
+                            Tolak Pengajuan
+                        </Button>
+                        <Button type="button" @click="confirmingApproval = true" class="w-full sm:w-auto px-8 shadow-sm bg-green-600 hover:bg-green-700 text-white">
+                            Setujui & Publikasikan
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
+
+        <!-- Reject Modal -->
+        <Dialog :open="showRejectForm" @update:open="val => showRejectForm = val">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center text-red-600"><AlertTriangle class="w-5 h-5 mr-2" /> Tolak Pengajuan</DialogTitle>
+                </DialogHeader>
+                <div class="py-2">
+                    <p class="text-sm text-gray-600 mb-3">Berikan alasan yang jelas mengapa pengajuan ini ditolak agar pemilik kos dapat memperbaikinya.</p>
+                    <Textarea v-model="rejectForm.note" placeholder="Misal: Dokumen KTP tidak jelas, foto buram..." rows="4" class="resize-none" />
+                    <p v-if="rejectForm.errors.note" class="text-xs text-red-500 mt-1">{{ rejectForm.errors.note }}</p>
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" @click="showRejectForm = false">Batal</Button>
+                    <Button variant="destructive" @click="reject" :disabled="rejectForm.processing">Kirim Penolakan</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <!-- Modal List Dokumen Legalitas -->
+        <Dialog :open="showLegalDocsModal" @update:open="val => showLegalDocsModal = val">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center text-gray-900"><FileText class="w-5 h-5 mr-2 text-purple-600" /> Dokumen Legalitas</DialogTitle>
+                </DialogHeader>
+                <div class="py-2">
+                    <div v-if="!kos.legal_documents || kos.legal_documents.length === 0" class="p-4 bg-red-50 rounded-lg border border-red-100 flex items-center gap-3">
+                        <AlertTriangle class="w-5 h-5 text-red-500 shrink-0" />
+                        <p class="text-sm text-red-700 font-medium">Kos tidak melampirkan dokumen legalitas.</p>
+                    </div>
+                    <div v-else class="space-y-3">
+                        <div v-for="doc in kos.legal_documents" :key="doc.id" 
+                            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer group"
+                            @click="openDocPreview(doc)">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                    <FileText class="w-4 h-4" />
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-700">{{ doc.document_type }}</p>
+                            </div>
+                            <Eye class="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0" />
+                        </div>
+                        <p class="text-xs text-gray-500 text-center mt-4">Ketuk dokumen untuk melihat pratinjau.</p>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" @click="showLegalDocsModal = false">Tutup</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
 
         <!-- Modal Slider Foto -->
         <Dialog :open="showPhotoSlider" @update:open="val => showPhotoSlider = val">
@@ -309,7 +293,7 @@ const openDocPreview = (doc) => {
 
         <!-- Modal Preview Dokumen -->
         <Dialog :open="showDocPreview" @update:open="val => showDocPreview = val">
-            <DialogContent class="max-w-4xl h-[85vh] flex flex-col p-0 overflow-hidden">
+            <DialogContent :hide-overlay="true" class="max-w-4xl h-[85vh] flex flex-col p-0 overflow-hidden shadow-2xl border-gray-300">
                 <DialogHeader class="p-4 border-b bg-gray-50 shrink-0">
                     <DialogTitle class="flex items-center">
                         <FileText class="w-5 h-5 mr-2 text-blue-600" /> Preview: {{ previewDocTitle }}
@@ -335,7 +319,7 @@ const openDocPreview = (doc) => {
                         <Map class="w-5 h-5 mr-2 text-primary" /> Lokasi Properti: {{ kos.name }}
                     </DialogTitle>
                 </DialogHeader>
-                <div class="w-full bg-gray-100 p-0 m-0 border-none">
+                <div class="w-full bg-gray-100 p-0 m-0 border-none h-[60vh]">
                     <MapPicker 
                         v-if="showMapModal"
                         :model-value="{ lat: kos.latitude || -6.200000, lng: kos.longitude || 106.816666 }" 
@@ -351,26 +335,25 @@ const openDocPreview = (doc) => {
 
         <!-- Modal Konfirmasi Setujui -->
         <Dialog :open="confirmingApproval" @update:open="val => confirmingApproval = val">
-            <DialogContent class="sm:max-w-[425px]">
+            <DialogContent class="sm:max-w-md">
                 <DialogHeader>
-                    <div class="flex items-center gap-4 mb-2 text-green-600">
-                        <div class="p-3 bg-green-100 rounded-full shrink-0">
-                            <CheckCircle class="w-6 h-6" />
+                    <div class="flex items-center gap-3 mb-2 text-green-600">
+                        <div class="p-2 bg-green-100 rounded-full shrink-0">
+                            <CheckCircle class="w-5 h-5" />
                         </div>
                         <DialogTitle>Setujui & Publikasikan?</DialogTitle>
                     </div>
                 </DialogHeader>
                 
-                <DialogDescription class="text-sm">
+                <div class="py-2 text-sm text-gray-600">
                     Apakah Anda yakin ingin menyetujui pengajuan ini? Properti <strong>{{ kos.name }}</strong> akan dipublikasikan dan dapat dilihat oleh semua calon penyewa.
-                </DialogDescription>
+                </div>
 
-                <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
+                <DialogFooter class="mt-2">
                     <Button variant="outline" @click="confirmingApproval = false">Batal</Button>
-                    <Button class="bg-green-600 hover:bg-green-700 text-white" @click="approve">Ya, Setujui & Publikasikan</Button>
+                    <Button class="bg-green-600 hover:bg-green-700 text-white" @click="approve">Ya, Publikasikan</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-
     </AppLayout>
 </template>

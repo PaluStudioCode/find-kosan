@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'vue-sonner';
-import { watch } from 'vue';
+import { watch, ref, onMounted, onUnmounted } from 'vue';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,12 +26,46 @@ const props = defineProps({
 });
 
 const page = usePage();
+const activeSection = ref('');
+let observer = null;
+
+onMounted(() => {
+    if (props.landing) {
+        const sections = document.querySelectorAll('section[id]');
+        
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    activeSection.value = entry.target.id;
+                }
+            });
+        }, {
+            rootMargin: '-30% 0px -70% 0px',
+            threshold: 0
+        });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
+});
+
+onUnmounted(() => {
+    if (observer) observer.disconnect();
+});
 
 watch(() => page.props.flash, (flash) => {
     if (flash?.success) toast.success(flash.success);
     if (flash?.error) toast.error(flash.error);
     if (flash?.status) toast.info(flash.status);
 }, { deep: true, immediate: true });
+
+const scrollToSection = (id) => {
+    const element = document.querySelector(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+};
 </script>
 
 <template>
@@ -45,17 +79,17 @@ watch(() => page.props.flash, (flash) => {
             </Link>
             <nav class="hidden md:flex gap-4 ml-4">
                 <template v-if="landing">
-                    <a href="#peta-kos" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Peta Kos</a>
-                    <a href="#cara-kerja" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Cara Kerja</a>
-                    <a href="#keamanan" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Keamanan</a>
-                    <a href="#pemilik" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Untuk Pemilik</a>
-                    <a href="#ulasan" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Ulasan</a>
+                    <a href="#peta-kos" @click.prevent="scrollToSection('#peta-kos')" :class="['text-sm transition-colors', activeSection === 'peta-kos' ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary font-medium']">Peta Kos</a>
+                    <a href="#cara-kerja" @click.prevent="scrollToSection('#cara-kerja')" :class="['text-sm transition-colors', activeSection === 'cara-kerja' ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary font-medium']">Cara Kerja</a>
+                    <a href="#keamanan" @click.prevent="scrollToSection('#keamanan')" :class="['text-sm transition-colors', activeSection === 'keamanan' ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary font-medium']">Keamanan</a>
+                    <a href="#pemilik" @click.prevent="scrollToSection('#pemilik')" :class="['text-sm transition-colors', activeSection === 'pemilik' ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary font-medium']">Untuk Pemilik</a>
+                    <a href="#ulasan" @click.prevent="scrollToSection('#ulasan')" :class="['text-sm transition-colors', activeSection === 'ulasan' ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary font-medium']">Ulasan</a>
                 </template>
                 <template v-else>
-                    <Link :href="route('public.kos.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+                    <Link :href="route('public.kos.index')" :class="route().current('public.kos.*') ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary'" class="text-sm transition-colors">
                         Cari Kos
                     </Link>
-                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'" :href="route('tenant.tenancies.index')" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'" :href="route('tenant.tenancies.index')" :class="route().current('tenant.tenancies.*') ? 'text-primary font-semibold' : 'text-gray-600 hover:text-primary'" class="text-sm transition-colors">
                         Sewa Kos Saya
                     </Link>
                 </template>

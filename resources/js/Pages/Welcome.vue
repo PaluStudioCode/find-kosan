@@ -246,7 +246,7 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:pb-32 lg:pt-20">
-                <div class="relative z-10 max-w-2xl">
+                <div class="relative z-10 max-w-2xl -mt-8 lg:-mt-24">
                     <div class="group mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 p-1 pr-4 text-xs font-semibold tracking-wide text-teal-100 shadow-2xl backdrop-blur-xl transition-all hover:bg-white/10">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-teal-400/20 text-teal-300">
                             <Star class="h-3.5 w-3.5" />
@@ -329,65 +329,29 @@ onBeforeUnmount(() => {
 
 
         <!-- 4. Animated map discovery -->
-        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-gradient-to-b from-slate-50 to-[#f3f7f5] py-20 sm:py-32">
-            <div class="absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-teal-400/10 blur-[100px]" />
-            <div class="absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full bg-emerald-400/10 blur-[100px]" />
-            <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8 relative z-10">
-                <div data-reveal="left" class="max-w-xl">
-                    <div class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-teal-700 border border-teal-100 mb-6">
-                        <Map class="h-3.5 w-3.5" /> Eksplorasi Visual
-                    </div>
-                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">Pencarian cerdas<br />di area tujuan.</h2>
-                    <p class="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                        Gunakan peta interaktif untuk melihat persebaran kos secara visual. Tentukan lokasi pusat, sesuaikan radius, dan temukan properti yang tepat dalam jangkauan Anda.
-                    </p>
-
-                    <div class="mt-10 space-y-6">
-                        <div class="group flex items-start gap-4">
-                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-600 shadow-sm transition-all group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-teal-600/30">
-                                <LocateFixed class="h-5 w-5" />
-                            </span>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-900">Lokasi sebagai titik pusat</h3>
-                                <p class="mt-1 text-sm leading-6 text-slate-500">Gunakan posisi Anda saat ini atau cari area spesifik untuk memulai penjelajahan.</p>
-                            </div>
-                        </div>
-                        <div class="group flex items-start gap-4">
-                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-600 shadow-sm transition-all group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-teal-600/30">
-                                <SlidersHorizontal class="h-5 w-5" />
-                            </span>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-900">Radius yang fleksibel</h3>
-                                <p class="mt-1 text-sm leading-6 text-slate-500">Persempit atau perluas jangkauan pencarian kos sesuai kebutuhan jarak Anda.</p>
-                            </div>
-                        </div>
-                        <div class="group flex items-start gap-4">
-                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-600 shadow-sm transition-all group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-teal-600/30">
-                                <MapPin class="h-5 w-5" />
-                            </span>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-900">Detail instan dari marker</h3>
-                                <p class="mt-1 text-sm leading-6 text-slate-500">Pilih titik untuk mengintip harga dan rating sebelum membuka halaman detail lengkap.</p>
-                            </div>
-                        </div>
+        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-white py-16 sm:py-24 border-y border-slate-100">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] items-start gap-12 lg:gap-16">
+                    <!-- Left: Text -->
+                    <div data-reveal="left" class="max-w-xl lg:mt-6">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Pencarian cerdas di area tujuan.</h2>
+                        <p class="mt-4 text-base leading-relaxed text-slate-600">
+                            Gunakan peta interaktif untuk melihat persebaran kos secara visual. Tentukan lokasi pusat, sesuaikan radius, dan temukan properti yang tepat dengan cepat.
+                        </p>
+                        <Link :href="route('public.kos.index')" class="mt-8 inline-block">
+                            <Button class="group h-12 rounded-full bg-[#0c292b] px-6 text-sm font-bold text-white shadow-md hover:bg-[#143b3e] transition-all hover:shadow-lg hover:-translate-y-0.5">
+                                Buka Peta Interaktif
+                                <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </Button>
+                        </Link>
                     </div>
 
-                    <Link :href="route('public.kos.index')" class="mt-10 inline-flex">
-                        <Button class="group h-12 rounded-full bg-[#0c292b] px-6 text-sm font-bold text-white shadow-lg hover:bg-[#143b3e] transition-all hover:shadow-xl hover:-translate-y-1">
-                            Buka Peta Interaktif
-                            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                    </Link>
-                </div>
-
-                <div data-reveal="right" class="relative">
-                    <div class="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-tr from-teal-200 to-[#f7924a]/30 opacity-60 blur-xl" />
-                    <div class="relative rounded-[2rem] border border-white bg-white/50 p-2 shadow-2xl backdrop-blur-sm">
-                        <LandingMapDiscovery :items="mapKos" class="overflow-hidden rounded-3xl" />
+                    <!-- Right: Map -->
+                    <div data-reveal="right" class="relative">
+                        <div class="relative rounded-[2rem] border border-slate-200 bg-slate-50 p-2 shadow-lg">
+                            <LandingMapDiscovery :items="mapKos" class="overflow-hidden rounded-3xl w-full h-[350px] sm:h-[450px]" />
+                        </div>
                     </div>
-                    <p class="mt-4 text-center text-xs font-medium text-slate-400">
-                        Pratinjau interaktif dari properti berkoordinat
-                    </p>
                 </div>
             </div>
         </section>
@@ -401,10 +365,6 @@ onBeforeUnmount(() => {
 
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-4 py-1.5 mb-6 backdrop-blur-md">
-                        <span class="flex h-2 w-2 rounded-full bg-teal-400 animate-pulse"></span>
-                        <p class="text-xs font-bold uppercase tracking-widest text-teal-300">Alur Pengguna</p>
-                    </div>
                     <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Perjalanan yang sangat mulus.</h2>
                     <p class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-400">Dari pencarian awal hingga pengelolaan masa sewa, semua dirancang dalam satu ekosistem tanpa gesekan yang membuang waktu Anda.</p>
                 </div>
@@ -467,170 +427,119 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 7. Security & transparency -->
-        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-24 sm:py-32 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" />
+        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-20 sm:py-24 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
-                    <div data-reveal="left">
-                        <div class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-teal-700 shadow-sm border border-slate-100 mb-6">
-                            <ShieldCheck class="h-3.5 w-3.5" /> Rasa Aman
+                <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Transparansi yang bisa dipercaya.</h2>
+                    <p class="mt-4 text-base text-slate-600">
+                        Platform kami memiliki lapisan verifikasi dan sistem umpan balik dari komunitas untuk memastikan kualitas kos tetap terjaga dan aman.
+                    </p>
+                </div>
+
+                <div class="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
+                    <!-- Feature 1 -->
+                    <div data-reveal="scale" class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-center group">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-6 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                            <ShieldCheck class="h-7 w-7" />
                         </div>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">Transparansi yang bisa Anda percayai.</h2>
-                        <p class="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                            Platform kami memiliki lapisan verifikasi dan sistem umpan balik dari komunitas untuk memastikan kualitas kos tetap terjaga.
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Verifikasi Ketat</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">
+                            Data properti dan dokumen legal ditinjau secara manual oleh tim kami sebelum kos dipublikasikan.
                         </p>
-                        <Link :href="route('public.kos.index')" class="group mt-10 inline-flex items-center gap-2 text-sm font-bold text-teal-700 hover:text-teal-900 bg-white px-5 py-3 rounded-full shadow-sm border border-slate-200 transition-all hover:shadow-md">
-                            Periksa properti terverifikasi
-                            <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Link>
                     </div>
 
-                    <div data-reveal="right" class="grid gap-4 sm:grid-cols-2">
-                        <article class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#0c292b] to-[#123e42] p-8 text-white sm:row-span-2 shadow-2xl">
-                            <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-teal-400/20 blur-2xl" />
-                            <div class="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-400/20 text-teal-300 backdrop-blur-md border border-white/10">
-                                <ShieldCheck class="h-7 w-7" />
-                            </div>
-                            <h3 class="relative z-10 mt-8 text-2xl font-bold">Verifikasi Ketat</h3>
-                            <p class="relative z-10 mt-3 text-sm leading-relaxed text-teal-50">Data properti dan dokumen legal ditinjau secara manual oleh tim kami sebelum kos dipublikasikan ke publik.</p>
+                    <!-- Feature 2 -->
+                    <div data-reveal="scale" style="--reveal-delay: 100ms" class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-center group">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 mb-6 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                            <Star class="h-7 w-7" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Ulasan Asli</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">
+                            Baca opini dan penilaian nyata langsung dari sesama penyewa yang pernah menetap di sana.
+                        </p>
+                    </div>
 
-                            <div class="relative z-10 mt-8 space-y-4 border-t border-white/10 pt-8">
-                                <div class="flex items-center gap-4 text-sm font-medium">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/5"><Check class="h-4 w-4 text-teal-300" /></span>
-                                    Validasi lokasi akurat
-                                </div>
-                                <div class="flex items-center gap-4 text-sm font-medium">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/5"><Check class="h-4 w-4 text-teal-300" /></span>
-                                    Kesesuaian foto
-                                </div>
-                                <div class="flex items-center gap-4 text-sm font-medium">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/5"><Check class="h-4 w-4 text-teal-300" /></span>
-                                    Pengecekan dokumen legal
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="rounded-[2.5rem] border border-slate-100 bg-white p-7 shadow-xl shadow-slate-200/40 transition-transform hover:-translate-y-1">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 mb-5">
-                                <Star class="h-6 w-6 fill-amber-500" />
-                            </div>
-                            <h3 class="font-bold text-slate-900 text-lg">Ulasan Asli</h3>
-                            <p class="mt-2 text-sm leading-relaxed text-slate-500">Baca opini nyata dari sesama penyewa yang pernah menetap.</p>
-                        </article>
-
-                        <article class="rounded-[2.5rem] border border-slate-100 bg-white p-7 shadow-xl shadow-slate-200/40 transition-transform hover:-translate-y-1">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 mb-5">
-                                <Flag class="h-6 w-6" />
-                            </div>
-                            <h3 class="font-bold text-slate-900 text-lg">Laporan Cepat</h3>
-                            <p class="mt-2 text-sm leading-relaxed text-slate-500">Sistem pelaporan efisien untuk menindaklanjuti properti bermasalah.</p>
-                        </article>
+                    <!-- Feature 3 -->
+                    <div data-reveal="scale" style="--reveal-delay: 200ms" class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-center group">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 mb-6 group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                            <Flag class="h-7 w-7" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Laporan Cepat</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">
+                            Sistem pelaporan yang efisien untuk menindaklanjuti properti atau pengguna bermasalah.
+                        </p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 8. Tenancy and payment -->
-        <section class="overflow-hidden bg-white py-24 sm:py-32">
+        <section class="overflow-hidden bg-white py-16 sm:py-24 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="grid items-center gap-14 lg:grid-cols-2">
+                <div class="grid items-center gap-10 lg:gap-16 lg:grid-cols-[0.9fr_1.1fr]">
+                    <!-- Left: Simplified Mockup -->
                     <div data-reveal="left" class="order-2 lg:order-1 relative">
-                        <div class="absolute -left-10 top-1/2 -translate-y-1/2 h-80 w-80 rounded-full bg-teal-100/50 blur-[80px] -z-10" />
-                        <div class="relative rounded-[2.5rem] bg-gradient-to-br from-teal-50 to-emerald-50 p-4 sm:p-8 shadow-inner border border-teal-100/50">
-                            <div class="rounded-3xl border border-white/50 bg-white/80 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-6">
-                                    <div>
-                                        <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Ringkasan Sewa</p>
-                                        <p class="mt-2 text-xl font-bold text-slate-900">Invoice Bulanan</p>
-                                    </div>
-                                    <span class="rounded-full bg-amber-100 px-4 py-1.5 text-xs font-bold text-amber-700 border border-amber-200 animate-pulse">Menunggu Pembayaran</span>
+                        <div class="relative rounded-3xl bg-slate-50 p-6 sm:p-8 border border-slate-200 shadow-lg max-w-md mx-auto lg:ml-auto">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-5 mb-5">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Ringkasan</p>
+                                    <p class="text-lg font-bold text-slate-900 mt-1">Invoice Bulanan</p>
                                 </div>
-
-                                <div class="mt-6 grid grid-cols-2 gap-4">
-                                    <div class="rounded-2xl bg-white border border-slate-100 p-5 shadow-sm">
-                                        <ReceiptText class="h-6 w-6 text-teal-600 mb-4" />
-                                        <p class="text-xs font-medium text-slate-400">Periode Sewa</p>
-                                        <p class="mt-1 text-base font-bold text-slate-800">Bulanan</p>
-                                    </div>
-                                    <div class="rounded-2xl bg-white border border-slate-100 p-5 shadow-sm">
-                                        <History class="h-6 w-6 text-blue-500 mb-4" />
-                                        <p class="text-xs font-medium text-slate-400">Status Sewa</p>
-                                        <p class="mt-1 text-base font-bold text-slate-800">Aktif</p>
-                                    </div>
-                                </div>
-
-                                <div class="mt-5 flex items-center justify-between rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-white shadow-lg transition-transform hover:scale-[1.02]">
-                                    <div class="flex items-center gap-4">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md">
-                                            <CreditCard class="h-5 w-5 text-teal-300" />
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-slate-300">Metode Pembayaran</p>
-                                            <p class="text-sm font-bold">Duitku / Transfer Bank</p>
-                                        </div>
-                                    </div>
-                                    <ArrowRight class="h-5 w-5 text-teal-300" />
-                                </div>
+                                <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 border border-amber-200">Menunggu Pembayaran</span>
                             </div>
 
-                            <div class="absolute -bottom-8 -right-6 hidden rounded-2xl border border-white/40 bg-white/70 p-5 shadow-2xl backdrop-blur-lg sm:block animate-float">
-                                <div class="flex items-center gap-4">
-                                    <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                                        <CheckCheck class="h-6 w-6" />
-                                    </span>
-                                    <div>
-                                        <p class="text-xs font-medium text-slate-500">Notifikasi Real-time</p>
-                                        <p class="text-sm font-bold text-slate-900">Pembayaran Terkonfirmasi</p>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm transition-transform hover:-translate-y-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+                                            <ReceiptText class="h-5 w-5" />
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-700">Periode Sewa</span>
                                     </div>
+                                    <span class="text-sm font-bold text-slate-900">Bulanan</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm transition-transform hover:-translate-y-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+                                            <CreditCard class="h-5 w-5" />
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-700">Metode</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-slate-900">Duitku / Transfer</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div data-reveal="right" class="order-1 lg:order-2">
-                        <div class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-teal-700 border border-teal-100 mb-6">
-                            <ReceiptText class="h-3.5 w-3.5" /> Administrasi Pintar
-                        </div>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">Administrasi sewa tanpa rasa pusing.</h2>
-                        <p class="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                            Sinkronisasi data otomatis antara penyewa dan pemilik. Invoice tercatat rapi, bukti tersimpan aman, dan status sewa termonitor dengan akurat.
+                    <!-- Right: Text Content -->
+                    <div data-reveal="right" class="order-1 lg:order-2 max-w-xl">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Administrasi sewa tanpa rasa pusing.</h2>
+                        <p class="mt-4 text-base leading-relaxed text-slate-600">
+                            Sinkronisasi data otomatis antara penyewa dan pemilik. Invoice tercatat rapi, bukti tersimpan aman, dan status sewa termonitor dengan akurat tanpa perlu pembukuan manual.
                         </p>
 
-                        <div class="mt-10 grid gap-6 sm:grid-cols-2">
-                            <div class="group flex gap-4">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-600 group-hover:text-white">
-                                    <ReceiptText class="h-6 w-6" />
-                                </div>
+                        <div class="mt-8 space-y-4">
+                            <div class="flex gap-4 items-start">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-600"><Check class="h-4 w-4" /></span>
                                 <div>
-                                    <h3 class="font-bold text-slate-900">Invoice Terstruktur</h3>
-                                    <p class="mt-1.5 text-sm leading-relaxed text-slate-500">Detail periode, jatuh tempo, dan nominal tersaji jelas.</p>
+                                    <p class="text-sm font-bold text-slate-900">Invoice Terstruktur</p>
+                                    <p class="text-sm text-slate-500 mt-0.5">Detail periode, jatuh tempo, dan nominal tersaji jelas.</p>
                                 </div>
                             </div>
-                            <div class="group flex gap-4">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-600 group-hover:text-white">
-                                    <UploadCloud class="h-6 w-6" />
-                                </div>
+                            <div class="flex gap-4 items-start">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-600"><Check class="h-4 w-4" /></span>
                                 <div>
-                                    <h3 class="font-bold text-slate-900">Unggah Praktis</h3>
-                                    <p class="mt-1.5 text-sm leading-relaxed text-slate-500">Sistem unggah bukti bayar yang ringan dan mudah digunakan.</p>
+                                    <p class="text-sm font-bold text-slate-900">Gateway Otomatis & Unggah Praktis</p>
+                                    <p class="text-sm text-slate-500 mt-0.5">Konfirmasi instan dari Duitku atau opsi unggah bukti bayar manual.</p>
                                 </div>
                             </div>
-                            <div class="group flex gap-4">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-600 group-hover:text-white">
-                                    <CreditCard class="h-6 w-6" />
-                                </div>
+                            <div class="flex gap-4 items-start">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-600"><Check class="h-4 w-4" /></span>
                                 <div>
-                                    <h3 class="font-bold text-slate-900">Gateway Otomatis</h3>
-                                    <p class="mt-1.5 text-sm leading-relaxed text-slate-500">Konfirmasi instan dengan integrasi gateway Duitku.</p>
-                                </div>
-                            </div>
-                            <div class="group flex gap-4">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-600 group-hover:text-white">
-                                    <History class="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-slate-900">Riwayat Terarsip</h3>
-                                    <p class="mt-1.5 text-sm leading-relaxed text-slate-500">Akses histori pembayaran kapan saja Anda butuhkan.</p>
+                                    <p class="text-sm font-bold text-slate-900">Riwayat Terarsip</p>
+                                    <p class="text-sm text-slate-500 mt-0.5">Akses seluruh histori pembayaran sewa Anda kapan saja.</p>
                                 </div>
                             </div>
                         </div>
@@ -640,60 +549,52 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 9. WhatsApp notifications -->
-        <section class="relative bg-gradient-to-br from-[#051114] to-[#0a2327] py-24 text-white sm:py-32 overflow-hidden">
-            <div class="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-teal-600/10 blur-[120px] mix-blend-screen" />
-            <div class="absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full bg-[#f7924a]/10 blur-[120px] mix-blend-screen" />
-            
-            <div class="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 relative z-10">
-                <div data-reveal="left">
-                    <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-teal-300 border border-white/10 mb-6 backdrop-blur-md">
-                        <MessageCircle class="h-3.5 w-3.5" /> Notifikasi WhatsApp
-                    </div>
-                    <h2 class="text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-5xl text-white">Informasi penting hadir di kanal yang familiar.</h2>
-                    <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-                        Sistem kami bekerja di balik layar, secara otomatis mengirimkan pemberitahuan instan tentang status pemesanan, konfirmasi pembayaran, dan pengingat invoice langsung ke WhatsApp Anda.
-                    </p>
+        <section class="relative bg-slate-900 py-16 sm:py-24 text-white overflow-hidden">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid items-center gap-14 lg:gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div data-reveal="left" class="max-w-xl">
+                        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">Informasi penting hadir di kanal yang familiar.</h2>
+                        <p class="mt-4 text-base leading-relaxed text-slate-300">
+                            Sistem kami bekerja di balik layar, secara otomatis mengirimkan pemberitahuan instan tentang status pemesanan, konfirmasi pembayaran, dan pengingat invoice langsung ke WhatsApp Anda.
+                        </p>
 
-                    <div class="mt-10 flex flex-wrap gap-4">
-                        <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-sm transition-colors hover:bg-white/10">
-                            <BellRing class="h-5 w-5 text-teal-400" />
-                            <span class="text-sm font-semibold">Pengajuan Sewa</span>
-                        </div>
-                        <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-sm transition-colors hover:bg-white/10">
-                            <ReceiptText class="h-5 w-5 text-teal-400" />
-                            <span class="text-sm font-semibold">Pengingat Invoice</span>
-                        </div>
-                        <div class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 backdrop-blur-sm transition-colors hover:bg-white/10">
-                            <CheckCheck class="h-5 w-5 text-teal-400" />
-                            <span class="text-sm font-semibold">Status Pembayaran</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div data-reveal="right" class="relative mx-auto w-full max-w-lg">
-                    <div class="relative rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-6 backdrop-blur-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
-                        <div class="mb-6 flex items-center gap-4 border-b border-white/10 pb-5">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#25D366] to-[#128C7E] shadow-lg">
-                                <MessageCircle class="h-6 w-6 text-white" />
+                        <div class="mt-8 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-400"><Check class="h-4 w-4" /></span>
+                                <span class="text-sm font-semibold text-slate-200">Pengajuan Sewa</span>
                             </div>
-                            <div>
-                                <p class="text-base font-bold text-white">Kos Online Bot</p>
-                                <p class="flex items-center gap-1 text-xs text-teal-200"><span class="h-1.5 w-1.5 rounded-full bg-[#25D366] animate-pulse"></span> Sedang aktif</p>
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-400"><Check class="h-4 w-4" /></span>
+                                <span class="text-sm font-semibold text-slate-200">Pengingat Invoice</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-400"><Check class="h-4 w-4" /></span>
+                                <span class="text-sm font-semibold text-slate-200">Status Pembayaran</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="space-y-4">
-                            <div class="max-w-[85%] rounded-[1.25rem] rounded-tl-sm bg-white p-5 text-[#183334] shadow-md transform transition-transform hover:scale-[1.02]">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <ReceiptText class="h-4 w-4 text-amber-500" />
-                                    <p class="text-sm font-bold">Pengingat Pembayaran</p>
+                    <div data-reveal="right" class="relative mx-auto w-full max-w-md lg:ml-auto">
+                        <div class="relative rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-xl">
+                            <div class="mb-5 flex items-center gap-4 border-b border-white/10 pb-5">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#25D366] shadow-md">
+                                    <MessageCircle class="h-6 w-6 text-white" />
                                 </div>
-                                <p class="text-sm leading-relaxed text-slate-600">Invoice masa sewa Anda untuk kamar <strong>A-01</strong> akan jatuh tempo besok. Silakan periksa detailnya.</p>
-                                <p class="mt-2 text-right text-[10px] font-bold text-slate-400">09.15</p>
+                                <div>
+                                    <p class="text-base font-bold text-white">Kos Online Bot</p>
+                                    <p class="flex items-center gap-1.5 text-xs text-teal-300"><span class="h-1.5 w-1.5 rounded-full bg-[#25D366]"></span> Otomatis 24/7</p>
+                                </div>
                             </div>
-                            <div class="ml-auto max-w-[85%] rounded-[1.25rem] rounded-tr-sm bg-gradient-to-br from-[#dcf8c6] to-[#d8f7e9] p-5 text-[#183334] shadow-md transform transition-transform hover:scale-[1.02]">
-                                <p class="text-sm leading-relaxed font-medium">Pembayaran sudah saya selesaikan via transfer bank! Terima kasih.</p>
-                                <p class="mt-2 flex items-center justify-end gap-1 text-[10px] font-bold text-teal-800">09.18 <CheckCheck class="h-3.5 w-3.5 text-blue-500" /></p>
+
+                            <div class="space-y-4">
+                                <div class="max-w-[90%] rounded-2xl rounded-tl-sm bg-white p-4 text-slate-800 shadow-sm">
+                                    <p class="text-sm leading-relaxed">Invoice masa sewa Anda untuk kamar <strong>A-01</strong> akan jatuh tempo besok. Silakan periksa detailnya.</p>
+                                    <p class="mt-2 text-right text-[10px] font-bold text-slate-400">09.15</p>
+                                </div>
+                                <div class="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-[#dcf8c6] p-4 text-slate-800 shadow-sm">
+                                    <p class="text-sm leading-relaxed font-medium">Pembayaran sudah saya selesaikan via transfer bank! Terima kasih.</p>
+                                    <p class="mt-2 flex items-center justify-end gap-1 text-[10px] font-bold text-teal-700">09.18 <CheckCheck class="h-3.5 w-3.5 text-blue-500" /></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -702,108 +603,100 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 10. Owner solution -->
-        <section id="pemilik" class="scroll-mt-20 bg-gradient-to-b from-white to-slate-50 py-24 sm:py-32">
+        <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] items-center">
-                    <div data-reveal="left">
-                        <div class="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-700 border border-orange-100 mb-6">
-                            <Building2 class="h-3.5 w-3.5" /> Solusi Pemilik
+                <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kendalikan properti Anda dari satu dashboard.</h2>
+                    <p class="mt-4 text-base leading-relaxed text-slate-600">
+                        Otomatiskan operasional harian kos Anda. Mulai dari publikasi listing, manajemen penyewa, hingga pemantauan pendapatan. Semuanya tersentralisasi.
+                    </p>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
+                    <div data-reveal="scale" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-5">
+                            <Building2 class="h-6 w-6" />
                         </div>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">Kendalikan properti Anda dari satu dashboard.</h2>
-                        <p class="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg">
-                            Otomatiskan operasional harian kos Anda. Mulai dari publikasi listing, manajemen penyewa, hingga pemantauan pendapatan. Semuanya tersentralisasi.
-                        </p>
-
-                        <Link v-if="canRegister && !$page.props.auth.user" :href="route('register')" class="mt-10 inline-block">
-                            <Button class="group h-14 rounded-full bg-gradient-to-r from-slate-900 to-slate-800 px-8 text-sm font-bold text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
-                                Mulai Jadi Mitra
-                                <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                            </Button>
-                        </Link>
-                        <Link v-else-if="$page.props.auth.user?.role === 'pemilik_kos'" :href="route('owner.dashboard')" class="mt-10 inline-block">
-                            <Button class="group h-14 rounded-full bg-gradient-to-r from-slate-900 to-slate-800 px-8 text-sm font-bold text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
-                                Buka Dashboard Pemilik
-                                <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                            </Button>
-                        </Link>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Manajemen Properti</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">Atur profil, foto, fasilitas, kamar, dan harga sewa dengan mudah.</p>
+                    </div>
+                    
+                    <div data-reveal="scale" style="--reveal-delay: 100ms" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-5">
+                            <FileCheck2 class="h-6 w-6" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Validasi Legalitas</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">Unggah dokumen resmi untuk dapatkan lencana terverifikasi.</p>
                     </div>
 
-                    <div data-reveal="right" class="grid gap-6 sm:grid-cols-2">
-                        <article class="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2">
-                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-6">
-                                <Building2 class="h-7 w-7" />
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900">Manajemen Properti</h3>
-                            <p class="mt-3 text-sm leading-relaxed text-slate-500">Atur profil, foto, fasilitas, tipe kamar, dan harga sewa dengan mudah.</p>
-                        </article>
-                        
-                        <article class="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2">
-                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-6">
-                                <FileCheck2 class="h-7 w-7" />
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900">Validasi Legalitas</h3>
-                            <p class="mt-3 text-sm leading-relaxed text-slate-500">Unggah dokumen resmi untuk mendapatkan badge terverifikasi.</p>
-                        </article>
-
-                        <article class="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2">
-                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 mb-6">
-                                <BarChart3 class="h-7 w-7" />
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900">Pantau Pembayaran</h3>
-                            <p class="mt-3 text-sm leading-relaxed text-slate-500">Lacak penyewa aktif, konfirmasi invoice otomatis, dan hunian Anda.</p>
-                        </article>
-
-                        <article class="relative overflow-hidden rounded-[2rem] border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 p-8 shadow-[0_8px_30px_rgb(247,146,74,0.15)] transition-all hover:shadow-[0_20px_40px_rgb(247,146,74,0.25)] hover:-translate-y-2">
-                            <div class="absolute -right-4 -bottom-4 h-32 w-32 rounded-full bg-orange-400/10 blur-xl" />
-                            <div class="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-orange-600 mb-6 shadow-sm">
-                                <WalletCards class="h-7 w-7" />
-                            </div>
-                            <h3 class="relative z-10 text-xl font-bold text-slate-900">Dompet Digital</h3>
-                            <p class="relative z-10 mt-3 text-sm leading-relaxed text-slate-600">Terima pembayaran dan cairkan saldo langsung ke rekening Anda.</p>
-                        </article>
+                    <div data-reveal="scale" style="--reveal-delay: 200ms" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 mb-5">
+                            <BarChart3 class="h-6 w-6" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Pantau Pembayaran</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">Lacak penyewa aktif dan konfirmasi invoice secara otomatis.</p>
                     </div>
+
+                    <div data-reveal="scale" style="--reveal-delay: 300ms" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 mb-5">
+                            <WalletCards class="h-6 w-6" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Dompet Digital</h3>
+                        <p class="text-sm leading-relaxed text-slate-500">Terima pembayaran dan cairkan saldo langsung ke rekening Anda.</p>
+                    </div>
+                </div>
+
+                <div data-reveal class="flex justify-center">
+                    <Link v-if="canRegister && !$page.props.auth.user" :href="route('register')">
+                        <Button class="group h-12 rounded-full bg-slate-900 px-8 text-sm font-bold text-white shadow-md hover:bg-slate-800 transition-all hover:-translate-y-0.5">
+                            Mulai Jadi Mitra
+                            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                    </Link>
+                    <Link v-else-if="$page.props.auth.user?.role === 'pemilik_kos'" :href="route('owner.dashboard')">
+                        <Button class="group h-12 rounded-full bg-slate-900 px-8 text-sm font-bold text-white shadow-md hover:bg-slate-800 transition-all hover:-translate-y-0.5">
+                            Buka Dashboard Pemilik
+                            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </section>
 
         <!-- 11. Tenant reviews -->
-        <section id="ulasan" class="scroll-mt-20 bg-white py-24 sm:py-32 relative overflow-hidden">
+        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-                <div data-reveal class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between mb-16">
-                    <div class="max-w-2xl">
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 bg-teal-50 px-4 py-1.5 rounded-full inline-block mb-4">Suara Penyewa</p>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">Cerita nyata dari mereka yang sudah mencoba.</h2>
-                    </div>
-                    <Link :href="route('public.kos.index')" class="group inline-flex shrink-0 items-center gap-2 text-sm font-bold text-teal-700 hover:text-teal-900 bg-slate-50 px-5 py-3 rounded-full border border-slate-200 transition-all hover:bg-slate-100">
-                        Jelajahi semua kos
-                        <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Link>
+                <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Cerita nyata dari mereka yang sudah mencoba.</h2>
+                    <p class="mt-4 text-base leading-relaxed text-slate-600">
+                        Baca opini dan pengalaman langsung dari penyewa yang telah menemukan hunian terbaik mereka melalui platform ini.
+                    </p>
                 </div>
 
-                <div v-if="featuredReviews.length" class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div v-if="featuredReviews.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
                     <article
                         v-for="(review, index) in featuredReviews"
                         :key="review.id"
                         data-reveal="scale"
-                        class="group relative rounded-[2rem] border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2"
+                        class="group relative rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                         :style="{ '--reveal-delay': `${(index % 3) * 90}ms` }"
                     >
-                        <div class="absolute right-8 top-8 opacity-10 transition-opacity group-hover:opacity-20 text-teal-600">
-                            <Quote class="h-12 w-12" />
+                        <div class="absolute right-6 top-6 opacity-5 transition-opacity group-hover:opacity-10 text-teal-600">
+                            <Quote class="h-10 w-10" />
                         </div>
-                        <div class="flex gap-1" :aria-label="`${review.rating} dari 5 bintang`">
+                        <div class="flex gap-1 mb-4" :aria-label="`${review.rating} dari 5 bintang`">
                             <Star
                                 v-for="score in 5"
                                 :key="score"
-                                class="h-5 w-5"
+                                class="h-4 w-4"
                                 :class="score <= review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'"
                             />
                         </div>
 
-                        <p class="mt-6 line-clamp-4 text-base leading-relaxed text-slate-600 italic">“{{ review.comment }}”</p>
+                        <p class="line-clamp-4 text-sm leading-relaxed text-slate-600 italic">“{{ review.comment }}”</p>
 
-                        <div class="mt-8 flex items-center gap-4 border-t border-slate-100 pt-6">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-emerald-100 text-sm font-bold text-teal-800 shadow-inner">
+                        <div class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-50 text-sm font-bold text-teal-700">
                                 {{ initials(review.user?.name) }}
                             </div>
                             <div class="min-w-0">
@@ -814,72 +707,71 @@ onBeforeUnmount(() => {
                     </article>
                 </div>
 
-                <div v-else class="mt-14 rounded-[2.5rem] border border-dashed border-slate-200 bg-slate-50/50 px-6 py-20 text-center">
-                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm mb-5">
-                        <MessageCircle class="h-8 w-8 text-slate-300" />
+                <div v-else class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center mb-12">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm mb-4">
+                        <MessageCircle class="h-6 w-6 text-slate-400" />
                     </div>
-                    <h3 class="font-bold text-xl text-slate-800">Belum ada ulasan yang dipublikasikan</h3>
-                    <p class="mt-3 text-sm text-slate-500 max-w-md mx-auto">Ulasan penyewa akan muncul di sini setelah mereka membagikan pengalaman pada detail kos.</p>
+                    <h3 class="font-bold text-lg text-slate-800">Belum ada ulasan yang dipublikasikan</h3>
+                    <p class="mt-2 text-sm text-slate-500 max-w-md mx-auto">Ulasan penyewa akan muncul di sini setelah mereka membagikan pengalaman pada detail kos.</p>
+                </div>
+
+                <div data-reveal class="flex justify-center">
+                    <Link :href="route('public.kos.index')">
+                        <Button class="group h-12 rounded-full bg-slate-900 px-8 text-sm font-bold text-white shadow-md hover:bg-slate-800 transition-all hover:-translate-y-0.5">
+                            Jelajahi Semua Kos
+                            <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </section>
 
         <!-- 12. FAQ -->
-        <section class="bg-gradient-to-b from-slate-50 to-[#eef4f1] py-24 sm:py-32 relative">
-            <div class="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-                <div data-reveal="left" class="lg:sticky lg:top-32 lg:h-fit">
-                    <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-lg shadow-teal-600/30 mb-6">
-                        <HelpCircle class="h-7 w-7" />
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 mb-3">Pertanyaan Umum</p>
+        <section class="bg-slate-50 py-16 sm:py-24 border-y border-slate-100 relative">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Hal penting yang sering ditanyakan.</h2>
-                    <p class="mt-6 text-base leading-relaxed text-slate-600">Punya pertanyaan? Temukan jawaban singkat mengenai pencarian, penyewaan, pembayaran, laporan, dan pengelolaan kos di bawah ini.</p>
+                    <p class="mt-4 text-base leading-relaxed text-slate-600">
+                        Punya pertanyaan? Temukan jawaban mengenai pencarian, penyewaan, pembayaran, laporan, dan pengelolaan kos di bawah ini.
+                    </p>
                 </div>
 
-                <div data-reveal="right" class="space-y-4">
-                    <details v-for="faq in faqs" :key="faq.question" class="group rounded-[1.5rem] border border-slate-200/60 bg-white p-6 shadow-sm transition-all open:border-teal-200 open:shadow-md hover:border-teal-100">
+                <div data-reveal="scale" class="mx-auto max-w-3xl space-y-4">
+                    <details v-for="faq in faqs" :key="faq.question" class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all open:border-teal-200 open:shadow-md hover:border-slate-300">
                         <summary class="flex cursor-pointer list-none items-center justify-between gap-5 font-bold text-slate-900 outline-none">
-                            <span class="text-lg">{{ faq.question }}</span>
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-500 transition-all group-open:rotate-180 group-open:bg-teal-50 group-open:text-teal-600 group-hover:bg-teal-50 group-hover:text-teal-600">
-                                <ChevronDown class="h-5 w-5" />
+                            <span class="text-base">{{ faq.question }}</span>
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-transform group-open:rotate-180 group-open:bg-teal-50 group-open:text-teal-600">
+                                <ChevronDown class="h-4 w-4" />
                             </span>
                         </summary>
-                        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 pr-12 border-t border-slate-100 pt-4">{{ faq.answer }}</p>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-600 pr-8 pt-4 border-t border-slate-100">{{ faq.answer }}</p>
                     </details>
                 </div>
             </div>
         </section>
 
         <!-- 13. Final CTA -->
-        <section class="bg-white px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
-            <div data-reveal="scale" class="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-[#02080a] px-6 py-16 text-center text-white sm:px-12 sm:py-24 shadow-2xl">
-                <div class="absolute inset-0 bg-gradient-to-br from-teal-900/40 via-transparent to-orange-900/30 mix-blend-overlay" />
-                <div class="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-teal-500/20 blur-[80px]" />
-                <div class="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-[#f7924a]/20 blur-[100px]" />
-                <div class="hero-grid absolute inset-0 opacity-20 mix-blend-overlay" />
-
-                <div class="relative mx-auto max-w-3xl z-10">
-                    <div class="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-1.5 backdrop-blur-md mb-6">
-                        <span class="relative flex h-2 w-2">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-                            <span class="relative inline-flex h-2 w-2 rounded-full bg-teal-400" />
-                        </span>
-                        <p class="text-xs font-bold uppercase tracking-[0.15em] text-teal-200">Mulai Perjalanan Anda</p>
-                    </div>
-                    <h2 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-white">
-                        Wujudkan <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">kenyamanan</span> hari ini.
+        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+            <div data-reveal="scale" class="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-slate-900 px-6 py-16 text-center shadow-xl sm:px-12 sm:py-20 relative">
+                <div class="absolute inset-0 bg-slate-800/20 mix-blend-overlay" />
+                
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white">
+                        Wujudkan kenyamanan hari ini.
                     </h2>
-                    <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg font-medium">Pilih jalur Anda dan gunakan fitur eksklusif yang dirancang khusus untuk memenuhi kebutuhan gaya hidup penyewa maupun efisiensi pemilik kos.</p>
+                    <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
+                        Pilih jalur Anda. Temukan hunian nyaman sebagai penyewa, atau kelola properti Anda dengan mudah sebagai pemilik kos.
+                    </p>
 
                     <div class="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
                         <Link :href="route('public.kos.index')">
-                            <Button class="group h-14 w-full rounded-full bg-gradient-to-r from-[#f7924a] to-[#ffaa66] px-8 font-bold text-[#172225] shadow-[0_0_30px_-5px_rgba(247,146,74,0.6)] transition-all hover:scale-105 hover:shadow-[0_0_40px_-5px_rgba(247,146,74,0.8)] sm:w-auto">
+                            <Button class="group h-12 w-full rounded-full bg-teal-500 px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 sm:w-auto hover:-translate-y-0.5">
                                 Mulai Cari Kos
                                 <Search class="h-4 w-4 ml-2 transition-transform group-hover:rotate-12" />
                             </Button>
                         </Link>
                         <Link v-if="canRegister && !$page.props.auth.user" :href="route('register')">
-                            <Button variant="outline" class="group h-14 w-full rounded-full border-white/20 bg-white/5 px-8 font-bold text-white backdrop-blur-md transition-all hover:bg-white/15 hover:border-white/30 sm:w-auto">
+                            <Button class="group h-12 w-full rounded-full border border-slate-700 bg-slate-800 px-8 text-sm font-bold text-white transition-all hover:bg-slate-700 hover:border-slate-600 sm:w-auto hover:-translate-y-0.5">
                                 Daftarkan Kos Anda
                                 <Building2 class="h-4 w-4 ml-2 transition-transform group-hover:-translate-y-1" />
                             </Button>

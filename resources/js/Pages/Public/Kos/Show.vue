@@ -160,7 +160,7 @@ const cheapestPrice = computed(() => {
         <!-- Hero Photo Gallery -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <div class="mb-4">
-                <Link :href="route('public.kos.index')" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                <Link :href="route('public.kos.index')" class="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 transition-colors">
                     <ArrowLeft class="w-4 h-4 mr-1" /> Kembali ke Pencarian
                 </Link>
             </div>
@@ -203,8 +203,8 @@ const cheapestPrice = computed(() => {
             </div>
 
             <!-- No photo placeholder -->
-            <div v-else class="rounded-2xl bg-gray-100 h-[200px] flex items-center justify-center">
-                <div class="text-center text-gray-400">
+            <div v-else class="rounded-2xl bg-slate-100 h-[200px] flex items-center justify-center">
+                <div class="text-center text-slate-400">
                     <ImageOff class="w-10 h-10 mx-auto mb-2" />
                     <p class="text-sm">Belum ada foto</p>
                 </div>
@@ -218,8 +218,8 @@ const cheapestPrice = computed(() => {
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Title & Location -->
                     <div>
-                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">{{ kos.name }}</h1>
-                        <p class="text-gray-500 mt-1.5 flex items-start gap-1.5 text-sm">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">{{ kos.name }}</h1>
+                        <p class="text-slate-500 mt-1.5 flex items-start gap-1.5 text-sm">
                             <MapPin class="w-4 h-4 mt-0.5 shrink-0" />
                             <span>{{ [kos.address, kos.subdistrict, kos.district, kos.city].filter(Boolean).join(', ') }}</span>
                         </p>
@@ -227,7 +227,7 @@ const cheapestPrice = computed(() => {
 
                     <!-- Quick Stats -->
                     <div class="flex flex-wrap gap-3">
-                        <div class="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium">
+                        <div class="flex items-center gap-2 px-3 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium">
                             <DoorOpen class="w-4 h-4" />
                             {{ kos.rooms.length }} Kamar
                         </div>
@@ -247,16 +247,16 @@ const cheapestPrice = computed(() => {
 
                     <!-- Description -->
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 mb-2">Tentang Kos Ini</h2>
-                        <div class="text-gray-600 text-[15px] leading-relaxed whitespace-pre-wrap">{{ kos.description }}</div>
+                        <h2 class="text-lg font-semibold text-slate-900 mb-2">Tentang Kos Ini</h2>
+                        <div class="text-slate-600 text-[15px] leading-relaxed whitespace-pre-wrap">{{ kos.description }}</div>
                     </div>
 
                     <!-- Facilities -->
                     <div v-if="kos.facilities.length > 0">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Fasilitas Umum</h2>
+                        <h2 class="text-lg font-semibold text-slate-900 mb-3">Fasilitas Umum</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            <div v-for="fac in kos.facilities" :key="fac.id" class="flex items-center gap-2 text-sm text-gray-600 py-1.5">
-                                <CheckCircle2 class="w-4 h-4 text-indigo-500 shrink-0" />
+                            <div v-for="fac in kos.facilities" :key="fac.id" class="flex items-center gap-2 text-sm text-slate-600 py-1.5">
+                                <CheckCircle2 class="w-4 h-4 text-teal-500 shrink-0" />
                                 <span>{{ fac.name }}</span>
                             </div>
                         </div>
@@ -265,19 +265,19 @@ const cheapestPrice = computed(() => {
 
                 <!-- Right: Sticky Summary Card -->
                 <div>
-                    <div class="sticky top-20 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+                    <div class="sticky top-20 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
                         <div v-if="cheapestPrice">
-                            <p class="text-sm text-gray-500">Harga mulai</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ formatRupiah(cheapestPrice) }}<span class="text-sm font-normal text-gray-500"> /bulan</span></p>
+                            <p class="text-sm text-slate-500">Harga mulai</p>
+                            <p class="text-2xl font-bold text-slate-900">{{ formatRupiah(cheapestPrice) }}<span class="text-sm font-normal text-slate-500"> /bulan</span></p>
                         </div>
                         <div class="flex items-center justify-between text-sm border-t pt-3">
-                            <span class="text-gray-500">Kamar tersedia</span>
+                            <span class="text-slate-500">Kamar tersedia</span>
                             <span class="font-semibold text-emerald-600">{{ availableRooms.length }} dari {{ kos.rooms.length }}</span>
                         </div>
-                        <a href="#daftar-kamar" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-medium transition-colors text-sm">
+                        <a href="#daftar-kamar" class="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white py-2.5 rounded-lg font-medium transition-colors text-sm">
                             Lihat Pilihan Kamar
                         </a>
-                        <a href="#ulasan" class="flex w-full items-center justify-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 py-2.5 rounded-lg font-medium transition-colors text-sm">
+                        <a href="#ulasan" class="flex w-full items-center justify-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 py-2.5 rounded-lg font-medium transition-colors text-sm">
                             <MessageSquare class="w-4 h-4" />
                             Lihat Rating & Komentar
                         </a>
@@ -297,8 +297,8 @@ const cheapestPrice = computed(() => {
                                 Login untuk Melapor
                             </Button>
                         </Link>
-                        <div v-if="!$page.props.auth.user" class="text-center text-xs text-gray-400">
-                            <Link :href="route('login')" class="text-indigo-600 hover:underline">Masuk</Link> untuk memesan kamar
+                        <div v-if="!$page.props.auth.user" class="text-center text-xs text-slate-400">
+                            <Link :href="route('login')" class="text-teal-600 hover:underline">Masuk</Link> untuk memesan kamar
                         </div>
                     </div>
                 </div>
@@ -306,20 +306,20 @@ const cheapestPrice = computed(() => {
 
             <!-- Rooms Section -->
             <div id="daftar-kamar" class="mt-10 scroll-mt-20">
-                <h2 class="text-xl font-bold text-gray-900 mb-5">Pilihan Kamar</h2>
+                <h2 class="text-xl font-bold text-slate-900 mb-5">Pilihan Kamar</h2>
 
                 <div v-if="kos.rooms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div 
                         v-for="room in kos.rooms" 
                         :key="room.id" 
-                        class="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-indigo-200 transition-all duration-200 flex flex-col"
+                        class="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-teal-200 transition-all duration-200 flex flex-col"
                         :class="{ 'opacity-50': room.status !== 'tersedia' }"
                     >
                         <!-- Header: Name + Status -->
                         <div class="flex items-start justify-between gap-2 mb-3">
                             <div>
-                                <h3 class="font-semibold text-gray-900 leading-tight">{{ room.name || `Kamar ${room.room_number}` }}</h3>
-                                <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                                <h3 class="font-semibold text-slate-900 leading-tight">{{ room.name || `Kamar ${room.room_number}` }}</h3>
+                                <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                                     No. {{ room.room_number }} · <Users class="w-3 h-3" /> {{ room.capacity }} orang
                                 </p>
                             </div>
@@ -333,26 +333,26 @@ const cheapestPrice = computed(() => {
 
                         <!-- Price -->
                         <div class="mb-3">
-                            <span class="text-xl font-bold text-indigo-600">{{ formatRupiah(room.price) }}</span>
-                            <span class="text-xs text-gray-400 ml-0.5">/ {{ room.price_period }}</span>
+                            <span class="text-xl font-bold text-teal-600">{{ formatRupiah(room.price) }}</span>
+                            <span class="text-xs text-slate-400 ml-0.5">/ {{ room.price_period }}</span>
                         </div>
 
                         <!-- Description -->
-                        <p v-if="room.description" class="text-sm text-gray-500 mb-3 line-clamp-2">{{ room.description }}</p>
+                        <p v-if="room.description" class="text-sm text-slate-500 mb-3 line-clamp-2">{{ room.description }}</p>
 
                         <!-- Room Facilities -->
                         <div v-if="room.facilities.length > 0" class="mb-4">
                             <Popover>
                                 <PopoverTrigger as-child>
-                                    <button type="button" class="text-xs text-indigo-600 font-medium hover:text-indigo-700 transition-colors">
+                                    <button type="button" class="text-xs text-teal-600 font-medium hover:text-teal-700 transition-colors">
                                         Lihat {{ room.facilities.length }} Fasilitas
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent class="w-56 p-3" align="start">
-                                    <p class="text-xs font-semibold text-gray-900 mb-2">Fasilitas Kamar</p>
+                                    <p class="text-xs font-semibold text-slate-900 mb-2">Fasilitas Kamar</p>
                                     <div class="flex flex-col gap-1.5">
-                                        <div v-for="fac in room.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-gray-600">
-                                            <CheckCircle2 class="w-3 h-3 text-indigo-500 shrink-0" />
+                                        <div v-for="fac in room.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-slate-600">
+                                            <CheckCircle2 class="w-3 h-3 text-teal-500 shrink-0" />
                                             {{ fac.name }}
                                         </div>
                                     </div>
@@ -380,22 +380,22 @@ const cheapestPrice = computed(() => {
                     </div>
                 </div>
 
-                <div v-else class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    <BedDouble class="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                    <p class="text-gray-500 font-medium">Belum ada kamar yang tersedia saat ini.</p>
-                    <p class="text-gray-400 text-sm mt-1">Silakan kembali lagi nanti.</p>
+                <div v-else class="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    <BedDouble class="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                    <p class="text-slate-500 font-medium">Belum ada kamar yang tersedia saat ini.</p>
+                    <p class="text-slate-400 text-sm mt-1">Silakan kembali lagi nanti.</p>
                 </div>
             </div>
 
             <!-- Rating & Reviews Section -->
-            <section id="ulasan" class="mt-12 scroll-mt-20 border-t border-gray-200 pt-10">
+            <section id="ulasan" class="mt-12 scroll-mt-20 border-t border-slate-200 pt-10">
                 <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h2 class="flex items-center gap-2 text-xl font-bold text-gray-900">
+                        <h2 class="flex items-center gap-2 text-xl font-bold text-slate-900">
                             <Star class="h-5 w-5 fill-yellow-400 text-yellow-400" />
                             Rating & Komentar
                         </h2>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-slate-500">
                             {{ reviewSummary.total > 0
                                 ? `${reviewSummary.average} dari 5 berdasarkan ${reviewSummary.total} ulasan`
                                 : 'Belum ada ulasan untuk kos ini' }}
@@ -407,14 +407,14 @@ const cheapestPrice = computed(() => {
                     <div class="lg:col-span-1">
                         <form
                             v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'"
-                            class="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                            class="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
                             @submit.prevent="submitReview"
                         >
                             <div>
-                                <h3 class="font-semibold text-gray-900">
+                                <h3 class="font-semibold text-slate-900">
                                     {{ currentReview ? 'Perbarui Ulasan Anda' : 'Beri Ulasan' }}
                                 </h3>
-                                <p class="mt-1 text-xs text-gray-500">Bagikan pengalaman Anda tentang kos ini.</p>
+                                <p class="mt-1 text-xs text-slate-500">Bagikan pengalaman Anda tentang kos ini.</p>
                             </div>
 
                             <div class="space-y-2">
@@ -424,7 +424,7 @@ const cheapestPrice = computed(() => {
                                         v-for="score in 5"
                                         :key="score"
                                         type="button"
-                                        class="rounded p-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                        class="rounded p-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                                         :aria-label="`${score} bintang`"
                                         @mouseenter="hoverRating = score"
                                         @focus="hoverRating = score"
@@ -435,7 +435,7 @@ const cheapestPrice = computed(() => {
                                             class="h-7 w-7 transition-colors"
                                             :class="score <= (hoverRating || reviewForm.rating)
                                                 ? 'fill-yellow-400 text-yellow-400'
-                                                : 'text-gray-300'"
+                                                : 'text-slate-300'"
                                         />
                                     </button>
                                 </div>
@@ -453,7 +453,7 @@ const cheapestPrice = computed(() => {
                                 />
                                 <div class="flex justify-between gap-3 text-xs">
                                     <p class="text-red-600">{{ reviewForm.errors.comment }}</p>
-                                    <p class="ml-auto text-gray-400">{{ reviewForm.comment.length }}/1000</p>
+                                    <p class="ml-auto text-slate-400">{{ reviewForm.comment.length }}/1000</p>
                                 </div>
                             </div>
 
@@ -464,10 +464,10 @@ const cheapestPrice = computed(() => {
                             </Button>
                         </form>
 
-                        <div v-else class="rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/50 p-6 text-center">
-                            <LogIn class="mx-auto h-8 w-8 text-indigo-500" />
-                            <h3 class="mt-3 font-semibold text-gray-900">Punya pengalaman di kos ini?</h3>
-                            <p class="mt-1 text-sm text-gray-500">Masuk sebagai penyewa untuk memberi rating dan komentar.</p>
+                        <div v-else class="rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-6 text-center">
+                            <LogIn class="mx-auto h-8 w-8 text-teal-500" />
+                            <h3 class="mt-3 font-semibold text-slate-900">Punya pengalaman di kos ini?</h3>
+                            <p class="mt-1 text-sm text-slate-500">Masuk sebagai penyewa untuk memberi rating dan komentar.</p>
                             <Link :href="route('login')" class="mt-4 inline-block">
                                 <Button type="button">Masuk untuk Mengulas</Button>
                             </Link>
@@ -478,12 +478,12 @@ const cheapestPrice = computed(() => {
                         <article
                             v-for="review in reviews.data"
                             :key="review.id"
-                            class="rounded-2xl border border-gray-200 bg-white p-5"
+                            class="rounded-2xl border border-slate-200 bg-white p-5"
                         >
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="font-semibold text-gray-900">{{ review.user.name }}</p>
-                                    <p class="mt-0.5 text-xs text-gray-400">{{ formatReviewDate(review.updated_at) }}</p>
+                                    <p class="font-semibold text-slate-900">{{ review.user.name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-400">{{ formatReviewDate(review.updated_at) }}</p>
                                 </div>
                                 <div class="flex" :aria-label="`${review.rating} dari 5 bintang`">
                                     <Star
@@ -492,17 +492,17 @@ const cheapestPrice = computed(() => {
                                         class="h-4 w-4"
                                         :class="score <= review.rating
                                             ? 'fill-yellow-400 text-yellow-400'
-                                            : 'text-gray-200'"
+                                            : 'text-slate-200'"
                                     />
                                 </div>
                             </div>
-                            <p class="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-600">{{ review.comment }}</p>
+                            <p class="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600">{{ review.comment }}</p>
                         </article>
 
-                        <div v-if="reviews.data.length === 0" class="rounded-2xl border border-dashed border-gray-200 py-12 text-center">
-                            <MessageSquare class="mx-auto h-9 w-9 text-gray-300" />
-                            <p class="mt-3 font-medium text-gray-500">Belum ada komentar.</p>
-                            <p class="mt-1 text-sm text-gray-400">Jadilah penyewa pertama yang memberikan ulasan.</p>
+                        <div v-if="reviews.data.length === 0" class="rounded-2xl border border-dashed border-slate-200 py-12 text-center">
+                            <MessageSquare class="mx-auto h-9 w-9 text-slate-300" />
+                            <p class="mt-3 font-medium text-slate-500">Belum ada komentar.</p>
+                            <p class="mt-1 text-sm text-slate-400">Jadilah penyewa pertama yang memberikan ulasan.</p>
                         </div>
 
                         <nav v-if="reviews.links && reviews.links.length > 3" class="flex flex-wrap justify-center gap-1 pt-3" aria-label="Navigasi ulasan">
@@ -513,13 +513,13 @@ const cheapestPrice = computed(() => {
                                     preserve-scroll
                                     class="rounded-md border px-3 py-1.5 text-sm transition-colors"
                                     :class="link.active
-                                        ? 'border-indigo-600 bg-indigo-600 text-white'
-                                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'"
+                                        ? 'border-teal-600 bg-teal-600 text-white'
+                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
                                     v-html="link.label"
                                 />
                                 <span
                                     v-else
-                                    class="cursor-not-allowed rounded-md border border-gray-100 px-3 py-1.5 text-sm text-gray-300"
+                                    class="cursor-not-allowed rounded-md border border-slate-100 px-3 py-1.5 text-sm text-slate-300"
                                     v-html="link.label"
                                 />
                             </template>
@@ -565,9 +565,9 @@ const cheapestPrice = computed(() => {
                 </DialogHeader>
                 
                 <form @submit.prevent="submitBooking" class="space-y-4">
-                    <div v-if="bookingRoom" class="bg-gray-50 rounded-lg p-3">
-                        <p class="font-semibold text-gray-900">{{ bookingRoom.name || `Kamar ${bookingRoom.room_number}` }}</p>
-                        <p class="text-sm text-indigo-600 font-medium">{{ formatRupiah(bookingRoom.price) }} / {{ bookingRoom.price_period }}</p>
+                    <div v-if="bookingRoom" class="bg-slate-50 rounded-lg p-3">
+                        <p class="font-semibold text-slate-900">{{ bookingRoom.name || `Kamar ${bookingRoom.room_number}` }}</p>
+                        <p class="text-sm text-teal-600 font-medium">{{ formatRupiah(bookingRoom.price) }} / {{ bookingRoom.price_period }}</p>
                     </div>
                     
                     <div class="space-y-2">
@@ -578,7 +578,7 @@ const cheapestPrice = computed(() => {
                     <div class="space-y-2">
                         <Label for="occupant_count">Jumlah Penghuni</Label>
                         <Input id="occupant_count" type="number" min="1" :max="bookingRoom?.capacity || 1" v-model="form.occupant_count" required />
-                        <p class="text-xs text-gray-500">Maksimal {{ bookingRoom?.capacity }} orang</p>
+                        <p class="text-xs text-slate-500">Maksimal {{ bookingRoom?.capacity }} orang</p>
                     </div>
 
                     <DialogFooter class="mt-6">
@@ -627,7 +627,7 @@ const cheapestPrice = computed(() => {
                         />
                         <div class="flex justify-between gap-3 text-xs">
                             <p class="text-red-600">{{ reportForm.errors.description }}</p>
-                            <p class="ml-auto text-gray-400">{{ reportForm.description.length }}/1000</p>
+                            <p class="ml-auto text-slate-400">{{ reportForm.description.length }}/1000</p>
                         </div>
                     </div>
 
@@ -642,3 +642,4 @@ const cheapestPrice = computed(() => {
         </Dialog>
     </PublicLayout>
 </template>
+

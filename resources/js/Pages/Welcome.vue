@@ -236,90 +236,53 @@ onBeforeUnmount(() => {
         </Head>
 
         <div ref="landingPage">
-        <!-- 1. Modern Hero with Glassmorphism -->
-        <section class="relative isolate overflow-hidden bg-[#02080a] text-white pb-32 pt-20">
-            <div class="absolute inset-0 -z-10">
-                <div class="absolute -left-20 top-0 h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-teal-500/20 to-emerald-400/20 blur-[120px]" />
-                <div class="absolute -right-20 bottom-0 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-orange-400/20 to-rose-400/20 blur-[130px]" />
-                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[1200px] rounded-full bg-white/[0.02] blur-[100px]" />
-                <div class="hero-grid absolute inset-0 opacity-40 mix-blend-overlay" />
-            </div>
+        <!-- 1. Modern Hero -->
+        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20">
+            <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
             <div class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:pb-32 lg:pt-20">
-                <div class="relative z-10 max-w-2xl -mt-8 lg:-mt-24">
-                    <div class="group mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 p-1 pr-4 text-xs font-semibold tracking-wide text-teal-100 shadow-2xl backdrop-blur-xl transition-all hover:bg-white/10">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-teal-400/20 text-teal-300">
-                            <Star class="h-3.5 w-3.5" />
-                        </span>
-                        Ekosistem kos modern terintegrasi
-                    </div>
-
-                    <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-[4.75rem]">
+                <div class="relative z-10 max-w-2xl -mt-12 lg:-mt-24">
+                    <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
                         Temukan ruang untuk
                         <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-2">hidup lebih dekat.</span>
                     </h1>
 
                     <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-300 sm:text-xl font-medium">
-                        Jelajahi kos premium melalui peta interaktif, periksa kamar dan ulasan terverifikasi, lalu kelola sewa serta pembayaran dari satu tempat yang transparan.
+                        Jelajahi kos premium melalui peta interaktif, periksa kamar dan ulasan terverifikasi, lalu kelola sewa dari satu tempat yang transparan.
                     </p>
 
                     <div class="mt-10 flex flex-col gap-4 sm:flex-row">
                         <Link :href="route('public.kos.index')">
-                            <Button class="group relative h-14 w-full overflow-hidden rounded-full bg-gradient-to-r from-[#f7924a] to-[#ffaa66] px-8 text-base font-bold text-[#172225] shadow-[0_0_40px_-10px_rgba(247,146,74,0.8)] transition-all hover:scale-105 hover:shadow-[0_0_60px_-15px_rgba(247,146,74,1)] sm:w-auto">
-                                <span class="relative z-10 flex items-center gap-2">
-                                    Jelajahi Kos Sekarang
-                                    <ArrowRight class="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                </span>
-                                <div class="absolute inset-0 z-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                            <Button class="group h-12 w-full rounded-full bg-teal-500 px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 hover:-translate-y-0.5 sm:w-auto">
+                                Jelajahi Kos Sekarang
+                                <ArrowRight class="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                             </Button>
                         </Link>
                         <a href="#cara-kerja">
-                            <Button variant="outline" class="h-14 w-full rounded-full border-white/10 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:text-white sm:w-auto">
+                            <Button class="h-12 w-full rounded-full border border-slate-700 bg-slate-800 px-8 text-sm font-bold text-white transition-all hover:bg-slate-700 hover:border-slate-600 hover:-translate-y-0.5 sm:w-auto">
                                 Lihat Cara Kerja
                             </Button>
                         </a>
                     </div>
 
-                    <div class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium text-slate-300">
+                    <div class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium text-slate-400">
                         <span class="flex items-center gap-2">
-                            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-teal-500/20">
-                                <Check class="h-3.5 w-3.5 text-teal-300" />
-                            </div>
+                            <Check class="h-4 w-4 text-teal-400" />
                             Pencarian berbasis peta
                         </span>
                         <span class="flex items-center gap-2">
-                            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-teal-500/20">
-                                <Check class="h-3.5 w-3.5 text-teal-300" />
-                            </div>
+                            <Check class="h-4 w-4 text-teal-400" />
                             Data ditinjau admin
                         </span>
                         <span class="flex items-center gap-2">
-                            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-teal-500/20">
-                                <Check class="h-3.5 w-3.5 text-teal-300" />
-                            </div>
+                            <Check class="h-4 w-4 text-teal-400" />
                             Pembayaran aman
                         </span>
                     </div>
                 </div>
 
                 <div class="relative min-h-[460px] lg:min-h-[650px] w-full">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-teal-500/10 to-transparent rounded-[3rem] blur-2xl transform rotate-3 scale-105" />
                     <LandingHeroScene class="relative z-10" />
-
-                    <!-- Floating glass card 1 -->
-                    <div class="absolute -bottom-6 left-4 z-20 animate-float rounded-2xl border border-white/20 bg-white/10 p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-xl sm:left-10 lg:bottom-10">
-                        <div class="flex items-center gap-4">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 shadow-inner">
-                                <MapPin class="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <p class="text-xs font-medium text-teal-100 uppercase tracking-wider">Siap dijelajahi</p>
-                                <p class="text-lg font-bold text-white">{{ formatNumber(stats.publishedKos) }} kos premium</p>
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
             </div>
 
@@ -357,68 +320,63 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 6. How it works -->
-        <section id="cara-kerja" class="scroll-mt-20 bg-[#030b0e] py-24 sm:py-32 relative overflow-hidden">
-            <!-- Glowing Orbs -->
-            <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-teal-500/10 rounded-full blur-[150px] opacity-70 translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-            <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[150px] opacity-70 -translate-x-1/3 translate-y-1/3 pointer-events-none" />
-            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-50 pointer-events-none" />
-
+        <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Perjalanan yang sangat mulus.</h2>
-                    <p class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-400">Dari pencarian awal hingga pengelolaan masa sewa, semua dirancang dalam satu ekosistem tanpa gesekan yang membuang waktu Anda.</p>
+                    <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-300">Dari pencarian awal hingga pengelolaan masa sewa, semua dirancang dalam satu ekosistem tanpa gesekan yang membuang waktu Anda.</p>
                 </div>
 
                 <div class="mt-20 max-w-6xl mx-auto relative">
                     <!-- Horizontal Timeline Track (Desktop) -->
-                    <div class="hidden md:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-teal-500/30 via-blue-500/30 to-violet-500/30 z-0 rounded-full blur-[1px]"></div>
-                    <div class="hidden md:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-teal-500/50 via-blue-500/50 to-violet-500/50 z-0"></div>
+                    <div class="hidden md:block absolute top-8 left-[10%] right-[10%] h-px bg-slate-800 z-0"></div>
+                    <div class="hidden md:block absolute top-8 left-[10%] right-[10%] h-px bg-gradient-to-r from-teal-500/50 via-blue-500/50 to-violet-500/50 z-0"></div>
 
                     <!-- Vertical Timeline Track (Mobile) -->
-                    <div class="md:hidden absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-teal-500/30 via-blue-500/30 to-violet-500/30 z-0"></div>
+                    <div class="md:hidden absolute left-8 top-8 bottom-8 w-px bg-gradient-to-b from-teal-500/50 via-blue-500/50 to-violet-500/50 z-0"></div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6 relative z-10">
                         <!-- Step 1 -->
                         <div data-reveal="scale" class="relative flex flex-row md:flex-col items-center md:text-center gap-6 md:gap-0 group" style="--reveal-delay: 0ms">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#030b0e] border border-teal-500/30 shadow-[0_0_20px_rgba(20,184,166,0.1)] group-hover:border-teal-400 group-hover:shadow-[0_0_40px_rgba(20,184,166,0.4)] transition-all md:mb-6 group-hover:-translate-y-2 group-hover:scale-110">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 border border-slate-700 group-hover:border-teal-500 transition-all md:mb-6 group-hover:-translate-y-1">
                                 <Search class="h-6 w-6 text-teal-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-teal-300 transition-colors">1. Cari dari peta</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 group-hover:text-slate-300 transition-colors">Eksplorasi visual pada area pilihan dengan filter cerdas untuk temukan kos terdekat.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">1. Cari dari peta</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Eksplorasi visual pada area pilihan dengan filter cerdas untuk temukan kos terdekat.</p>
                             </div>
                         </div>
 
                         <!-- Step 2 -->
                         <div data-reveal="scale" class="relative flex flex-row md:flex-col items-center md:text-center gap-6 md:gap-0 group" style="--reveal-delay: 100ms">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#030b0e] border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.1)] group-hover:border-emerald-400 group-hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] transition-all md:mb-6 group-hover:-translate-y-2 group-hover:scale-110">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 border border-slate-700 group-hover:border-emerald-500 transition-all md:mb-6 group-hover:-translate-y-1">
                                 <MapPin class="h-6 w-6 text-emerald-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">2. Periksa detail</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 group-hover:text-slate-300 transition-colors">Tinjau foto lengkap, fasilitas kamar, aturan kos, dan baca ulasan nyata penghuni.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">2. Periksa detail</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Tinjau foto lengkap, fasilitas kamar, aturan kos, dan baca ulasan nyata penghuni.</p>
                             </div>
                         </div>
 
                         <!-- Step 3 -->
                         <div data-reveal="scale" class="relative flex flex-row md:flex-col items-center md:text-center gap-6 md:gap-0 group" style="--reveal-delay: 200ms">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#030b0e] border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.1)] group-hover:border-blue-400 group-hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] transition-all md:mb-6 group-hover:-translate-y-2 group-hover:scale-110">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 border border-slate-700 group-hover:border-blue-500 transition-all md:mb-6 group-hover:-translate-y-1">
                                 <ClipboardCheck class="h-6 w-6 text-blue-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">3. Ajukan sewa</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 group-hover:text-slate-300 transition-colors">Pilih kamar dan tanggal masuk, lalu kirim pengajuan sewa langsung ke sistem.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">3. Ajukan sewa</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Pilih kamar dan tanggal masuk, lalu kirim pengajuan sewa langsung ke sistem.</p>
                             </div>
                         </div>
 
                         <!-- Step 4 -->
                         <div data-reveal="scale" class="relative flex flex-row md:flex-col items-center md:text-center gap-6 md:gap-0 group" style="--reveal-delay: 300ms">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#030b0e] border border-violet-500/30 shadow-[0_0_20px_rgba(139,92,246,0.1)] group-hover:border-violet-400 group-hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] transition-all md:mb-6 group-hover:-translate-y-2 group-hover:scale-110">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 border border-slate-700 group-hover:border-violet-500 transition-all md:mb-6 group-hover:-translate-y-1">
                                 <KeyRound class="h-6 w-6 text-violet-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">4. Kelola mudah</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 group-hover:text-slate-300 transition-colors">Pantau status, bayar tagihan bulanan secara otomatis, dan lihat arsip invoice.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">4. Kelola mudah</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Pantau status, bayar tagihan bulanan secara otomatis, dan lihat arsip invoice.</p>
                             </div>
                         </div>
                     </div>
@@ -782,48 +740,50 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 14. Professional footer -->
-        <footer class="border-t border-slate-800 bg-[#071a1d] text-white">
-            <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-                <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr]">
-                    <div>
-                        <Link :href="route('home')" class="inline-flex items-center gap-2 text-lg font-bold">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-300 text-[#071a1d]">
+        <footer class="border-t border-slate-200 bg-white">
+            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="lg:col-span-1">
+                        <Link :href="route('home')" class="inline-flex items-center gap-2 text-lg font-bold text-slate-900">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
                                 <Home class="h-4 w-4" />
                             </span>
                             Kos Online
                         </Link>
-                        <p class="mt-5 max-w-sm text-sm leading-7 text-slate-400">Platform pencarian dan pengelolaan kos yang mempertemukan kebutuhan penyewa dan pemilik dalam alur yang lebih tertata.</p>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-500">
+                            Platform pencarian dan pengelolaan kos yang mempertemukan kebutuhan penyewa dan pemilik dalam alur yang lebih tertata.
+                        </p>
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-bold">Jelajahi</h3>
-                        <nav class="mt-5 flex flex-col gap-3 text-sm text-slate-400">
-                            <Link :href="route('public.kos.index')" class="hover:text-teal-300">Cari Kos</Link>
-                            <a href="#cara-kerja" class="hover:text-teal-300">Cara Kerja</a>
-                            <a href="#ulasan" class="hover:text-teal-300">Ulasan Penyewa</a>
+                        <h3 class="text-sm font-bold text-slate-900">Jelajahi</h3>
+                        <nav class="mt-4 flex flex-col gap-3 text-sm text-slate-500">
+                            <Link :href="route('public.kos.index')" class="hover:text-teal-600 transition-colors">Cari Kos</Link>
+                            <a href="#cara-kerja" class="hover:text-teal-600 transition-colors">Cara Kerja</a>
+                            <a href="#ulasan" class="hover:text-teal-600 transition-colors">Ulasan Penyewa</a>
                         </nav>
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-bold">Platform</h3>
-                        <nav class="mt-5 flex flex-col gap-3 text-sm text-slate-400">
-                            <a href="#keamanan" class="hover:text-teal-300">Keamanan</a>
-                            <a href="#pemilik" class="hover:text-teal-300">Untuk Pemilik</a>
-                            <Link v-if="canLogin && !$page.props.auth.user" :href="route('login')" class="hover:text-teal-300">Masuk Akun</Link>
+                        <h3 class="text-sm font-bold text-slate-900">Platform</h3>
+                        <nav class="mt-4 flex flex-col gap-3 text-sm text-slate-500">
+                            <a href="#keamanan" class="hover:text-teal-600 transition-colors">Keamanan</a>
+                            <a href="#pemilik" class="hover:text-teal-600 transition-colors">Untuk Pemilik</a>
+                            <Link v-if="canLogin && !$page.props.auth.user" :href="route('login')" class="hover:text-teal-600 transition-colors">Masuk Akun</Link>
                         </nav>
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-bold">Akses cepat</h3>
-                        <p class="mt-5 text-sm leading-6 text-slate-400">Temukan kos yang tersedia di sekitar area tujuan Anda.</p>
-                        <Link :href="route('public.kos.index')" class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-300 hover:text-teal-200">
+                        <h3 class="text-sm font-bold text-slate-900">Akses Cepat</h3>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-500">Temukan kos yang tersedia di sekitar area tujuan Anda.</p>
+                        <Link :href="route('public.kos.index')" class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-teal-600 hover:text-teal-700 transition-colors">
                             Buka peta kos
                             <ArrowRight class="h-4 w-4" />
                         </Link>
                     </div>
                 </div>
 
-                <div class="mt-12 flex flex-col gap-3 border-t border-white/10 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+                <div class="mt-12 flex flex-col gap-4 border-t border-slate-100 pt-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
                     <p>&copy; {{ new Date().getFullYear() }} Kos Online. Seluruh hak dilindungi.</p>
                     <p>Dibangun untuk ekosistem sewa kos yang lebih tertata.</p>
                 </div>

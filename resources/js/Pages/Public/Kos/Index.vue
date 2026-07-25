@@ -128,25 +128,25 @@ const updateMapMarkers = () => {
 
             const photoHtml = kos.photos && kos.photos.length > 0 
                 ? `<img src="${kos.photos[0].file_path}" class="w-full h-32 object-cover" />`
-                : `<div class="w-full h-32 bg-gray-200 flex items-center justify-center text-gray-400 text-xs">Tidak ada foto</div>`;
+                : `<div class="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs">Tidak ada foto</div>`;
             
-            const facilitiesHtml = kos.facilities.slice(0, 2).map(f => `<span class="px-1.5 py-0.5 bg-gray-100 text-[10px] rounded text-gray-600">${f.name}</span>`).join('');
-            const moreFacilitiesHtml = kos.facilities.length > 2 ? `<span class="px-1.5 py-0.5 bg-gray-100 text-[10px] rounded text-gray-600">+${kos.facilities.length - 2}</span>` : '';
+            const facilitiesHtml = kos.facilities.slice(0, 2).map(f => `<span class="px-1.5 py-0.5 bg-slate-100 text-[10px] font-medium rounded text-slate-600">${f.name}</span>`).join('');
+            const moreFacilitiesHtml = kos.facilities.length > 2 ? `<span class="px-1.5 py-0.5 bg-slate-100 text-[10px] font-medium rounded text-slate-600">+${kos.facilities.length - 2}</span>` : '';
 
             marker.bindPopup(`
-                <div class="flex flex-col w-[240px] overflow-hidden rounded-lg">
+                <div class="flex flex-col w-[240px] overflow-hidden rounded-xl">
                     ${photoHtml}
-                    <div class="p-3 bg-white">
-                        <h3 class="font-bold text-[15px] mb-1 leading-tight text-gray-900">${kos.name}</h3>
-                        <p class="text-[12px] text-gray-500 mb-2 flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <div class="p-4 bg-white">
+                        <h3 class="font-bold text-[15px] mb-1 leading-tight text-slate-900">${kos.name}</h3>
+                        <p class="text-[12px] text-slate-500 mb-3 flex items-center gap-1 font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                             ${kos.city}, ${kos.district}
                         </p>
-                        <div class="flex flex-wrap gap-1 mb-3">
+                        <div class="flex flex-wrap gap-1.5 mb-4">
                             ${facilitiesHtml}
                             ${moreFacilitiesHtml}
                         </div>
-                        <a href="${route('public.kos.show', kos.id)}" class="flex items-center justify-center gap-1 text-[13px] font-medium bg-indigo-600 hover:bg-indigo-700 !text-white px-3 py-2 rounded-md transition-colors w-full">
+                        <a href="${route('public.kos.show', kos.id)}" class="flex items-center justify-center gap-1 text-[13px] font-bold bg-teal-500 hover:bg-teal-600 !text-white px-3 py-2 rounded-lg transition-all w-full hover:-translate-y-0.5 shadow-sm">
                             Lihat Detail
                         </a>
                     </div>
@@ -214,19 +214,22 @@ onMounted(() => {
             <div 
                 ref="cardRef"
                 :style="cardStyle"
-                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-gray-100 flex flex-col gap-4"
+                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex flex-col gap-5"
             >
-                <div ref="dragHandleRef" class="w-full cursor-grab active:cursor-grabbing flex justify-center pb-2 -mt-2 opacity-50 hover:opacity-100 transition-opacity">
-                    <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+                <div ref="dragHandleRef" class="w-full cursor-grab active:cursor-grabbing flex justify-center pb-1 -mt-2 opacity-50 hover:opacity-100 transition-opacity">
+                    <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2 mb-1">
-                        <Map class="w-5 h-5 text-indigo-600" /> Cari Kos Sekitar
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-2">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                            <Map class="w-4 h-4" />
+                        </span>
+                        Cari Kos Sekitar
                     </h2>
-                    <p class="text-xs text-gray-500 leading-relaxed">Aktifkan GPS Anda dan geser slider untuk menemukan kos yang masuk dalam area radius.</p>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">Aktifkan GPS Anda dan geser slider untuk menemukan kos yang masuk dalam area radius.</p>
                 </div>
 
-                <Button @click="getLocation(false)" size="default" class="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-sm h-11" :disabled="detectingLocation">
+                <Button @click="getLocation(false)" size="default" class="w-full gap-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-md h-12 transition-all hover:-translate-y-0.5" :disabled="detectingLocation">
                     <svg v-if="detectingLocation" class="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -237,8 +240,8 @@ onMounted(() => {
                 
                 <div class="w-full text-left transition-opacity duration-300" :class="{ 'opacity-50 pointer-events-none': !latitude }">
                     <div class="flex justify-between items-center mb-3">
-                        <Label class="text-sm font-bold text-gray-700">Radius Jangkauan</Label>
-                        <span class="text-indigo-700 font-bold bg-indigo-50 px-2.5 py-1 rounded-full text-xs border border-indigo-100">{{ radius }} KM</span>
+                        <Label class="text-sm font-bold text-slate-700">Radius Jangkauan</Label>
+                        <span class="text-teal-700 font-bold bg-teal-50 px-3 py-1 rounded-full text-xs border border-teal-100">{{ radius }} KM</span>
                     </div>
                     <input 
                         type="range" 
@@ -246,17 +249,17 @@ onMounted(() => {
                         min="1" 
                         max="50" 
                         step="1"
-                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30" 
+                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30" 
                         :disabled="!latitude"
                     />
-                    <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-medium">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-bold tracking-wider">
                         <span>1 KM</span>
                         <span>50 KM</span>
                     </div>
                 </div>
 
-                <div v-if="latitude" class="text-xs text-center text-gray-600 bg-gray-50 p-2.5 rounded-xl font-medium border border-gray-100 shadow-inner">
-                    <span class="font-bold text-indigo-600 text-sm">{{ filteredKos.length }}</span> properti kos ditemukan
+                <div v-if="latitude" class="text-xs text-center text-slate-600 bg-slate-50 p-3 rounded-xl font-medium border border-slate-100 shadow-inner">
+                    <span class="font-bold text-teal-600 text-sm">{{ filteredKos.length }}</span> properti kos ditemukan
                 </div>
             </div>
 
@@ -294,7 +297,7 @@ input[type=range]::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: #4f46e5;
+    background: #14b8a6; /* teal-500 */
     cursor: pointer;
     margin-top: -8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
@@ -303,7 +306,7 @@ input[type=range]::-moz-range-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: #4f46e5;
+    background: #14b8a6; /* teal-500 */
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);

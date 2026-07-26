@@ -35,7 +35,8 @@ return [
         ],
     ],
 
-    'fonnte' => [
-        'api_key' => env('FONNTE_API_KEY'),
+    'wa_service' => [
+        'url' => env('WA_SERVICE_URL', 'http://localhost:3001'),
+        'api_key' => env('WA_SERVICE_API_KEY'),
     ],
 ];

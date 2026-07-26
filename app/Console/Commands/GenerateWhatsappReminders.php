@@ -20,7 +20,7 @@ class GenerateWhatsappReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Generate Whatsapp reminders for invoices due in 3 days or less';
+    protected $description = 'Generate Whatsapp reminders for invoices due today';
 
     /**
      * Execute the console command.
@@ -29,7 +29,7 @@ class GenerateWhatsappReminders extends Command
     {
         // Get invoices that are not paid, not waiting for confirmation, and are due in 3 days or already past due
         $invoices = Invoice::whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
-            ->where('due_date', '<=', now()->addDays(3))
+            ->whereDate('due_date', today())
             ->with(['tenant', 'tenancy.room.boardingHouse'])
             ->get();
 
@@ -37,9 +37,6 @@ class GenerateWhatsappReminders extends Command
         foreach ($invoices as $invoice) {
             $tenant = $invoice->tenant;
             if (!$tenant || !$tenant->whatsapp_number) continue;
-
-            $diffDays = now()->startOfDay()->diffInDays($invoice->due_date, false);
-            $dayText = $diffDays > 0 ? "dalam {$diffDays} hari" : ($diffDays === 0 ? "HARI INI" : "TELAH LEWAT");
 
             // Avoid generating duplicate reminder for the same date
             $exists = WhatsappNotification::where('invoice_id', $invoice->id)
@@ -51,9 +48,10 @@ class GenerateWhatsappReminders extends Command
                 WhatsappNotification::create([
                     'invoice_id' => $invoice->id,
                     'tenant_id' => $tenant->id,
+                    'owner_id' => $invoice->owner_id,
                     'phone_number' => $tenant->whatsapp_number,
                     'message_type' => 'pengingat_jatuh_tempo',
-                    'message_body' => "Halo {$tenant->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " jatuh tempo $dayText (" . $invoice->due_date->format('d M Y') . "). Mohon segera lakukan pembayaran.",
+                    'message_body' => "Halo {$tenant->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " jatuh tempo HARI INI (" . $invoice->due_date->format('d M Y') . "). Mohon segera lakukan pembayaran.",
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);

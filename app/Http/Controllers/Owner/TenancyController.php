@@ -89,23 +89,7 @@ class TenancyController extends Controller
                 $room->update(['status' => 'tersedia']);
             }
 
-            // Notification to Tenant
-            $tenant = $invoice->tenant;
-            if ($tenant && $tenant->whatsapp_number) {
-                \App\Models\WhatsappNotification::updateOrCreate(
-                    [
-                        'invoice_id' => $invoice->id,
-                        'message_type' => 'pembayaran_dikonfirmasi',
-                        'scheduled_date' => today(),
-                    ],
-                    [
-                        'tenant_id' => $tenant->id,
-                        'phone_number' => $tenant->whatsapp_number,
-                        'message_body' => "Halo {$tenant->name}, pembayaran sewa Anda sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " telah DISETUJUI. Selamat menempati kamar Anda!",
-                        'status' => 'belum_dikirim',
-                    ]
-                );
-            }
+
 
             \App\Models\ActivityLog::create([
                 'user_id' => auth()->id(),
@@ -125,23 +109,7 @@ class TenancyController extends Controller
             ]);
             $invoice->update(['status' => 'belum_dibayar']);
             
-            // Notification to Tenant
-            $tenant = $invoice->tenant;
-            if ($tenant && $tenant->whatsapp_number) {
-                \App\Models\WhatsappNotification::updateOrCreate(
-                    [
-                        'invoice_id' => $invoice->id,
-                        'message_type' => 'pembayaran_dikonfirmasi',
-                        'scheduled_date' => today(),
-                    ],
-                    [
-                        'tenant_id' => $tenant->id,
-                        'phone_number' => $tenant->whatsapp_number,
-                        'message_body' => "Halo {$tenant->name}, pembayaran sewa Anda sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " DITOLAK. Catatan: " . ($request->review_note ?? 'Tidak ada') . ". Silakan unggah bukti yang benar.",
-                        'status' => 'belum_dikirim',
-                    ]
-                );
-            }
+
 
             return back()->with('success', 'Pembayaran ditolak.');
         }

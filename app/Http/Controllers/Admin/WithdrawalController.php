@@ -66,6 +66,21 @@ class WithdrawalController extends Controller
             ]);
 
             $this->log($request, 'withdrawal.completed', $withdrawal);
+
+            // WhatsApp notification to owner
+            $owner = $withdrawal->owner ?? \App\Models\User::find($withdrawal->owner_id);
+            if ($owner && $owner->whatsapp_number) {
+                \App\Models\WhatsappNotification::create([
+                    'tenant_id' => $owner->id,
+                    'owner_id' => $withdrawal->owner_id,
+                    'send_via' => 'admin',
+                    'phone_number' => $owner->whatsapp_number,
+                    'message_type' => 'penarikan_disetujui',
+                    'message_body' => "Halo {$owner->name}, penarikan dana sebesar Rp" . number_format($withdrawal->amount, 0, ',', '.') . " telah disetujui dan ditransfer ke rekening Anda. No. Ref: {$validated['transfer_reference']}",
+                    'scheduled_date' => today(),
+                    'status' => 'belum_dikirim',
+                ]);
+            }
         });
 
         return back()->with('success', 'Penarikan telah disetujui dan ditransfer.');
@@ -101,6 +116,21 @@ class WithdrawalController extends Controller
             ]);
 
             $this->log($request, 'withdrawal.rejected', $withdrawal);
+
+            // WhatsApp notification to owner
+            $owner = $withdrawal->owner ?? \App\Models\User::find($withdrawal->owner_id);
+            if ($owner && $owner->whatsapp_number) {
+                \App\Models\WhatsappNotification::create([
+                    'tenant_id' => $owner->id,
+                    'owner_id' => $withdrawal->owner_id,
+                    'send_via' => 'admin',
+                    'phone_number' => $owner->whatsapp_number,
+                    'message_type' => 'penarikan_ditolak',
+                    'message_body' => "Halo {$owner->name}, penarikan dana sebesar Rp" . number_format($withdrawal->amount, 0, ',', '.') . " ditolak. Alasan: {$validated['review_note']}. Saldo Anda telah dikembalikan.",
+                    'scheduled_date' => today(),
+                    'status' => 'belum_dikirim',
+                ]);
+            }
         });
 
         return back()->with('success', 'Penarikan ditolak dan saldo pemilik dikembalikan.');

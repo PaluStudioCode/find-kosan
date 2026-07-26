@@ -143,24 +143,6 @@ class TenancyController extends Controller
 
         $invoice->update(['status' => 'menunggu_konfirmasi']);
 
-        // Notification to Owner
-        $owner = $invoice->owner;
-        if ($owner && $owner->whatsapp_number) {
-            \App\Models\WhatsappNotification::updateOrCreate(
-                [
-                    'invoice_id' => $invoice->id,
-                    'message_type' => 'pembayaran_baru',
-                    'scheduled_date' => today(),
-                ],
-                [
-                    'tenant_id' => $owner->id,
-                    'phone_number' => $owner->whatsapp_number,
-                    'message_body' => "Halo {$owner->name}, ada pembayaran baru sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " yang menunggu konfirmasi. Silakan cek dashboard Anda.",
-                    'status' => 'belum_dikirim',
-                ]
-            );
-        }
-
         return back()->with('success', 'Bukti pembayaran berhasil diunggah.');
     }
 }

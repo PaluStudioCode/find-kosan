@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(BoardingHouseReview::class);
     }
+
+    public function waSession()
+    {
+        return $this->hasOne(WaSession::class, 'owner_id');
+    }
 }

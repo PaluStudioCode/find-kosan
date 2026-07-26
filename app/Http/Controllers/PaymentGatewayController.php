@@ -176,8 +176,11 @@ class PaymentGatewayController extends Controller
                 ]
             );
 
-            $tenant = $invoice->tenant;
-            if ($tenant && $tenant->whatsapp_number) {
+            $owner = \App\Models\User::find($invoice->owner_id);
+            if ($owner && $owner->whatsapp_number) {
+                $tenantName = $invoice->tenant->name ?? 'Penyewa';
+                $kosName = $invoice->tenancy->room->boardingHouse->name ?? 'kos';
+                $roomNumber = $invoice->tenancy->room->room_number ?? '';
                 \App\Models\WhatsappNotification::updateOrCreate(
                     [
                         'invoice_id' => $invoice->id,
@@ -185,9 +188,11 @@ class PaymentGatewayController extends Controller
                         'scheduled_date' => today(),
                     ],
                     [
-                        'tenant_id' => $tenant->id,
-                        'phone_number' => $tenant->whatsapp_number,
-                        'message_body' => "Halo {$tenant->name}, pembayaran sewa Anda otomatis DISETUJUI via Duitku. Selamat menempati kamar Anda!",
+                        'tenant_id' => $invoice->tenant_id,
+                        'owner_id' => $invoice->owner_id,
+                        'send_via' => 'admin',
+                        'phone_number' => $owner->whatsapp_number,
+                        'message_body' => "Halo {$owner->name}, pembayaran sewa dari {$tenantName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " telah diterima melalui Duitku.",
                         'status' => 'belum_dikirim',
                     ]
                 );

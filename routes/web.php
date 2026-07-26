@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VerificationController as AdminVerificationController;
 use App\Http\Controllers\Admin\WithdrawalController;
+use App\Http\Controllers\Admin\WhatsappSettingsController as AdminWhatsappSettingsController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboard;
 use App\Http\Controllers\Owner\KosController as OwnerKosController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Owner\LegalDocumentController as OwnerLegalDocumentCont
 use App\Http\Controllers\Owner\RoomController as OwnerRoomController;
 use App\Http\Controllers\Owner\TenancyController;
 use App\Http\Controllers\Owner\WalletController;
+use App\Http\Controllers\Owner\WhatsappSettingsController;
 use App\Http\Controllers\PaymentGatewayController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
@@ -66,6 +68,14 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
             Route::post('/withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
             Route::post('/withdrawals/{withdrawal}/complete', [WithdrawalController::class, 'complete'])->name('withdrawals.complete');
+
+            // WhatsApp Settings (Admin/System)
+            Route::get('/whatsapp-settings', [AdminWhatsappSettingsController::class, 'index'])->name('whatsapp.index');
+            Route::post('/whatsapp-settings/start', [AdminWhatsappSettingsController::class, 'startSession'])->name('whatsapp.start');
+            Route::post('/whatsapp-settings/start-pairing', [AdminWhatsappSettingsController::class, 'startPairingCode'])->name('whatsapp.start-pairing');
+            Route::post('/whatsapp-settings/stop', [AdminWhatsappSettingsController::class, 'stopSession'])->name('whatsapp.stop');
+            Route::get('/whatsapp-settings/status', [AdminWhatsappSettingsController::class, 'getStatus'])->name('whatsapp.status');
+            Route::get('/whatsapp-settings/qr', [AdminWhatsappSettingsController::class, 'getQrCode'])->name('whatsapp.qr');
         });
 
         // Role Pemilik Kos
@@ -94,6 +104,14 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
             
             Route::get('/reviews', [App\Http\Controllers\Owner\ReviewController::class, 'index'])->name('reviews.index');
+
+            // WhatsApp Settings
+            Route::get('/whatsapp-settings', [WhatsappSettingsController::class, 'index'])->name('whatsapp.index');
+            Route::post('/whatsapp-settings/start', [WhatsappSettingsController::class, 'startSession'])->name('whatsapp.start');
+            Route::post('/whatsapp-settings/start-pairing', [WhatsappSettingsController::class, 'startPairingCode'])->name('whatsapp.start-pairing');
+            Route::post('/whatsapp-settings/stop', [WhatsappSettingsController::class, 'stopSession'])->name('whatsapp.stop');
+            Route::get('/whatsapp-settings/status', [WhatsappSettingsController::class, 'getStatus'])->name('whatsapp.status');
+            Route::get('/whatsapp-settings/qr', [WhatsappSettingsController::class, 'getQrCode'])->name('whatsapp.qr');
         });
 
         // Role Penyewa

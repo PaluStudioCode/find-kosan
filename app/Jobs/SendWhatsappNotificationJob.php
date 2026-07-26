@@ -33,7 +33,24 @@ class SendWhatsappNotificationJob implements ShouldQueue
             return; // Already processed
         }
 
+        // Determine which WA session to use
+        if ($this->notification->send_via === 'admin') {
+            $sessionId = 0; // Admin/System WA session
+        } else {
+            $sessionId = $this->notification->owner_id
+                ?? $this->notification->invoice?->owner_id;
+        }
+
+        if (is_null($sessionId)) {
+            $this->notification->update([
+                'status' => 'gagal',
+                'failed_reason' => 'Session WA tidak ditemukan untuk notifikasi ini',
+            ]);
+            return;
+        }
+
         $result = $whatsappService->sendMessage(
+            $sessionId,
             $this->notification->phone_number,
             $this->notification->message_body
         );

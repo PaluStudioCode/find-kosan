@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('whatsapp_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
-            $table->foreignId('tenant_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('phone_number', 30);
             $table->enum('message_type', ['pengingat_jatuh_tempo', 'pembayaran_baru', 'pembayaran_dikonfirmasi']);
             $table->text('message_body')->nullable();

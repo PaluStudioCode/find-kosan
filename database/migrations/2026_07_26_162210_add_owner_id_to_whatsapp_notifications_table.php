@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('whatsapp_notifications', function (Blueprint $table) {
-            $table->foreignId('owner_id')->nullable()->after('tenant_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('admin_id')->nullable()->after('user_id')->constrained('users')->onDelete('cascade');
         });
     }
 
@@ -22,8 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('whatsapp_notifications', function (Blueprint $table) {
-            $table->dropForeign(['owner_id']);
-            $table->dropColumn('owner_id');
+            $table->dropForeign(['admin_id']);
+            $table->dropColumn('admin_id');
         });
     }
 };

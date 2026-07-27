@@ -55,7 +55,7 @@ const submit = () => {
                 <!-- Penyewa Card -->
                 <Card 
                     class="cursor-pointer border-2 transition-all duration-200 hover:border-primary hover:shadow-lg group"
-                    @click="selectRole('penyewa')"
+                    @click="selectRole('user')"
                 >
                     <CardContent class="p-6 flex items-center gap-5">
                         <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -74,7 +74,7 @@ const submit = () => {
                 <!-- Pemilik Kos Card -->
                 <Card 
                     class="cursor-pointer border-2 transition-all duration-200 hover:border-primary hover:shadow-lg group"
-                    @click="selectRole('pemilik_kos')"
+                    @click="selectRole('admin')"
                 >
                     <CardContent class="p-6 flex items-center gap-5">
                         <div class="w-14 h-14 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center shrink-0 group-hover:bg-green-600 group-hover:text-white transition-colors">
@@ -103,17 +103,17 @@ const submit = () => {
         <Card v-else class="border-0 shadow-none bg-transparent">
             <CardHeader class="space-y-2 text-center pb-6">
                 <CardTitle class="text-2xl font-bold tracking-tight">
-                    {{ form.role === 'penyewa' ? 'Daftar Sebagai Penyewa' : 'Daftar Sebagai Pemilik Kos' }}
+                    {{ form.role === 'user' ? 'Daftar Sebagai Penyewa' : 'Daftar Sebagai Pemilik Kos' }}
                 </CardTitle>
                 <CardDescription class="text-base">
-                    {{ form.role === 'penyewa' 
+                    {{ form.role === 'user' 
                         ? 'Buat akun untuk mulai mencari dan menyewa kos' 
                         : 'Buat akun untuk mulai mengelola kos Anda' }}
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <!-- Info Box -->
-                <div v-if="form.role === 'pemilik_kos'" class="mb-6 flex items-start gap-3 rounded-lg bg-blue-50/50 p-4 text-sm text-blue-900 border border-blue-100 shadow-sm">
+                <div v-if="form.role === 'admin'" class="mb-6 flex items-start gap-3 rounded-lg bg-blue-50/50 p-4 text-sm text-blue-900 border border-blue-100 shadow-sm">
                     <Info class="h-5 w-5 shrink-0 text-blue-500 mt-0.5" />
                     <p class="leading-relaxed">Kos tidak akan tampil di publik sebelum data kos dan dokumen legalitas wajib diverifikasi oleh admin.</p>
                 </div>

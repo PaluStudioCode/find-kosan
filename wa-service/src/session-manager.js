@@ -13,22 +13,22 @@ const logger = pino({ level: 'silent' });
 
 class SessionManager {
     constructor() {
-        /** @type {Map<string, object>} ownerId -> { socket, qr, status, pairingCode } */
+        /** @type {Map<string, object>} adminId -> { socket, qr, status, pairingCode } */
         this.sessions = new Map();
     }
 
     /**
-     * Get session info for an owner
+     * Get session info for an Admin
      */
-    getSession(ownerId) {
-        return this.sessions.get(String(ownerId)) || null;
+    getSession(adminId) {
+        return this.sessions.get(String(adminId)) || null;
     }
 
     /**
-     * Get current status of an owner's session
+     * Get current status of an Admin's session
      */
-    getStatus(ownerId) {
-        const session = this.getSession(ownerId);
+    getStatus(adminId) {
+        const session = this.getSession(adminId);
         if (!session) return { status: 'disconnected', qr: null, pairingCode: null, phoneNumber: null };
 
         return {
@@ -40,16 +40,16 @@ class SessionManager {
     }
 
     /**
-     * Start a new WhatsApp session for an owner
-     * @param {string|number} ownerId
+     * Start a new WhatsApp session for an Admin
+     * @param {string|number} adminId
      * @param {object} options - { usePairingCode: boolean, phoneNumber: string }
      */
-    async startSession(ownerId, options = {}) {
-        ownerId = String(ownerId);
+    async startSession(adminId, options = {}) {
+        adminId = String(adminId);
         const { usePairingCode = false, phoneNumber = null } = options;
 
         // If session already exists and is connected, return it
-        const existing = this.getSession(ownerId);
+        const existing = this.getSession(adminId);
         if (existing && existing.status === 'connected') {
             return { status: 'already_connected', phoneNumber: existing.phoneNumber };
         }
@@ -62,7 +62,7 @@ class SessionManager {
         }
 
         // Initialize session data
-        this.sessions.set(ownerId, {
+        this.sessions.set(adminId, {
             socket: null,
             qr: null,
             qrBase64: null,
@@ -73,25 +73,25 @@ class SessionManager {
             requestedPhoneNumber: phoneNumber,
         });
 
-        await this._updateDbStatus(ownerId, 'connecting');
+        await this._updateDbStatus(adminId, 'connecting');
 
         try {
-            await this._createSocket(ownerId);
+            await this._createSocket(adminId);
             return { status: 'connecting' };
         } catch (error) {
-            console.error(`[Session ${ownerId}] Failed to start:`, error.message);
-            this.sessions.delete(ownerId);
-            await this._updateDbStatus(ownerId, 'disconnected');
+            console.error(`[Session ${adminId}] Failed to start:`, error.message);
+            this.sessions.delete(adminId);
+            await this._updateDbStatus(adminId, 'disconnected');
             throw error;
         }
     }
 
     /**
-     * Stop/disconnect a session for an owner
+     * Stop/disconnect a session for an Admin
      */
-    async stopSession(ownerId) {
-        ownerId = String(ownerId);
-        const session = this.getSession(ownerId);
+    async stopSession(adminId) {
+        adminId = String(adminId);
+        const session = this.getSession(adminId);
 
         if (session && session.socket) {
             try {
@@ -103,24 +103,24 @@ class SessionManager {
             }
         }
 
-        this.sessions.delete(ownerId);
-        await clearAuthState(ownerId);
-        await this._updateDbStatus(ownerId, 'disconnected');
+        this.sessions.delete(adminId);
+        await clearAuthState(adminId);
+        await this._updateDbStatus(adminId, 'disconnected');
 
         return { status: 'disconnected' };
     }
 
     /**
-     * Send a WhatsApp message using an owner's session
+     * Send a WhatsApp message using an Admin's session
      */
-    async sendMessage(ownerId, targetPhone, message) {
-        ownerId = String(ownerId);
-        const session = this.getSession(ownerId);
+    async sendMessage(adminId, targetPhone, message) {
+        adminId = String(adminId);
+        const session = this.getSession(adminId);
 
         if (!session || session.status !== 'connected' || !session.socket) {
             return {
                 success: false,
-                reason: 'WhatsApp owner tidak terhubung',
+                reason: 'WhatsApp Admin tidak terhubung',
             };
         }
 
@@ -141,7 +141,7 @@ class SessionManager {
                 messageId: result.key.id,
             };
         } catch (error) {
-            console.error(`[Session ${ownerId}] Send failed:`, error.message);
+            console.error(`[Session ${adminId}] Send failed:`, error.message);
             return {
                 success: false,
                 reason: error.message,
@@ -155,17 +155,17 @@ class SessionManager {
     async restartSavedSessions() {
         const db = getPool();
         const [rows] = await db.execute(
-            "SELECT owner_id FROM wa_sessions WHERE status = 'connected'"
+            "SELECT admin_id FROM wa_sessions WHERE status = 'connected'"
         );
 
         console.log(`[SessionManager] Found ${rows.length} saved session(s) to restart.`);
 
         for (const row of rows) {
             try {
-                console.log(`[SessionManager] Restarting session for owner ${row.owner_id}...`);
-                await this.startSession(row.owner_id);
+                console.log(`[SessionManager] Restarting session for Admin ${row.admin_id}...`);
+                await this.startSession(row.admin_id);
             } catch (error) {
-                console.error(`[SessionManager] Failed to restart session for owner ${row.owner_id}:`, error.message);
+                console.error(`[SessionManager] Failed to restart session for Admin ${row.admin_id}:`, error.message);
             }
         }
     }
@@ -173,11 +173,11 @@ class SessionManager {
     /**
      * Internal: Create Baileys socket
      */
-    async _createSocket(ownerId) {
-        const { state, saveCreds } = await useMySQLAuthState(ownerId);
+    async _createSocket(adminId) {
+        const { state, saveCreds } = await useMySQLAuthState(adminId);
         const { version } = await fetchLatestBaileysVersion();
 
-        const session = this.getSession(ownerId);
+        const session = this.getSession(adminId);
         const usePairingCode = session?.usePairingCode || false;
 
         const socket = makeWASocket({
@@ -193,14 +193,14 @@ class SessionManager {
         });
 
         // Update session with socket
-        if (this.sessions.has(ownerId)) {
-            this.sessions.get(ownerId).socket = socket;
+        if (this.sessions.has(adminId)) {
+            this.sessions.get(adminId).socket = socket;
         }
 
         // Handle connection updates
         socket.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
-            const currentSession = this.getSession(ownerId);
+            const currentSession = this.getSession(adminId);
             if (!currentSession) return;
 
             if (qr && !usePairingCode) {
@@ -210,9 +210,9 @@ class SessionManager {
                     currentSession.qr = qr;
                     currentSession.qrBase64 = qrBase64;
                     currentSession.status = 'connecting';
-                    console.log(`[Session ${ownerId}] New QR code generated.`);
+                    console.log(`[Session ${adminId}] New QR code generated.`);
                 } catch (e) {
-                    console.error(`[Session ${ownerId}] QR generation error:`, e.message);
+                    console.error(`[Session ${adminId}] QR generation error:`, e.message);
                 }
             }
 
@@ -224,15 +224,15 @@ class SessionManager {
                 currentSession.qr = null;
                 currentSession.qrBase64 = null;
                 currentSession.pairingCode = null;
-                await this._updateDbStatus(ownerId, 'connected', phoneNumber);
-                console.log(`[Session ${ownerId}] Connected as ${phoneNumber}.`);
+                await this._updateDbStatus(adminId, 'connected', phoneNumber);
+                console.log(`[Session ${adminId}] Connected as ${phoneNumber}.`);
             }
 
             if (connection === 'close') {
                 const statusCode = lastDisconnect?.error?.output?.statusCode;
                 const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
 
-                console.log(`[Session ${ownerId}] Connection closed. Status: ${statusCode}. Reconnect: ${shouldReconnect}`);
+                console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}. Reconnect: ${shouldReconnect}`);
 
                 if (shouldReconnect) {
                     // Reconnect after a delay
@@ -241,19 +241,19 @@ class SessionManager {
                     currentSession.qrBase64 = null;
                     setTimeout(async () => {
                         try {
-                            if (this.sessions.has(ownerId)) {
-                                await this._createSocket(ownerId);
+                            if (this.sessions.has(adminId)) {
+                                await this._createSocket(adminId);
                             }
                         } catch (e) {
-                            console.error(`[Session ${ownerId}] Reconnect failed:`, e.message);
+                            console.error(`[Session ${adminId}] Reconnect failed:`, e.message);
                         }
                     }, 3000);
                 } else {
                     // Logged out - clean up
-                    this.sessions.delete(ownerId);
-                    await clearAuthState(ownerId);
-                    await this._updateDbStatus(ownerId, 'disconnected');
-                    console.log(`[Session ${ownerId}] Logged out. Session cleaned.`);
+                    this.sessions.delete(adminId);
+                    await clearAuthState(adminId);
+                    await this._updateDbStatus(adminId, 'disconnected');
+                    console.log(`[Session ${adminId}] Logged out. Session cleaned.`);
                 }
             }
         });
@@ -270,14 +270,14 @@ class SessionManager {
                         phone = '62' + phone.substring(1);
                     }
                     const code = await socket.requestPairingCode(phone);
-                    const currentSession = this.getSession(ownerId);
+                    const currentSession = this.getSession(adminId);
                     if (currentSession) {
                         currentSession.pairingCode = code;
                         currentSession.status = 'connecting';
-                        console.log(`[Session ${ownerId}] Pairing code: ${code}`);
+                        console.log(`[Session ${adminId}] Pairing code: ${code}`);
                     }
                 } catch (error) {
-                    console.error(`[Session ${ownerId}] Pairing code request failed:`, error.message);
+                    console.error(`[Session ${adminId}] Pairing code request failed:`, error.message);
                 }
             }, 3000);
         }
@@ -286,32 +286,32 @@ class SessionManager {
     /**
      * Internal: Update session status in database
      */
-    async _updateDbStatus(ownerId, status, phoneNumber = null) {
+    async _updateDbStatus(adminId, status, phoneNumber = null) {
         const db = getPool();
         const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
         if (status === 'connected') {
             await db.execute(
-                `INSERT INTO wa_sessions (owner_id, status, phone_number, connected_at, created_at, updated_at)
+                `INSERT INTO wa_sessions (admin_id, status, phone_number, connected_at, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE status = VALUES(status), phone_number = VALUES(phone_number),
                  connected_at = VALUES(connected_at), disconnected_at = NULL, updated_at = VALUES(updated_at)`,
-                [ownerId, status, phoneNumber, now, now, now]
+                [adminId, status, phoneNumber, now, now, now]
             );
         } else if (status === 'disconnected') {
             await db.execute(
-                `INSERT INTO wa_sessions (owner_id, status, disconnected_at, created_at, updated_at)
+                `INSERT INTO wa_sessions (admin_id, status, disconnected_at, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE status = VALUES(status),
                  disconnected_at = VALUES(disconnected_at), phone_number = NULL, updated_at = VALUES(updated_at)`,
-                [ownerId, status, now, now, now]
+                [adminId, status, now, now, now]
             );
         } else {
             await db.execute(
-                `INSERT INTO wa_sessions (owner_id, status, created_at, updated_at)
+                `INSERT INTO wa_sessions (admin_id, status, created_at, updated_at)
                  VALUES (?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = VALUES(updated_at)`,
-                [ownerId, status, now, now]
+                [adminId, status, now, now]
             );
         }
     }

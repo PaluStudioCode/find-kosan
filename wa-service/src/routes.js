@@ -8,16 +8,16 @@ const router = express.Router();
 function createRoutes(sessionManager) {
 
     /**
-     * POST /api/sessions/:ownerId/start
-     * Start a new WhatsApp session for an owner.
+     * POST /api/sessions/:adminId/start
+     * Start a new WhatsApp session for an Admin.
      * Body: { usePairingCode?: boolean, phoneNumber?: string }
      */
-    router.post('/sessions/:ownerId/start', async (req, res) => {
+    router.post('/sessions/:adminId/start', async (req, res) => {
         try {
-            const { ownerId } = req.params;
+            const { adminId } = req.params;
             const { usePairingCode = false, phoneNumber = null } = req.body || {};
 
-            const result = await sessionManager.startSession(ownerId, {
+            const result = await sessionManager.startSession(adminId, {
                 usePairingCode,
                 phoneNumber,
             });
@@ -30,13 +30,13 @@ function createRoutes(sessionManager) {
     });
 
     /**
-     * POST /api/sessions/:ownerId/stop
-     * Stop/disconnect an owner's WhatsApp session.
+     * POST /api/sessions/:adminId/stop
+     * Stop/disconnect an Admin's WhatsApp session.
      */
-    router.post('/sessions/:ownerId/stop', async (req, res) => {
+    router.post('/sessions/:adminId/stop', async (req, res) => {
         try {
-            const { ownerId } = req.params;
-            const result = await sessionManager.stopSession(ownerId);
+            const { adminId } = req.params;
+            const result = await sessionManager.stopSession(adminId);
             res.json({ success: true, ...result });
         } catch (error) {
             console.error('[API] Stop session error:', error.message);
@@ -45,23 +45,23 @@ function createRoutes(sessionManager) {
     });
 
     /**
-     * GET /api/sessions/:ownerId/status
-     * Get the current status of an owner's session.
+     * GET /api/sessions/:adminId/status
+     * Get the current status of an Admin's session.
      */
-    router.get('/sessions/:ownerId/status', (req, res) => {
-        const { ownerId } = req.params;
-        const status = sessionManager.getStatus(ownerId);
+    router.get('/sessions/:adminId/status', (req, res) => {
+        const { adminId } = req.params;
+        const status = sessionManager.getStatus(adminId);
         res.json({ success: true, ...status });
     });
 
     /**
-     * GET /api/sessions/:ownerId/qr
-     * Get the current QR code for an owner's session.
+     * GET /api/sessions/:adminId/qr
+     * Get the current QR code for an Admin's session.
      * Returns base64 data URI of the QR code image.
      */
-    router.get('/sessions/:ownerId/qr', (req, res) => {
-        const { ownerId } = req.params;
-        const session = sessionManager.getSession(ownerId);
+    router.get('/sessions/:adminId/qr', (req, res) => {
+        const { adminId } = req.params;
+        const session = sessionManager.getSession(adminId);
 
         if (!session) {
             return res.json({
@@ -90,13 +90,13 @@ function createRoutes(sessionManager) {
     });
 
     /**
-     * POST /api/sessions/:ownerId/send
-     * Send a WhatsApp message using an owner's session.
+     * POST /api/sessions/:adminId/send
+     * Send a WhatsApp message using an Admin's session.
      * Body: { phone: string, message: string }
      */
-    router.post('/sessions/:ownerId/send', async (req, res) => {
+    router.post('/sessions/:adminId/send', async (req, res) => {
         try {
-            const { ownerId } = req.params;
+            const { adminId } = req.params;
             const { phone, message } = req.body || {};
 
             if (!phone || !message) {
@@ -106,7 +106,7 @@ function createRoutes(sessionManager) {
                 });
             }
 
-            const result = await sessionManager.sendMessage(ownerId, phone, message);
+            const result = await sessionManager.sendMessage(adminId, phone, message);
             res.json(result);
         } catch (error) {
             console.error('[API] Send message error:', error.message);

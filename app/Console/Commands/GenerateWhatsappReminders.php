@@ -30,13 +30,13 @@ class GenerateWhatsappReminders extends Command
         // Get invoices that are not paid, not waiting for confirmation, and are due in 3 days or already past due
         $invoices = Invoice::whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
             ->whereDate('due_date', today())
-            ->with(['tenant', 'tenancy.room.boardingHouse'])
+            ->with(['user', 'tenancy.room.boardingHouse'])
             ->get();
 
         $count = 0;
         foreach ($invoices as $invoice) {
-            $tenant = $invoice->tenant;
-            if (!$tenant || !$tenant->whatsapp_number) continue;
+            $user = $invoice->user;
+            if (!$user || !$user->whatsapp_number) continue;
 
             // Avoid generating duplicate reminder for the same date
             $exists = WhatsappNotification::where('invoice_id', $invoice->id)
@@ -47,11 +47,11 @@ class GenerateWhatsappReminders extends Command
             if (!$exists) {
                 WhatsappNotification::create([
                     'invoice_id' => $invoice->id,
-                    'tenant_id' => $tenant->id,
-                    'owner_id' => $invoice->owner_id,
-                    'phone_number' => $tenant->whatsapp_number,
+                    'user_id' => $user->id,
+                    'admin_id' => $invoice->admin_id,
+                    'phone_number' => $user->whatsapp_number,
                     'message_type' => 'pengingat_jatuh_tempo',
-                    'message_body' => "Halo {$tenant->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " jatuh tempo HARI INI (" . $invoice->due_date->format('d M Y') . "). Mohon segera lakukan pembayaran.",
+                    'message_body' => "Halo {$user->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " jatuh tempo HARI INI (" . $invoice->due_date->format('d M Y') . ").\n\nSilakan segera lakukan pembayaran melalui tautan berikut:\n" . route('user.tenancies.show', $invoice->tenancy_id),
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);

@@ -75,15 +75,16 @@ const scrollToSection = (id) => {
         <div class="flex justify-between h-16 items-center">
           <div class="flex items-center gap-8">
             <Link href="/" class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" alt="Logo" class="h-8 w-auto" />
+                <span v-else class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
                     <Home class="w-4 h-4" />
                 </span>
-                Kos Online
+                {{ $page.props.appSettings?.app_name || 'Kos Online' }}
             </Link>
             
             <nav class="hidden md:flex gap-6 items-center">
                 <template v-if="landing">
-                    <a href="#peta-kos" @click.prevent="scrollToSection('#peta-kos')" :class="['text-sm transition-all', activeSection === 'peta-kos' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Peta Kos</a>
+                    <Link :href="route('public.kos.index')" class="text-sm transition-all text-slate-500 hover:text-slate-900 font-medium">Cari Kos</Link>
                     <a href="#cara-kerja" @click.prevent="scrollToSection('#cara-kerja')" :class="['text-sm transition-all', activeSection === 'cara-kerja' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Cara Kerja</a>
                     <a href="#keamanan" @click.prevent="scrollToSection('#keamanan')" :class="['text-sm transition-all', activeSection === 'keamanan' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Keamanan</a>
                     <a href="#pemilik" @click.prevent="scrollToSection('#pemilik')" :class="['text-sm transition-all', activeSection === 'pemilik' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Untuk Pemilik</a>
@@ -93,7 +94,7 @@ const scrollToSection = (id) => {
                     <Link :href="route('public.kos.index')" :class="route().current('public.kos.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
                         Cari Kos
                     </Link>
-                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'" :href="route('tenant.tenancies.index')" :class="route().current('tenant.tenancies.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
+                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'" :href="route('user.tenancies.index')" :class="route().current('tenant.tenancies.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
                         Sewa Kos Saya
                     </Link>
                 </template>
@@ -116,7 +117,7 @@ const scrollToSection = (id) => {
                         <DropdownMenuLabel class="font-bold text-slate-900">Akun Saya</DropdownMenuLabel>
                         <DropdownMenuSeparator class="bg-slate-100" />
                         
-                        <template v-if="$page.props.auth.user.role === 'super_admin' || $page.props.auth.user.role === 'pemilik_kos'">
+                        <template v-if="$page.props.auth.user.role === 'super_admin' || $page.props.auth.user.role === 'admin'">
                             <Link :href="route('dashboard')">
                                 <DropdownMenuItem class="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">
                                     <LayoutDashboard class="w-4 h-4 mr-2 text-slate-500" /> Kelola (Admin Panel)
@@ -152,21 +153,9 @@ const scrollToSection = (id) => {
       <slot />
     </main>
     
-    <footer v-if="!hideFooter" class="bg-white border-t py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-            <div class="flex items-center gap-2">
-                <Home class="w-5 h-5 text-gray-400" />
-                <span class="font-semibold text-gray-900">Kos Online</span>
-                &copy; {{ new Date().getFullYear() }}. All rights reserved.
-            </div>
-            <div class="flex gap-4">
-                <Link href="#" class="hover:text-primary">Tentang Kami</Link>
-                <Link href="#" class="hover:text-primary">Syarat & Ketentuan</Link>
-                <Link href="#" class="hover:text-primary">Kebijakan Privasi</Link>
-            </div>
-        </div>
+    <footer v-if="false">
+        <!-- Footer dinonaktifkan atas permintaan user untuk semua prefix -->
     </footer>
-    
     <Toaster position="top-right" richColors expand />
   </div>
 </template>

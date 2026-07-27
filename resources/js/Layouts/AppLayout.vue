@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings } from 'lucide-vue-next';
 import { useDark, useToggle } from '@vueuse/core';
 
 const isDark = useDark();
@@ -36,23 +36,23 @@ const navItems = computed(() => {
     const items = [];
 
     if (role === 'super_admin') {
+        items.push({ name: 'Dashboard', route: 'superadmin.dashboard', icon: LayoutDashboard });
+        items.push({ name: 'Verifikasi Kos', route: 'superadmin.verifications.index', icon: Building2 });
+        items.push({ name: 'Master Fasilitas', route: 'superadmin.facilities.index', icon: LayoutList });
+        items.push({ name: 'Laporan', route: 'superadmin.reports.index', icon: Flag });
+        items.push({ name: 'Penarikan Dana', route: 'superadmin.withdrawals.index', icon: Landmark });
+        items.push({ name: 'Manajemen Pengguna', route: 'superadmin.users.index', icon: UserCog });
+        items.push({ name: 'Pengaturan Sistem', route: 'superadmin.settings.index', icon: Settings });
+    } else if (role === 'admin') {
         items.push({ name: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard });
-        items.push({ name: 'Verifikasi Kos', route: 'admin.verifications.index', icon: Building2 });
-        items.push({ name: 'Master Fasilitas', route: 'admin.facilities.index', icon: LayoutList });
-        items.push({ name: 'Laporan', route: 'admin.reports.index', icon: Flag });
-        items.push({ name: 'Penarikan Pemilik', route: 'admin.withdrawals.index', icon: Landmark });
-        items.push({ name: 'Manajemen Pengguna', route: 'admin.users.index', icon: UserCog });
-        items.push({ name: 'WhatsApp Sistem', route: 'admin.whatsapp.index', icon: Smartphone });
-    } else if (role === 'pemilik_kos') {
-        items.push({ name: 'Dashboard', route: 'owner.dashboard', icon: LayoutDashboard });
-        items.push({ name: 'Properti Kos', route: 'owner.kos.index', icon: Building2 });
-        items.push({ name: 'Sewa & Pembayaran', route: 'owner.tenancies.index', icon: Users });
-        items.push({ name: 'Saldo & Penarikan', route: 'owner.wallet.index', icon: WalletCards });
-        items.push({ name: 'Ulasan Penyewa', route: 'owner.reviews.index', icon: MessageSquare });
-        items.push({ name: 'Pengaturan WhatsApp', route: 'owner.whatsapp.index', icon: Smartphone });
-    } else if (role === 'penyewa') {
+        items.push({ name: 'Properti Kos', route: 'admin.kos.index', icon: Building2 });
+        items.push({ name: 'Sewa & Pembayaran', route: 'admin.tenancies.index', icon: Users });
+        items.push({ name: 'Saldo & Penarikan', route: 'admin.wallet.index', icon: WalletCards });
+        items.push({ name: 'Ulasan Penyewa', route: 'admin.reviews.index', icon: MessageSquare });
+        items.push({ name: 'Pengaturan WhatsApp', route: 'admin.whatsapp.index', icon: Smartphone });
+    } else if (role === 'user') {
         items.push({ name: 'Beranda Kos', route: 'public.kos.index', icon: LayoutDashboard });
-        items.push({ name: 'Sewa & Tagihan', route: 'tenant.tenancies.index', icon: ReceiptText });
+        items.push({ name: 'Sewa & Tagihan', route: 'user.tenancies.index', icon: ReceiptText });
         items.push({ name: 'Laporan & Pengaduan', route: 'reports.index', icon: Flag });
     }
 
@@ -78,7 +78,10 @@ const isActive = (routeName) => {
     <!-- Sidebar Desktop -->
     <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 fixed h-full z-40 transition-colors duration-300">
       <div class="h-16 flex items-center px-6 border-b dark:border-slate-800">
-        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400">Kos Online</Link>
+        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400 flex items-center gap-2">
+            <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" alt="Logo" class="h-8 w-auto" />
+            <span>{{ $page.props.appSettings?.app_name || 'Kos Online' }}</span>
+        </Link>
       </div>
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
         <template v-for="item in navItems" :key="item.name">
@@ -104,7 +107,10 @@ const isActive = (routeName) => {
     <!-- Sidebar Mobile -->
     <aside :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="md:hidden flex flex-col w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 fixed h-full z-50 transition-transform duration-300 ease-in-out top-0 left-0">
       <div class="h-16 flex items-center justify-between px-6 border-b dark:border-slate-800">
-        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400">Kos Online</Link>
+        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400 flex items-center gap-2">
+            <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" alt="Logo" class="h-8 w-auto" />
+            <span>{{ $page.props.appSettings?.app_name || 'Kos Online' }}</span>
+        </Link>
         <button @click="isMobileMenuOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>

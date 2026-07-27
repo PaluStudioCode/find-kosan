@@ -37,27 +37,27 @@ class User extends Authenticatable
 
     public function boardingHouses()
     {
-        return $this->hasMany(BoardingHouse::class, 'owner_id');
+        return $this->hasMany(BoardingHouse::class, 'admin_id');
     }
 
     public function tenanciesAsTenant()
     {
-        return $this->hasMany(Tenancy::class, 'tenant_id');
+        return $this->hasMany(Tenancy::class, 'user_id');
     }
 
     public function tenanciesAsOwner()
     {
-        return $this->hasMany(Tenancy::class, 'owner_id');
+        return $this->hasMany(Tenancy::class, 'admin_id');
     }
 
     public function wallet()
     {
-        return $this->hasOne(OwnerWallet::class, 'owner_id');
+        return $this->hasOne(AdminWallet::class, 'admin_id');
     }
 
     public function withdrawalRequests()
     {
-        return $this->hasMany(WithdrawalRequest::class, 'owner_id');
+        return $this->hasMany(WithdrawalRequest::class, 'admin_id');
     }
 
     public function boardingHouseReviews()
@@ -67,6 +67,6 @@ class User extends Authenticatable
 
     public function waSession()
     {
-        return $this->hasOne(WaSession::class, 'owner_id');
+        return $this->hasOne(WaSession::class, 'admin_id');
     }
 }

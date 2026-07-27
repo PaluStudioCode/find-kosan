@@ -23,9 +23,9 @@ class Phase6PropertyManagementTest extends TestCase
 
     public function test_owner_can_create_kos()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
 
-        $response = $this->actingAs($owner)->post('/owner/kos', [
+        $response = $this->actingAs($admin)->post('/admin/kos', [
             'name' => 'Kos Baru',
             'description' => 'Deskripsi kos',
             'address' => 'Jl. Baru No. 1',
@@ -33,20 +33,20 @@ class Phase6PropertyManagementTest extends TestCase
             'payment_proof_required' => true,
         ]);
 
-        $response->assertRedirect('/owner/kos');
+        $response->assertRedirect('/admin/kos');
         $this->assertDatabaseHas('boarding_houses', [
             'name' => 'Kos Baru',
-            'owner_id' => $owner->id,
+            'admin_id' => $admin->id,
             'status' => 'draft',
         ]);
     }
 
     public function test_owner_can_update_kos_and_trigger_shadow_revision()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id, 'status' => 'dipublikasikan']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'dipublikasikan']);
 
-        $response = $this->actingAs($owner)->put("/owner/kos/{$kos->id}", [
+        $response = $this->actingAs($admin)->put("/admin/kos/{$kos->id}", [
             'name' => 'Kos Berubah',
             'description' => 'Deskripsi',
             'address' => 'Alamat',
@@ -65,11 +65,11 @@ class Phase6PropertyManagementTest extends TestCase
 
     public function test_owner_can_create_and_delete_room()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id]);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id]);
 
         // Create Room
-        $response = $this->actingAs($owner)->post("/owner/kos/{$kos->id}/rooms", [
+        $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/rooms", [
             'name' => 'Kamar VIP',
             'room_number' => 'A1',
             'description' => 'Desc',
@@ -85,24 +85,24 @@ class Phase6PropertyManagementTest extends TestCase
         $room = Room::where('name', 'Kamar VIP')->first();
 
         // Delete Room
-        $response = $this->actingAs($owner)->delete("/owner/kos/{$kos->id}/rooms/{$room->id}");
+        $response = $this->actingAs($admin)->delete("/admin/kos/{$kos->id}/rooms/{$room->id}");
         $response->assertSessionHas('success');
         $this->assertSoftDeleted('rooms', ['id' => $room->id]);
     }
 
     public function test_owner_cannot_reduce_capacity_below_active_tenants()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $tenant1 = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
-        $tenant2 = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $user1 = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
+        $user2 = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
 
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id]);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id]);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 2]);
 
-        Tenancy::factory()->create(['room_id' => $room->id, 'tenant_id' => $tenant1->id, 'status' => 'aktif', 'boarding_house_id' => $kos->id, 'owner_id' => $owner->id]);
-        Tenancy::factory()->create(['room_id' => $room->id, 'tenant_id' => $tenant2->id, 'status' => 'aktif', 'boarding_house_id' => $kos->id, 'owner_id' => $owner->id]);
+        Tenancy::factory()->create(['room_id' => $room->id, 'user_id' => $user1->id, 'status' => 'aktif', 'boarding_house_id' => $kos->id, 'admin_id' => $admin->id]);
+        Tenancy::factory()->create(['room_id' => $room->id, 'user_id' => $user2->id, 'status' => 'aktif', 'boarding_house_id' => $kos->id, 'admin_id' => $admin->id]);
 
-        $response = $this->actingAs($owner)->put("/owner/kos/{$kos->id}/rooms/{$room->id}", [
+        $response = $this->actingAs($admin)->put("/admin/kos/{$kos->id}/rooms/{$room->id}", [
             'name' => 'Kamar VIP',
             'room_number' => 'A1',
             'description' => 'Desc',
@@ -120,27 +120,27 @@ class Phase6PropertyManagementTest extends TestCase
         Storage::fake('local');
         Storage::fake('public');
 
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id, 'status' => 'draft']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'draft']);
 
-        $response = $this->actingAs($owner)->post("/owner/kos/{$kos->id}/verify");
+        $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");
         $response->assertSessionHas('error'); 
 
         $file = UploadedFile::fake()->create('ktp.pdf', 100, 'application/pdf');
-        $this->actingAs($owner)->post("/owner/kos/{$kos->id}/legal-documents", [
+        $this->actingAs($admin)->post("/admin/kos/{$kos->id}/legal-documents", [
             'document_type' => 'identitas_pemilik_pengelola',
             'file' => $file
         ]);
 
-        $response = $this->actingAs($owner)->post("/owner/kos/{$kos->id}/verify");
+        $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");
         $response->assertSessionHas('error'); 
 
         $photo = UploadedFile::fake()->image('kos.jpg');
-        $this->actingAs($owner)->post("/owner/kos/{$kos->id}/photos", [
-            'photo' => $photo
+        $this->actingAs($admin)->post("/admin/kos/{$kos->id}/photos", [
+            'photos' => [$photo]
         ]);
 
-        $response = $this->actingAs($owner)->post("/owner/kos/{$kos->id}/verify");
+        $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");
         $response->assertSessionHas('success');
         $this->assertEquals('menunggu_verifikasi', $kos->refresh()->status);
     }
@@ -150,8 +150,8 @@ class Phase6PropertyManagementTest extends TestCase
         $admin = User::factory()->create(['role' => 'super_admin', 'status' => 'aktif']);
         $kos = BoardingHouse::factory()->create(['status' => 'menunggu_verifikasi']);
 
-        $response = $this->actingAs($admin)->post("/admin/verifications/{$kos->id}/approve");
-        $response->assertRedirect('/admin/verifications');
+        $response = $this->actingAs($admin)->post("/superadmin/verifications/{$kos->id}/approve");
+        $response->assertRedirect('/superadmin/verifications');
 
         $kos->refresh();
         $this->assertEquals('dipublikasikan', $kos->status);

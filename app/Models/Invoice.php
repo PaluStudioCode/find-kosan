@@ -17,7 +17,7 @@ class Invoice extends Model
         });
     }
     protected $fillable = [
-        'tenancy_id', 'tenant_id', 'owner_id', 'period_start', 'period_end',
+        'tenancy_id', 'user_id', 'admin_id', 'period_start', 'period_end',
         'amount', 'due_date', 'status', 'payment_reference', 'payment_method', 'payment_url',
     ];
 
@@ -33,14 +33,14 @@ class Invoice extends Model
         return $this->belongsTo(Tenancy::class);
     }
 
-    public function tenant()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function payments()

@@ -11,7 +11,7 @@ class Payment extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'invoice_id', 'tenant_id', 'owner_id', 'amount', 'payment_date',
+        'invoice_id', 'user_id', 'admin_id', 'amount', 'payment_date',
         'proof_file_path', 'note', 'status', 'review_note', 'reviewed_at', 'reviewed_by',
     ];
 
@@ -26,14 +26,14 @@ class Payment extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    public function tenant()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function reviewer()

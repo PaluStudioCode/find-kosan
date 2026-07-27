@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // Super Admin
         $superAdmin = User::firstOrCreate([
-            'email' => 'admin@kosonline.test',
+            'email' => 'superadmin@example.com',
         ], [
             'name' => 'Super Admin',
             'password' => Hash::make('password'),
@@ -31,22 +31,22 @@ class DatabaseSeeder extends Seeder
 
         // Pemilik Kos Dummy
         User::firstOrCreate([
-            'email' => 'owner@kosonline.test',
+            'email' => 'admin@example.com',
         ], [
             'name' => 'Pemilik Kos',
             'password' => Hash::make('password'),
-            'role' => 'pemilik_kos',
+            'role' => 'admin',
             'status' => 'aktif',
             'whatsapp_number' => '628222222222',
             'email_verified_at' => Carbon::now(),
         ]);
 
         User::firstOrCreate([
-            'email' => 'penyewa@kosonline.test',
+            'email' => 'user@example.com',
         ], [
             'name' => 'Penyewa',
             'password' => Hash::make('password'),
-            'role' => 'penyewa',
+            'role' => 'user',
             'status' => 'aktif',
             'whatsapp_number' => '085151246624',
             'email_verified_at' => Carbon::now(),

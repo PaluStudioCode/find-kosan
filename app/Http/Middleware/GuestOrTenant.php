@@ -18,13 +18,13 @@ class GuestOrTenant
         if (auth()->check()) {
             $role = auth()->user()->role;
             // Izinkan Admin dan Owner untuk melihat halaman detail kos publik
-            if (($role === 'super_admin' || $role === 'pemilik_kos') && $request->routeIs('public.kos.show')) {
+            if (($role === 'super_admin' || $role === 'admin') && $request->routeIs('public.kos.show')) {
                 return $next($request);
             }
             if ($role === 'super_admin') {
                 return redirect()->route('admin.dashboard');
-            } elseif ($role === 'pemilik_kos') {
-                return redirect()->route('owner.dashboard');
+            } elseif ($role === 'admin') {
+                return redirect()->route('admin.dashboard');
             }
         }
 

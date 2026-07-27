@@ -29,26 +29,26 @@ async function initTables() {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS wa_sessions (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            owner_id BIGINT UNSIGNED NOT NULL,
+            admin_id BIGINT UNSIGNED NOT NULL,
             status ENUM('disconnected', 'connecting', 'connected') NOT NULL DEFAULT 'disconnected',
             phone_number VARCHAR(30) NULL,
             connected_at TIMESTAMP NULL,
             disconnected_at TIMESTAMP NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY uk_owner_id (owner_id)
+            UNIQUE KEY uk_admin_id (admin_id)
         )
     `);
 
     await db.execute(`
         CREATE TABLE IF NOT EXISTS wa_auth_keys (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            owner_id BIGINT UNSIGNED NOT NULL,
+            admin_id BIGINT UNSIGNED NOT NULL,
             key_id VARCHAR(255) NOT NULL,
             key_data LONGTEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY uk_owner_key (owner_id, key_id)
+            UNIQUE KEY uk_admin_key (admin_id, key_id)
         )
     `);
 

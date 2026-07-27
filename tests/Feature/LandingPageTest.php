@@ -22,25 +22,25 @@ class LandingPageTest extends TestCase
 
     public function test_landing_page_uses_live_platform_statistics_and_public_reviews(): void
     {
-        $owner = User::factory()->create([
-            'role' => 'pemilik_kos',
+        $admin = User::factory()->create([
+            'role' => 'admin',
             'status' => 'aktif',
         ]);
-        $tenant = User::factory()->create([
-            'role' => 'penyewa',
+        $user = User::factory()->create([
+            'role' => 'user',
             'status' => 'aktif',
             'name' => 'Penyewa Landing',
         ]);
 
         $publishedKos = BoardingHouse::factory()->create([
-            'owner_id' => $owner->id,
+            'admin_id' => $admin->id,
             'status' => 'dipublikasikan',
             'name' => 'Kos Tampil',
             'latitude' => -5.1477,
             'longitude' => 119.4327,
         ]);
         $draftKos = BoardingHouse::factory()->create([
-            'owner_id' => $owner->id,
+            'admin_id' => $admin->id,
             'status' => 'draft',
         ]);
 
@@ -59,12 +59,12 @@ class LandingPageTest extends TestCase
 
         BoardingHouseReview::create([
             'boarding_house_id' => $publishedKos->id,
-            'user_id' => $tenant->id,
+            'user_id' => $user->id,
             'rating' => 5,
             'comment' => 'Lokasinya mudah dijangkau dan pengelola responsif.',
         ]);
 
-        $expectedOwnerCount = User::where('role', 'pemilik_kos')
+        $expectedOwnerCount = User::where('role', 'admin')
             ->where('status', 'aktif')
             ->count();
 

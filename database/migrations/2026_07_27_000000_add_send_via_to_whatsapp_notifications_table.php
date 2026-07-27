@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('whatsapp_notifications', function (Blueprint $table) {
-            $table->enum('send_via', ['owner', 'admin'])->default('owner')->after('owner_id');
+            $table->enum('send_via', ['owner', 'admin'])->default('owner')->after('admin_id');
         });
     }
 

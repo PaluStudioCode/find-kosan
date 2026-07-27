@@ -23,8 +23,8 @@ onMounted(() => {
         // Cek URL tujuan
         const targetPath = visit.url.pathname;
         
-        // Jangan tampilkan transisi jika berada di area dashboard (admin, owner, tenant, dll)
-        if (targetPath.startsWith('/admin') || targetPath.startsWith('/owner') || targetPath.startsWith('/profile') || targetPath.startsWith('/tenant') || targetPath.startsWith('/reports')) {
+        // Jangan tampilkan transisi jika berada di area dashboard (admin, superadmin, user, dll)
+        if (targetPath.startsWith('/admin') || targetPath.startsWith('/superadmin') || targetPath.startsWith('/user') || targetPath.startsWith('/profile') || targetPath.startsWith('/reports')) {
             return;
         }
         

@@ -18,8 +18,8 @@ class TenancyFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => \App\Models\User::factory()->create(['role' => 'penyewa'])->id,
-            'owner_id' => \App\Models\User::factory()->create(['role' => 'pemilik_kos'])->id,
+            'user_id' => \App\Models\User::factory()->create(['role' => 'user'])->id,
+            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
             'boarding_house_id' => \App\Models\BoardingHouse::factory(),
             'room_id' => \App\Models\Room::factory(),
             'start_date' => now(),

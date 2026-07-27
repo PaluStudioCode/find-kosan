@@ -32,6 +32,8 @@ import {
     Map,
     MapPin,
     MessageCircle,
+    Mail,
+    Phone,
     Quote,
     ReceiptText,
     Search,
@@ -127,28 +129,28 @@ const initials = (name) => name
 
 const faqs = [
     {
-        question: 'Bagaimana cara mencari kos melalui peta?',
-        answer: 'Buka halaman Cari Kos, izinkan akses lokasi jika diperlukan, lalu geser peta atau pilih marker untuk melihat ringkasan kos. Dari sana Anda dapat membuka detail kamar, fasilitas, harga, rating, dan komentar.',
+        question: 'Gimana cara cari kosan pakai peta?',
+        answer: 'Gampang banget! Buka halaman Cari Kos, izinkan akses lokasi, trus geser-geser petanya. Klik ikon lokasi buat lihat info singkat kosannya. Kalau sreg, klik buat lihat detail kamar, harga, dan baca review jujur.',
     },
     {
-        question: 'Apakah saya harus memiliki akun untuk melihat kos?',
-        answer: 'Tidak. Daftar kos, peta, detail kamar, fasilitas, rating, dan komentar dapat dilihat sebagai guest. Akun penyewa diperlukan saat mengajukan sewa, memberi ulasan, atau membuat laporan.',
+        question: 'Harus bikin akun dulu gak sih buat sekadar lihat-lihat?',
+        answer: 'Gak perlu! Kamu bebas keliling peta, lihat foto kamar, fasilitas, sampai baca komentar penyewa lain tanpa harus login. Akun baru dibutuhkan kalau kamu udah mantap mau mulai booking kamar.',
     },
     {
-        question: 'Bagaimana proses pengajuan sewa kamar?',
-        answer: 'Pilih kamar yang masih tersedia, tentukan tanggal mulai dan jumlah penghuni, kemudian kirim pengajuan. Setelah tercatat, status sewa dan invoice dapat dipantau dari akun penyewa.',
+        question: 'Proses booking kamarnya ribet gak?',
+        answer: 'Sama sekali enggak! Pilih kamar yang masih kosong, tentuin tanggal masuk dan jumlah orang, trus klik ajukan. Nanti semua status pesanan dan tagihannya bisa kamu pantau langsung dari HP.',
     },
     {
-        question: 'Metode pembayaran apa yang tersedia?',
-        answer: 'Pembayaran dapat diproses melalui gateway Duitku atau unggah bukti pembayaran sesuai pengaturan kos. Detail instruksi dan status konfirmasi akan tampil pada invoice.',
+        question: 'Bisa bayar pakai metode apa aja?',
+        answer: 'Banyak pilihan dan semuanya serba otomatis! Begitu tagihan terbit, kamu tinggal klik link bayar, pilih metode pembayaran online favoritmu, lalu selesaikan. Tagihan otomatis lunas tanpa perlu repot ngirim bukti transfer.',
     },
     {
-        question: 'Bagaimana jika data atau titik lokasi kos tidak sesuai?',
-        answer: 'Gunakan tombol Laporkan Kos pada halaman detail. Pilih kategori masalah dan berikan keterangan yang jelas agar admin dapat meninjau serta menindaklanjuti laporan.',
+        question: 'Gimana kalau info atau lokasi kosannya zonk/gak sesuai?',
+        answer: 'Langsung aja klik tombol Laporkan Kos di halaman detail. Kasih tahu kami apa masalahnya, biar tim admin kami bisa langsung bertindak dan mastiin platform ini tetep aman buat semua pencari kos.',
     },
     {
-        question: 'Apa saja yang dapat dikelola oleh pemilik kos?',
-        answer: 'Pemilik dapat mengelola profil kos, titik lokasi, kamar, harga, fasilitas, foto, dokumen legal, penyewa, pembayaran, wallet, dan pengajuan penarikan dana dari satu dashboard.',
+        question: 'Kalau daftar jadi pemilik kos, bisa ngatur apa aja?',
+        answer: 'Semuanya! Dari mulai update foto kamar, atur harga, kelola anak kos yang aktif, pantau pembayaran, sampai narik saldo pendapatan bulanan. Semua dikerjain sambil ngopi lewat satu dashboard pintar.',
     },
 ];
 
@@ -247,22 +249,22 @@ onBeforeUnmount(() => {
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
-                        Sistem Manajemen Kos Terpadu
+                        Cari Kos Gak Pake Ribet 🚀
                     </div>
                     
                     <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
-                        Temukan ruang untuk
-                        <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-2">hidup lebih dekat.</span>
+                        Ketemu Kos Idaman,
+                        <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-2">Lebih Cepat & Gampang.</span>
                     </h1>
 
                     <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-300 sm:text-xl font-medium">
-                        Jelajahi kos premium melalui peta interaktif, periksa kamar dan ulasan terverifikasi, lalu kelola sewa dari satu tempat yang transparan.
+                        Tinggal buka peta, cek fasilitas, baca review jujur penyewa lain, langsung booking. Bayar dan kelola tagihan bulanan? Semua beres dari HP-mu!
                     </p>
 
                     <div class="mt-10 flex flex-col gap-4 sm:flex-row">
                         <Link :href="route('public.kos.index')">
                             <Button class="group h-12 w-full rounded-full bg-teal-500 px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 hover:-translate-y-0.5 sm:w-auto">
-                                Jelajahi Kos Sekarang
+                                Mulai Cari Kos Sekarang
                                 <ArrowRight class="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                             </Button>
                         </Link>
@@ -305,13 +307,13 @@ onBeforeUnmount(() => {
                 <div class="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] items-start gap-12 lg:gap-16">
                     <!-- Left: Text -->
                     <div data-reveal="left" class="max-w-xl lg:mt-6">
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Pencarian cerdas di area tujuan.</h2>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Cari Kos Langsung di Peta. Gampang Banget!</h2>
                         <p class="mt-4 text-base leading-relaxed text-slate-600">
-                            Gunakan peta interaktif untuk melihat persebaran kos secara visual. Tentukan lokasi pusat, sesuaikan radius, dan temukan properti yang tepat dengan cepat.
+                            Males baca list kosan yang kepanjangan? Buka aja petanya, zoom in ke kampus atau area kantormu, dan pantau langsung kosan mana yang posisinya paling strategis buat kamu.
                         </p>
                         <Link :href="route('public.kos.index')" class="mt-8 inline-block">
                             <Button class="group h-12 rounded-full bg-[#0c292b] px-6 text-sm font-bold text-white shadow-md hover:bg-[#143b3e] transition-all hover:shadow-lg hover:-translate-y-0.5">
-                                Buka Peta Interaktif
+                                Cobain Petanya Sekarang
                                 <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </Button>
                         </Link>
@@ -331,8 +333,8 @@ onBeforeUnmount(() => {
         <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center">
-                    <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Perjalanan yang sangat mulus.</h2>
-                    <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-300">Dari pencarian awal hingga pengelolaan masa sewa, semua dirancang dalam satu ekosistem tanpa gesekan yang membuang waktu Anda.</p>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Ngekos Tanpa Pusing, Cukup 4 Langkah.</h2>
+                    <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-300">Semuanya udah didesain simpel biar kamu gak ribet. Dari milih kamar sampai bayar sewa, semua selesai sambil rebahan.</p>
                 </div>
 
                 <div class="mt-20 max-w-6xl mx-auto relative">
@@ -350,8 +352,8 @@ onBeforeUnmount(() => {
                                 <Search class="h-6 w-6 text-teal-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">1. Cari dari peta</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Eksplorasi visual pada area pilihan dengan filter cerdas untuk temukan kos terdekat.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">1. Kepoin Peta</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Cari kosan favoritmu yang deket dari kampus atau tempat kerja.</p>
                             </div>
                         </div>
 
@@ -361,8 +363,8 @@ onBeforeUnmount(() => {
                                 <MapPin class="h-6 w-6 text-emerald-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">2. Periksa detail</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Tinjau foto lengkap, fasilitas kamar, aturan kos, dan baca ulasan nyata penghuni.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">2. Cek Detail Kamar</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Lihat foto kamarnya, fasilitasnya apa aja, dan baca review asli dari anak kos lain.</p>
                             </div>
                         </div>
 
@@ -372,8 +374,8 @@ onBeforeUnmount(() => {
                                 <ClipboardCheck class="h-6 w-6 text-blue-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">3. Ajukan sewa</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Pilih kamar dan tanggal masuk, lalu kirim pengajuan sewa langsung ke sistem.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">3. Booking Sekali Klik</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Udah sreg? Langsung pesen kamarnya lewat HP, gak usah panas-panasan nyamperin bapak kos.</p>
                             </div>
                         </div>
 
@@ -383,8 +385,8 @@ onBeforeUnmount(() => {
                                 <KeyRound class="h-6 w-6 text-violet-400" />
                             </div>
                             <div class="flex-1 md:px-2">
-                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">4. Kelola mudah</h3>
-                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Pantau status, bayar tagihan bulanan secara otomatis, dan lihat arsip invoice.</p>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 transition-colors">4. Bayar & Huni</h3>
+                                <p class="text-sm leading-relaxed text-slate-400 transition-colors">Selesaikan pembayaran tagihan bulanan dengan aman. Voila! Kamu tinggal bawa koper aja.</p>
                             </div>
                         </div>
                     </div>
@@ -397,9 +399,9 @@ onBeforeUnmount(() => {
             <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
-                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Transparansi yang bisa dipercaya.</h2>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Aman, Jujur, & Gak Ada Drama.</h2>
                     <p class="mt-4 text-base text-slate-600">
-                        Platform kami memiliki lapisan verifikasi dan sistem umpan balik dari komunitas untuk memastikan kualitas kos tetap terjaga dan aman.
+                        Semua data kos diverifikasi ketat sama tim kami. Mau baca review jujur dari anak kos lama? Atau mau laporin info kos yang zonk? Bisa banget!
                     </p>
                 </div>
 
@@ -473,7 +475,7 @@ onBeforeUnmount(() => {
                                         </div>
                                         <span class="text-sm font-medium text-slate-700">Metode</span>
                                     </div>
-                                    <span class="text-sm font-bold text-slate-900">Duitku / Transfer</span>
+                                    <span class="text-sm font-bold text-slate-900">Sistem Otomatis</span>
                                 </div>
                             </div>
                         </div>
@@ -481,9 +483,9 @@ onBeforeUnmount(() => {
 
                     <!-- Right: Text Content -->
                     <div data-reveal="right" class="order-1 lg:order-2 max-w-xl">
-                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Administrasi sewa tanpa rasa pusing.</h2>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Bayar Sewa & Urus Tagihan Makin Santuy.</h2>
                         <p class="mt-4 text-base leading-relaxed text-slate-600">
-                            Sinkronisasi data otomatis antara penyewa dan pemilik. Invoice tercatat rapi, bukti tersimpan aman, dan status sewa termonitor dengan akurat tanpa perlu pembukuan manual.
+                            Sistem kami memproses pembayaranmu secara otomatis. Tinggal bayar sesuai invoice, status langsung ter-update detik itu juga tanpa perlu konfirmasi panjang lebar!
                         </p>
 
                         <div class="mt-8 space-y-4">
@@ -497,8 +499,8 @@ onBeforeUnmount(() => {
                             <div class="flex gap-4 items-start">
                                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-600"><Check class="h-4 w-4" /></span>
                                 <div>
-                                    <p class="text-sm font-bold text-slate-900">Gateway Otomatis & Unggah Praktis</p>
-                                    <p class="text-sm text-slate-500 mt-0.5">Konfirmasi instan dari Duitku atau opsi unggah bukti bayar manual.</p>
+                                    <p class="text-sm font-bold text-slate-900">Pembayaran 100% Otomatis</p>
+                                    <p class="text-sm text-slate-500 mt-0.5">Tagihan langsung terbayar dan terkonfirmasi instan oleh sistem.</p>
                                 </div>
                             </div>
                             <div class="flex gap-4 items-start">
@@ -519,9 +521,9 @@ onBeforeUnmount(() => {
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="grid items-center gap-14 lg:gap-16 lg:grid-cols-[1.1fr_0.9fr]">
                     <div data-reveal="left" class="max-w-xl">
-                        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">Informasi penting hadir di kanal yang familiar.</h2>
+                        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">Selalu Update Langsung ke WhatsApp-mu.</h2>
                         <p class="mt-4 text-base leading-relaxed text-slate-300">
-                            Sistem kami bekerja di balik layar, secara otomatis mengirimkan pemberitahuan instan tentang status pemesanan, konfirmasi pembayaran, dan pengingat invoice langsung ke WhatsApp Anda.
+                            Gak perlu rajin-rajin buka web cuma buat ngecek status kamar. Mulai dari reminder tagihan sampai konfirmasi bayar, robot WA kami bakal langsung nge-chat kamu!
                         </p>
 
                         <div class="mt-8 space-y-4">
@@ -554,11 +556,11 @@ onBeforeUnmount(() => {
 
                             <div class="space-y-4">
                                 <div class="max-w-[90%] rounded-2xl rounded-tl-sm bg-white p-4 text-slate-800 shadow-sm">
-                                    <p class="text-sm leading-relaxed">Invoice masa sewa Anda untuk kamar <strong>A-01</strong> akan jatuh tempo besok. Silakan periksa detailnya.</p>
+                                    <p class="text-sm leading-relaxed">Halo! Tagihan sewa kamar <strong>A-01</strong> kamu sudah terbit. Yuk klik link berikut untuk membayar otomatis: <br><span class="text-teal-600 font-medium break-all">kosonline.id/inv/8923</span></p>
                                     <p class="mt-2 text-right text-[10px] font-bold text-slate-400">09.15</p>
                                 </div>
                                 <div class="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-[#dcf8c6] p-4 text-slate-800 shadow-sm">
-                                    <p class="text-sm leading-relaxed font-medium">Pembayaran sudah saya selesaikan via transfer bank! Terima kasih.</p>
+                                    <p class="text-sm leading-relaxed font-medium">Sip, tagihannya udah langsung aku bayar lewat link itu ya. Makasih!</p>
                                     <p class="mt-2 flex items-center justify-end gap-1 text-[10px] font-bold text-teal-700">09.18 <CheckCheck class="h-3.5 w-3.5 text-blue-500" /></p>
                                 </div>
                             </div>
@@ -572,9 +574,9 @@ onBeforeUnmount(() => {
         <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
-                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kendalikan properti Anda dari satu dashboard.</h2>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Punya Kos-Kosan? Atur Semuanya Dari Satu Layar.</h2>
                     <p class="mt-4 text-base leading-relaxed text-slate-600">
-                        Otomatiskan operasional harian kos Anda. Mulai dari publikasi listing, manajemen penyewa, hingga pemantauan pendapatan. Semuanya tersentralisasi.
+                        Ucapkan selamat tinggal pada buku catatan lecek! Promosikan kamar kosong, pantau tagihan anak kos, sampai tarik saldo pendapatan cukup dari satu dashboard cerdas.
                     </p>
                 </div>
 
@@ -619,7 +621,7 @@ onBeforeUnmount(() => {
                             <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>
                     </Link>
-                    <Link v-else-if="$page.props.auth.user?.role === 'pemilik_kos'" :href="route('owner.dashboard')">
+                    <Link v-else-if="$page.props.auth.user?.role === 'admin'" :href="route('admin.dashboard')">
                         <Button class="group h-12 rounded-full bg-slate-900 px-8 text-sm font-bold text-white shadow-md hover:bg-slate-800 transition-all hover:-translate-y-0.5">
                             Buka Dashboard Pemilik
                             <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -633,9 +635,9 @@ onBeforeUnmount(() => {
         <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
-                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Cerita nyata dari mereka yang sudah mencoba.</h2>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kata Mereka yang Udah Buktiin Langsung.</h2>
                     <p class="mt-4 text-base leading-relaxed text-slate-600">
-                        Baca opini dan pengalaman langsung dari penyewa yang telah menemukan hunian terbaik mereka melalui platform ini.
+                        Masih ragu? Dengerin nih cerita jujur dari para penyewa lain yang udah ngerasain gampangnya dapet hunian nyaman lewat platform kami.
                     </p>
                 </div>
 
@@ -696,9 +698,9 @@ onBeforeUnmount(() => {
         <section class="bg-slate-50 py-16 sm:py-24 border-y border-slate-100 relative">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
-                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Hal penting yang sering ditanyakan.</h2>
+                    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Masih Punya Pertanyaan? (FAQ)</h2>
                     <p class="mt-4 text-base leading-relaxed text-slate-600">
-                        Punya pertanyaan? Temukan jawaban mengenai pencarian, penyewaan, pembayaran, laporan, dan pengelolaan kos di bawah ini.
+                        Kumpulin semua rasa kepomu di sini. Mulai dari cara booking, metode pembayaran, sampai cara daftar jadi pemilik kos udah kami rangkum semua jawabannya.
                     </p>
                 </div>
 
@@ -723,10 +725,10 @@ onBeforeUnmount(() => {
                 
                 <div class="relative z-10">
                     <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white">
-                        Wujudkan kenyamanan hari ini.
+                        Tunggu Apa Lagi? Yuk Mulai Sekarang!
                     </h2>
                     <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
-                        Pilih jalur Anda. Temukan hunian nyaman sebagai penyewa, atau kelola properti Anda dengan mudah sebagai pemilik kos.
+                        Gak usah ditunda-tunda. Cari kosan idamanmu sekarang, atau gabung jadi pemilik kos buat nikmatin gampangnya ngurus properti secara online.
                     </p>
 
                     <div class="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
@@ -753,14 +755,32 @@ onBeforeUnmount(() => {
                 <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     <div class="lg:col-span-1">
                         <Link :href="route('home')" class="inline-flex items-center gap-2 text-lg font-bold text-slate-900">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                            <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" class="w-8 h-8 object-contain" alt="Logo" />
+                            <span v-else class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
                                 <Home class="h-4 w-4" />
                             </span>
-                            Kos Online
+                            {{ $page.props.appSettings?.app_name || 'Kos Online' }}
                         </Link>
                         <p class="mt-4 text-sm leading-relaxed text-slate-500">
-                            Platform pencarian dan pengelolaan kos yang mempertemukan kebutuhan penyewa dan pemilik dalam alur yang lebih tertata.
+                            {{ $page.props.appSettings?.footer_text || 'Platform pencarian dan pengelolaan kos yang mempertemukan kebutuhan penyewa dan pemilik dalam alur yang lebih tertata.' }}
                         </p>
+                        
+                        <div class="mt-4 space-y-2">
+                            <a v-if="$page.props.appSettings?.contact_email" :href="'mailto:' + $page.props.appSettings.contact_email" class="flex items-center gap-2 text-sm text-slate-500 hover:text-teal-600 transition-colors w-fit">
+                                <Mail class="w-4 h-4" />
+                                {{ $page.props.appSettings.contact_email }}
+                            </a>
+                            <a v-if="$page.props.appSettings?.contact_phone" :href="'https://wa.me/' + $page.props.appSettings.contact_phone.replace(/\D/g,'')" class="flex items-center gap-2 text-sm text-slate-500 hover:text-teal-600 transition-colors w-fit">
+                                <Phone class="w-4 h-4" />
+                                {{ $page.props.appSettings.contact_phone }}
+                            </a>
+                        </div>
+                        
+                        <div class="mt-6 flex gap-4 text-sm font-medium">
+                            <a v-if="$page.props.appSettings?.link_instagram" :href="$page.props.appSettings.link_instagram" target="_blank" class="text-slate-400 hover:text-teal-600 transition-colors">Instagram</a>
+                            <a v-if="$page.props.appSettings?.link_facebook" :href="$page.props.appSettings.link_facebook" target="_blank" class="text-slate-400 hover:text-teal-600 transition-colors">Facebook</a>
+                            <a v-if="$page.props.appSettings?.link_tiktok" :href="$page.props.appSettings.link_tiktok" target="_blank" class="text-slate-400 hover:text-teal-600 transition-colors">TikTok</a>
+                        </div>
                     </div>
 
                     <div>
@@ -773,11 +793,14 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-bold text-slate-900">Platform</h3>
+                        <h3 class="text-sm font-bold text-slate-900">Platform & Legal</h3>
                         <nav class="mt-4 flex flex-col gap-3 text-sm text-slate-500">
                             <a href="#keamanan" class="hover:text-teal-600 transition-colors">Keamanan</a>
                             <a href="#pemilik" class="hover:text-teal-600 transition-colors">Untuk Pemilik</a>
                             <Link v-if="canLogin && !$page.props.auth.user" :href="route('login')" class="hover:text-teal-600 transition-colors">Masuk Akun</Link>
+                            <Link :href="route('page.show', 'tentang-kami')" class="hover:text-teal-600 transition-colors">Tentang Kami</Link>
+                            <Link :href="route('page.show', 'syarat-ketentuan')" class="hover:text-teal-600 transition-colors">Syarat & Ketentuan</Link>
+                            <Link :href="route('page.show', 'kebijakan-privasi')" class="hover:text-teal-600 transition-colors">Kebijakan Privasi</Link>
                         </nav>
                     </div>
 
@@ -792,7 +815,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="mt-12 flex flex-col gap-4 border-t border-slate-100 pt-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-                    <p>&copy; {{ new Date().getFullYear() }} Kos Online. Seluruh hak dilindungi.</p>
+                    <p>&copy; {{ new Date().getFullYear() }} {{ $page.props.appSettings?.app_name || 'Kos Online' }}. Seluruh hak dilindungi.</p>
                     <p>Dibangun untuk ekosistem sewa kos yang lebih tertata.</p>
                 </div>
             </div>

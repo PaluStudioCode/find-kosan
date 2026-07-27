@@ -25,22 +25,22 @@ class Phase7TenancyTest extends TestCase
 
     public function test_tenant_can_book_room()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
         
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id, 'status' => 'dipublikasikan']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'dipublikasikan']);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 2, 'price_period' => 'bulanan']);
 
-        $response = $this->actingAs($tenant)->post("/tenant/rooms/{$room->id}/book", [
+        $response = $this->actingAs($user)->post("/user/rooms/{$room->id}/book", [
             'start_date' => now()->addDays(2)->format('Y-m-d'),
             'occupant_count' => 1,
         ]);
 
-        $tenancy = Tenancy::where('tenant_id', $tenant->id)->first();
+        $tenancy = Tenancy::where('user_id', $user->id)->first();
         $this->assertNotNull($tenancy);
         $this->assertEquals('nonaktif', $tenancy->status);
         
-        $response->assertRedirect("/tenant/tenancies/{$tenancy->id}");
+        $response->assertRedirect("/user/tenancies/{$tenancy->id}");
 
         $this->assertDatabaseHas('invoices', [
             'tenancy_id' => $tenancy->id,
@@ -52,14 +52,14 @@ class Phase7TenancyTest extends TestCase
     {
         Storage::fake('public');
         
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
-        $tenancy = Tenancy::factory()->create(['tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'status' => 'nonaktif']);
-        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'status' => 'belum_dibayar']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
+        $tenancy = Tenancy::factory()->create(['user_id' => $user->id, 'admin_id' => $admin->id, 'status' => 'nonaktif']);
+        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'user_id' => $user->id, 'admin_id' => $admin->id, 'status' => 'belum_dibayar']);
 
         $file = UploadedFile::fake()->image('proof.jpg');
         
-        $response = $this->actingAs($tenant)->post("/tenant/invoices/{$invoice->id}/payment", [
+        $response = $this->actingAs($user)->post("/user/invoices/{$invoice->id}/payment", [
             'proof_file' => $file
         ]);
 
@@ -76,24 +76,24 @@ class Phase7TenancyTest extends TestCase
 
     public function test_owner_can_approve_payment()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
         
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id, 'status' => 'dipublikasikan']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'dipublikasikan']);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 1]);
 
-        $tenancy = Tenancy::factory()->create(['tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'room_id' => $room->id, 'status' => 'nonaktif']);
-        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'status' => 'menunggu_konfirmasi']);
+        $tenancy = Tenancy::factory()->create(['user_id' => $user->id, 'admin_id' => $admin->id, 'room_id' => $room->id, 'status' => 'nonaktif']);
+        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'user_id' => $user->id, 'admin_id' => $admin->id, 'status' => 'menunggu_konfirmasi']);
         $payment = Payment::create([
             'invoice_id' => $invoice->id,
-            'tenant_id' => $tenant->id,
-            'owner_id' => $owner->id,
+            'user_id' => $user->id,
+            'admin_id' => $admin->id,
             'amount' => 1000000,
             'payment_date' => now(),
             'status' => 'menunggu_konfirmasi'
         ]);
 
-        $response = $this->actingAs($owner)->post("/owner/payments/{$payment->id}/confirm", [
+        $response = $this->actingAs($admin)->post("/admin/payments/{$payment->id}/confirm", [
             'action' => 'approve'
         ]);
 

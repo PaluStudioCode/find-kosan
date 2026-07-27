@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('boarding_houses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
             $table->string('name', 150);
             $table->text('description');
             $table->text('address');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['owner_id', 'status']);
+            $table->index(['admin_id', 'status']);
             $table->index(['city', 'district', 'subdistrict']);
             $table->index(['latitude', 'longitude']);
             $table->index('name');

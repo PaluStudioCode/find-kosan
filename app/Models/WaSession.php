@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class WaSession extends Model
 {
     protected $fillable = [
-        'owner_id',
+        'admin_id',
         'status',
         'phone_number',
         'connected_at',
@@ -19,8 +19,8 @@ class WaSession extends Model
         'disconnected_at' => 'datetime',
     ];
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

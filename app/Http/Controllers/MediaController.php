@@ -27,7 +27,7 @@ class MediaController extends Controller
             switch ($type) {
                 case 'payments':
                     $payment = Payment::where('proof_file_path', $path)->first();
-                    if ($payment && ($payment->tenant_id === $user->id || $payment->owner_id === $user->id)) {
+                    if ($payment && ($payment->user_id === $user->id || $payment->admin_id === $user->id)) {
                         $authorized = true;
                     }
                     break;
@@ -35,9 +35,9 @@ class MediaController extends Controller
                     // QRIS is attached to BoardingHouse. Owner can see it, and any tenant booking it can see it.
                     $kos = BoardingHouse::where('payment_qris_image_path', $path)->first();
                     if ($kos) {
-                        if ($kos->owner_id === $user->id) {
+                        if ($kos->admin_id === $user->id) {
                             $authorized = true;
-                        } elseif ($user->role === 'penyewa') {
+                        } elseif ($user->role === 'user') {
                             // Can see if they have tenancy for this kos
                             $hasTenancy = $user->tenanciesAsTenant()->whereHas('room', function($q) use ($kos) {
                                 $q->where('boarding_house_id', $kos->id);
@@ -48,7 +48,7 @@ class MediaController extends Controller
                     break;
                 case 'legal_documents':
                     $doc = LegalDocument::where('file_path', $path)->first();
-                    if ($doc && $doc->boardingHouse->owner_id === $user->id) {
+                    if ($doc && $doc->boardingHouse->admin_id === $user->id) {
                         $authorized = true;
                     }
                     break;

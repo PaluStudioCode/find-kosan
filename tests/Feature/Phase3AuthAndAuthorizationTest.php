@@ -47,13 +47,13 @@ class Phase3AuthAndAuthorizationTest extends TestCase
 
     public function test_dashboard_redirects_per_role()
     {
-        $admin = User::factory()->create(['role' => 'super_admin']);
-        $owner = User::factory()->create(['role' => 'pemilik_kos']);
-        $tenant = User::factory()->create(['role' => 'penyewa']);
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'user']);
 
+        $this->actingAs($superAdmin)->get('/dashboard')->assertRedirect('/superadmin/dashboard');
         $this->actingAs($admin)->get('/dashboard')->assertRedirect('/admin/dashboard');
-        $this->actingAs($owner)->get('/dashboard')->assertRedirect('/owner/dashboard');
-        $this->actingAs($tenant)->get('/dashboard')->assertRedirect('/tenant/dashboard');
+        $this->actingAs($user)->get('/dashboard')->assertRedirect('/');
     }
 
     public function test_registration_creates_pemilik_kos()
@@ -64,29 +64,30 @@ class Phase3AuthAndAuthorizationTest extends TestCase
             'whatsapp_number' => '6281234567890',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'admin',
         ]);
 
         $response->assertRedirect('/dashboard');
         $this->assertDatabaseHas('users', [
             'email' => 'owner@example.com',
-            'role' => 'pemilik_kos',
+            'role' => 'admin',
             'status' => 'aktif'
         ]);
     }
 
     public function test_role_middleware_returns_403()
     {
-        $tenant = User::factory()->create(['role' => 'penyewa']);
-        $this->actingAs($tenant)->get('/admin/dashboard')->assertStatus(403);
+        $user = User::factory()->create(['role' => 'user']);
+        $this->actingAs($user)->get('/superadmin/dashboard')->assertStatus(403);
     }
 
     public function test_policy_denies_access_to_other_owners_data()
     {
-        $owner1 = User::factory()->create(['role' => 'pemilik_kos']);
-        $owner2 = User::factory()->create(['role' => 'pemilik_kos']);
+        $admin1 = User::factory()->create(['role' => 'admin']);
+        $admin2 = User::factory()->create(['role' => 'admin']);
 
         $boardingHouse = BoardingHouse::create([
-            'owner_id' => $owner1->id,
+            'admin_id' => $admin1->id,
             'name' => 'Kos 1',
             'description' => 'Desc',
             'address' => 'Addr',
@@ -94,23 +95,23 @@ class Phase3AuthAndAuthorizationTest extends TestCase
         ]);
 
         // owner1 can update
-        $this->assertTrue($owner1->can('update', $boardingHouse));
+        $this->assertTrue($admin1->can('update', $boardingHouse));
         
         // owner2 cannot
-        $this->assertFalse($owner2->can('update', $boardingHouse));
+        $this->assertFalse($admin2->can('update', $boardingHouse));
     }
 
     public function test_tenant_activation_flow()
     {
-        $tenant = User::factory()->create([
+        $user = User::factory()->create([
             'status' => 'menunggu_aktivasi',
             'password' => null,
-            'role' => 'penyewa'
+            'role' => 'user'
         ]);
 
         $tokenStr = 'randomtoken123';
         UserActivationToken::create([
-            'user_id' => $tenant->id,
+            'user_id' => $user->id,
             'token_hash' => hash('sha256', $tokenStr),
             'purpose' => 'tenant_activation',
             'expires_at' => now()->addDays(7)
@@ -124,8 +125,8 @@ class Phase3AuthAndAuthorizationTest extends TestCase
 
         $response->assertRedirect('/login');
         
-        $tenant->refresh();
-        $this->assertEquals('aktif', $tenant->status);
-        $this->assertNotNull($tenant->password);
+        $user->refresh();
+        $this->assertEquals('aktif', $user->status);
+        $this->assertNotNull($user->password);
     }
 }

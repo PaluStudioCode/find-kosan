@@ -19,7 +19,7 @@ class UserPolicy
 
     public function createLimited(User $user): bool
     {
-        return in_array($user->role, ['pemilik_kos', 'super_admin']);
+        return in_array($user->role, ['admin', 'super_admin']);
     }
 
     public function update(User $user, User $model): bool

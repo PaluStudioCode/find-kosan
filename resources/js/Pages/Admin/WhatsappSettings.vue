@@ -199,11 +199,11 @@ onUnmounted(() => {
 
 <template>
     <AppLayout>
-        <Head title="WhatsApp Sistem" />
+        <Head title="Pengaturan WhatsApp" />
 
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">WhatsApp Sistem</h2>
-            <p class="text-gray-500 dark:text-slate-400 mt-1">Hubungkan nomor WhatsApp untuk mengirim notifikasi otomatis.</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Pengaturan WhatsApp</h2>
+            <p class="text-gray-500 dark:text-slate-400 mt-1">Hubungkan akun WhatsApp Anda untuk mengirim notifikasi ke penyewa.</p>
         </div>
 
         <div class="max-w-3xl mx-auto">
@@ -218,7 +218,7 @@ onUnmounted(() => {
                         <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">Terhubung sejak {{ formatDate(connectedAt) }}</p>
                         
                         <div class="mt-8 p-4 bg-gray-50/80 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl text-sm text-gray-600 dark:text-slate-300 max-w-md w-full mx-auto leading-relaxed">
-                            Sistem akan otomatis mengirim pengingat, konfirmasi pembayaran dan notifikasi penarikan dana ke pemilik kos menggunakan nomor ini.
+                            Sistem akan otomatis mengirim pengingat tagihan dan konfirmasi pembayaran ke penyewa Anda melalui WhatsApp.
                         </div>
 
                         <Button variant="destructive" class="mt-8 px-6 shadow-sm" @click="stopSession" :disabled="isLoading">

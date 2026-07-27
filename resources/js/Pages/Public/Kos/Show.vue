@@ -87,7 +87,7 @@ const openBookModal = (room) => {
 };
 
 const submitBooking = () => {
-    form.post(route('tenant.tenancies.store', bookingRoom.value.id), {
+    form.post(route('user.tenancies.store', bookingRoom.value.id), {
         onSuccess: () => {
             bookingRoom.value = null;
         },
@@ -106,7 +106,7 @@ const reviewForm = useForm({
 });
 
 const submitReview = () => {
-    reviewForm.post(route('tenant.kos.reviews.store', props.kos.id), {
+    reviewForm.post(route('user.kos.reviews.store', props.kos.id), {
         preserveScroll: true,
         onSuccess: () => reviewForm.clearErrors(),
     });
@@ -272,7 +272,7 @@ const cheapestPrice = computed(() => {
                         <!-- Report Button -->
                         <div class="pt-2 flex justify-center">
                             <Button
-                                v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'"
+                                v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'"
                                 type="button"
                                 variant="ghost"
                                 class="text-xs text-slate-400 hover:text-slate-600 hover:bg-slate-50 h-auto py-1.5 px-3 rounded-full transition-colors"
@@ -353,7 +353,7 @@ const cheapestPrice = computed(() => {
                         <!-- Action (pushed to bottom) -->
                         <div class="mt-auto">
                             <template v-if="room.status === 'tersedia'">
-                                <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'">
+                                <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'">
                                     <Button class="w-full rounded-full font-bold h-11 bg-slate-900 hover:bg-slate-800 text-white transition-all hover:-translate-y-0.5 shadow-md" @click="openBookModal(room)">
                                         Pesan Kamar Ini
                                     </Button>
@@ -401,7 +401,7 @@ const cheapestPrice = computed(() => {
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div class="lg:col-span-1">
                         <form
-                            v-if="$page.props.auth.user && $page.props.auth.user.role === 'penyewa'"
+                            v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'"
                             class="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
                             @submit.prevent="submitReview"
                         >

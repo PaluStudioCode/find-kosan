@@ -19,7 +19,7 @@ class BoardingHouse extends Model
     }
 
     protected $fillable = [
-        'owner_id', 'name', 'description', 'address', 'public_contact_name',
+        'admin_id', 'name', 'description', 'address', 'public_contact_name',
         'public_contact_whatsapp_number', 'payment_instructions', 'payment_qris_image_path',
         'payment_proof_required', 'city', 'district', 'subdistrict', 'latitude', 'longitude',
         'status', 'verified_at', 'verified_by', 'verification_note', 'pending_revisions',
@@ -33,9 +33,9 @@ class BoardingHouse extends Model
         'pending_revisions' => 'array',
     ];
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function verifier()

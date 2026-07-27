@@ -97,9 +97,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="relative w-full">
+    <div class="relative w-full z-0">
         <div ref="mapContainer" class="w-full h-[300px] md:h-[400px] rounded-md border" style="z-index: 10;"></div>
-        <button v-if="!readonly" @click.prevent="getCurrentLocation" type="button" class="absolute top-4 right-4 z-[400] bg-white px-3 py-2 rounded-md shadow-md border border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors">
+        <button v-if="!readonly" @click.prevent="getCurrentLocation" type="button" class="absolute top-4 right-4 z-20 bg-white px-3 py-2 rounded-md shadow-md border border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors">
             <Locate class="w-4 h-4 text-primary" /> Gunakan GPS Saya
         </button>
     </div>

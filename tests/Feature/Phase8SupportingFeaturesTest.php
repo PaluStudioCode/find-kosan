@@ -24,7 +24,7 @@ class Phase8SupportingFeaturesTest extends TestCase
 
     public function test_user_can_submit_report()
     {
-        $user = User::factory()->create(['role' => 'penyewa']);
+        $user = User::factory()->create(['role' => 'user']);
         $kos = BoardingHouse::factory()->create();
 
         $response = $this->actingAs($user)->post('/reports', [
@@ -52,7 +52,7 @@ class Phase8SupportingFeaturesTest extends TestCase
             'status' => 'menunggu',
         ]);
 
-        $response = $this->actingAs($admin)->put("/admin/reports/{$report->id}", [
+        $response = $this->actingAs($admin)->put("/superadmin/reports/{$report->id}", [
             'status' => 'selesai',
             'resolution_note' => 'Sudah diperbaiki',
         ]);
@@ -70,11 +70,11 @@ class Phase8SupportingFeaturesTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'super_admin']);
 
-        $response = $this->actingAs($admin)->post('/admin/users', [
+        $response = $this->actingAs($admin)->post('/superadmin/users', [
             'name' => 'New Tenant',
             'email' => 'newtenant@example.com',
             'password' => 'password123',
-            'role' => 'penyewa',
+            'role' => 'user',
             'status' => 'aktif',
         ]);
 
@@ -86,57 +86,57 @@ class Phase8SupportingFeaturesTest extends TestCase
         $user = User::where('email', 'newtenant@example.com')->first();
 
         // Update user
-        $response = $this->actingAs($admin)->put("/admin/users/{$user->id}", [
+        $response = $this->actingAs($admin)->put("/superadmin/users/{$user->id}", [
             'name' => 'Updated Tenant',
             'email' => 'updatedtenant@example.com',
-            'role' => 'penyewa',
+            'role' => 'user',
             'status' => 'nonaktif',
         ]);
 
         $this->assertEquals('nonaktif', $user->refresh()->status);
 
         // Delete user
-        $response = $this->actingAs($admin)->delete("/admin/users/{$user->id}");
+        $response = $this->actingAs($admin)->delete("/superadmin/users/{$user->id}");
         $this->assertSoftDeleted($user);
     }
 
     public function test_super_admin_cannot_delete_user_with_active_relations()
     {
-        $admin = User::factory()->create(['role' => 'super_admin']);
-        $owner = User::factory()->create(['role' => 'pemilik_kos']);
-        BoardingHouse::factory()->create(['owner_id' => $owner->id]);
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        BoardingHouse::factory()->create(['admin_id' => $admin->id]);
 
-        $response = $this->actingAs($admin)->delete("/admin/users/{$owner->id}");
+        $response = $this->actingAs($superAdmin)->delete("/superadmin/users/{$admin->id}");
         $response->assertSessionHas('error');
-        $this->assertNotSoftDeleted($owner);
+        $this->assertNotSoftDeleted($admin);
     }
 
     public function test_payment_approval_creates_activity_log()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
 
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id, 'status' => 'dipublikasikan']);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'dipublikasikan']);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 1]);
 
-        $tenancy = Tenancy::factory()->create(['tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'room_id' => $room->id, 'status' => 'nonaktif']);
-        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'tenant_id' => $tenant->id, 'owner_id' => $owner->id, 'status' => 'menunggu_konfirmasi']);
+        $tenancy = Tenancy::factory()->create(['user_id' => $user->id, 'admin_id' => $admin->id, 'room_id' => $room->id, 'status' => 'nonaktif']);
+        $invoice = Invoice::factory()->create(['tenancy_id' => $tenancy->id, 'user_id' => $user->id, 'admin_id' => $admin->id, 'status' => 'menunggu_konfirmasi']);
         $payment = Payment::create([
             'invoice_id' => $invoice->id,
-            'tenant_id' => $tenant->id,
-            'owner_id' => $owner->id,
+            'user_id' => $user->id,
+            'admin_id' => $admin->id,
             'amount' => 1000000,
             'payment_date' => now(),
             'status' => 'menunggu_konfirmasi',
         ]);
 
-        $response = $this->actingAs($owner)->post("/owner/payments/{$payment->id}/confirm", [
+        $response = $this->actingAs($admin)->post("/admin/payments/{$payment->id}/confirm", [
             'action' => 'approve',
         ]);
 
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('activity_logs', [
-            'user_id' => $owner->id,
+            'user_id' => $admin->id,
             'action' => 'payment.approved',
         ]);
     }

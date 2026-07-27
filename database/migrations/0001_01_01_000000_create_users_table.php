@@ -15,7 +15,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255)->nullable();
             $table->string('whatsapp_number', 30)->nullable();
-            $table->enum('role', ['penyewa', 'pemilik_kos', 'super_admin']);
+            $table->enum('role', ['user', 'admin', 'super_admin']);
             $table->enum('status', ['menunggu_aktivasi', 'aktif', 'nonaktif']);
             $table->boolean('must_change_password')->default(false);
             $table->rememberToken();

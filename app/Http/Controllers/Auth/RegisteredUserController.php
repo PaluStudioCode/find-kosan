@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:150|unique:'.User::class,
             'whatsapp_number' => ['required', 'string', 'regex:/^(\+62|62|08)\d{8,13}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:penyewa,pemilik_kos'],
+            'role' => ['required', 'in:user,admin'],
         ], [
             'whatsapp_number.regex' => 'Nomor WhatsApp harus nomor Indonesia yang valid (dimulai dengan 08, +62, atau 62).',
             'role.required' => 'Silakan pilih jenis akun.',

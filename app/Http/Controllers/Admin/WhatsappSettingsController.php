@@ -11,16 +11,19 @@ use Inertia\Inertia;
 class WhatsappSettingsController extends Controller
 {
     protected WhatsappService $waService;
-    const ADMIN_SESSION_ID = 0;
 
     public function __construct(WhatsappService $waService)
     {
         $this->waService = $waService;
     }
 
+    /**
+     * Display the WhatsApp settings page.
+     */
     public function index()
     {
-        $session = WaSession::where('owner_id', self::ADMIN_SESSION_ID)->first();
+        $adminId = auth()->id();
+        $session = WaSession::where('admin_id', $adminId)->first();
 
         return Inertia::render('Admin/WhatsappSettings', [
             'session' => $session ? [
@@ -32,31 +35,55 @@ class WhatsappSettingsController extends Controller
         ]);
     }
 
+    /**
+     * Start a WhatsApp session using QR code.
+     */
     public function startSession()
     {
-        $result = $this->waService->startSession(self::ADMIN_SESSION_ID);
+        $adminId = auth()->id();
+        $result = $this->waService->startSession($adminId);
+
         return response()->json($result);
     }
 
+    /**
+     * Start a WhatsApp session using pairing code.
+     */
     public function startPairingCode(Request $request)
     {
         $request->validate([
             'phone_number' => ['required', 'string', 'regex:/^(\+62|62|08)\d{8,13}$/'],
         ]);
-        $result = $this->waService->startSessionWithPairingCode(self::ADMIN_SESSION_ID, $request->phone_number);
+
+        $adminId = auth()->id();
+        $result = $this->waService->startSessionWithPairingCode($adminId, $request->phone_number);
+
         return response()->json($result);
     }
 
+    /**
+     * Stop/disconnect the WhatsApp session.
+     */
     public function stopSession()
     {
-        $result = $this->waService->stopSession(self::ADMIN_SESSION_ID);
+        $adminId = auth()->id();
+        $result = $this->waService->stopSession($adminId);
+
         return response()->json($result);
     }
 
+    /**
+     * Get current session status (for polling from frontend).
+     */
     public function getStatus()
     {
-        $liveStatus = $this->waService->getStatus(self::ADMIN_SESSION_ID);
-        $session = WaSession::where('owner_id', self::ADMIN_SESSION_ID)->first();
+        $adminId = auth()->id();
+
+        // First try to get live status from WA service
+        $liveStatus = $this->waService->getStatus($adminId);
+
+        // Also get DB session for extra info
+        $session = WaSession::where('admin_id', $adminId)->first();
 
         return response()->json([
             'success' => true,
@@ -67,9 +94,14 @@ class WhatsappSettingsController extends Controller
         ]);
     }
 
+    /**
+     * Get QR code (for polling from frontend).
+     */
     public function getQrCode()
     {
-        $result = $this->waService->getQrCode(self::ADMIN_SESSION_ID);
+        $adminId = auth()->id();
+        $result = $this->waService->getQrCode($adminId);
+
         return response()->json($result);
     }
 }

@@ -46,19 +46,19 @@ class KosReviewFeatureTest extends TestCase
 
     public function test_tenant_can_create_and_then_update_one_review_per_kos(): void
     {
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
         $kos = BoardingHouse::factory()->create(['status' => 'dipublikasikan']);
 
-        $this->actingAs($tenant)
-            ->post(route('tenant.kos.reviews.store', $kos), [
+        $this->actingAs($user)
+            ->post(route('user.kos.reviews.store', $kos), [
                 'rating' => 3,
                 'comment' => 'Kos cukup nyaman untuk ditinggali.',
             ])
             ->assertRedirect()
             ->assertSessionHas('success', 'Rating dan komentar berhasil dikirim.');
 
-        $this->actingAs($tenant)
-            ->post(route('tenant.kos.reviews.store', $kos), [
+        $this->actingAs($user)
+            ->post(route('user.kos.reviews.store', $kos), [
                 'rating' => 5,
                 'comment' => 'Setelah beberapa waktu, pelayanannya sangat baik.',
             ])
@@ -68,7 +68,7 @@ class KosReviewFeatureTest extends TestCase
         $this->assertDatabaseCount('boarding_house_reviews', 1);
         $this->assertDatabaseHas('boarding_house_reviews', [
             'boarding_house_id' => $kos->id,
-            'user_id' => $tenant->id,
+            'user_id' => $user->id,
             'rating' => 5,
             'comment' => 'Setelah beberapa waktu, pelayanannya sangat baik.',
         ]);
@@ -76,11 +76,11 @@ class KosReviewFeatureTest extends TestCase
 
     public function test_review_requires_valid_rating_and_comment(): void
     {
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
         $kos = BoardingHouse::factory()->create(['status' => 'dipublikasikan']);
 
-        $this->actingAs($tenant)
-            ->post(route('tenant.kos.reviews.store', $kos), [
+        $this->actingAs($user)
+            ->post(route('user.kos.reviews.store', $kos), [
                 'rating' => 6,
                 'comment' => 'Buruk',
             ])
@@ -93,15 +93,15 @@ class KosReviewFeatureTest extends TestCase
     {
         $kos = BoardingHouse::factory()->create(['status' => 'dipublikasikan']);
 
-        $this->post(route('tenant.kos.reviews.store', $kos), [
+        $this->post(route('user.kos.reviews.store', $kos), [
             'rating' => 5,
             'comment' => 'Komentar dari guest.',
         ])->assertRedirect(route('login'));
 
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
 
-        $this->actingAs($owner)
-            ->post(route('tenant.kos.reviews.store', $kos), [
+        $this->actingAs($admin)
+            ->post(route('user.kos.reviews.store', $kos), [
                 'rating' => 5,
                 'comment' => 'Komentar dari pemilik.',
             ])
@@ -112,11 +112,11 @@ class KosReviewFeatureTest extends TestCase
 
     public function test_review_cannot_be_submitted_for_unpublished_kos(): void
     {
-        $tenant = User::factory()->create(['role' => 'penyewa', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'user', 'status' => 'aktif']);
         $kos = BoardingHouse::factory()->create(['status' => 'draft']);
 
-        $this->actingAs($tenant)
-            ->post(route('tenant.kos.reviews.store', $kos), [
+        $this->actingAs($user)
+            ->post(route('user.kos.reviews.store', $kos), [
                 'rating' => 5,
                 'comment' => 'Kos ini belum dipublikasikan.',
             ])

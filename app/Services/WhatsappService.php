@@ -35,10 +35,10 @@ class WhatsappService
     /**
      * Start a WhatsApp session for an owner (QR Code mode).
      */
-    public function startSession(int $ownerId): array
+    public function startSession(int $adminId): array
     {
         try {
-            $response = $this->request()->post("/sessions/{$ownerId}/start", [
+            $response = $this->request()->post("/sessions/{$adminId}/start", [
                 'usePairingCode' => false,
             ]);
 
@@ -52,10 +52,10 @@ class WhatsappService
     /**
      * Start a WhatsApp session for an owner (Pairing Code mode).
      */
-    public function startSessionWithPairingCode(int $ownerId, string $phoneNumber): array
+    public function startSessionWithPairingCode(int $adminId, string $phoneNumber): array
     {
         try {
-            $response = $this->request()->post("/sessions/{$ownerId}/start", [
+            $response = $this->request()->post("/sessions/{$adminId}/start", [
                 'usePairingCode' => true,
                 'phoneNumber' => $phoneNumber,
             ]);
@@ -70,10 +70,10 @@ class WhatsappService
     /**
      * Stop/disconnect an owner's WhatsApp session.
      */
-    public function stopSession(int $ownerId): array
+    public function stopSession(int $adminId): array
     {
         try {
-            $response = $this->request()->post("/sessions/{$ownerId}/stop");
+            $response = $this->request()->post("/sessions/{$adminId}/stop");
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
             Log::error("WA Service stopSession error: " . $e->getMessage());
@@ -84,10 +84,10 @@ class WhatsappService
     /**
      * Get session status for an owner.
      */
-    public function getStatus(int $ownerId): array
+    public function getStatus(int $adminId): array
     {
         try {
-            $response = $this->request()->get("/sessions/{$ownerId}/status");
+            $response = $this->request()->get("/sessions/{$adminId}/status");
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
             Log::error("WA Service getStatus error: " . $e->getMessage());
@@ -98,10 +98,10 @@ class WhatsappService
     /**
      * Get QR code for an owner's session.
      */
-    public function getQrCode(int $ownerId): array
+    public function getQrCode(int $adminId): array
     {
         try {
-            $response = $this->request()->get("/sessions/{$ownerId}/qr");
+            $response = $this->request()->get("/sessions/{$adminId}/qr");
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
             Log::error("WA Service getQrCode error: " . $e->getMessage());
@@ -112,10 +112,10 @@ class WhatsappService
     /**
      * Send a WhatsApp message using an owner's session.
      */
-    public function sendMessage(int $ownerId, string $phoneNumber, string $message): array
+    public function sendMessage(int $adminId, string $phoneNumber, string $message): array
     {
         try {
-            $response = $this->request()->post("/sessions/{$ownerId}/send", [
+            $response = $this->request()->post("/sessions/{$adminId}/send", [
                 'phone' => $phoneNumber,
                 'message' => $message,
             ]);

@@ -20,7 +20,7 @@ defineProps({
 
 const page = usePage();
 const layout = computed(() => {
-    return page.props.auth.user.role === 'penyewa' ? PublicLayout : AppLayout;
+    return page.props.auth.user.role === 'user' ? PublicLayout : AppLayout;
 });
 </script>
 

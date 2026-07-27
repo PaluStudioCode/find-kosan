@@ -18,58 +18,58 @@ class Phase8WhatsappNotificationTest extends TestCase
 
     public function test_it_creates_notification_when_booking()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'whatsapp_number' => '08123456789']);
-        $tenant = User::factory()->create(['role' => 'penyewa']);
+        $admin = User::factory()->create(['role' => 'admin', 'whatsapp_number' => '08123456789']);
+        $user = User::factory()->create(['role' => 'user']);
         
-        $kos = BoardingHouse::factory()->create(['owner_id' => $owner->id]);
+        $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id]);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 2, 'price_period' => 'bulanan']);
 
-        $response = $this->actingAs($tenant)->post("/tenant/rooms/{$room->id}/book", [
+        $response = $this->actingAs($user)->post("/user/rooms/{$room->id}/book", [
             'start_date' => now()->addDays(1)->format('Y-m-d'),
             'occupant_count' => 1,
         ]);
 
         $this->assertDatabaseHas('whatsapp_notifications', [
-            'tenant_id' => $owner->id,
+            'user_id' => $admin->id,
             'message_type' => 'pembayaran_baru'
         ]);
     }
 
     public function test_it_generates_reminders_for_due_invoices()
     {
-        $tenant = User::factory()->create(['role' => 'penyewa', 'whatsapp_number' => '08987654321']);
-        $tenancy = Tenancy::factory()->create(['tenant_id' => $tenant->id]);
+        $user = User::factory()->create(['role' => 'user', 'whatsapp_number' => '08987654321']);
+        $tenancy = Tenancy::factory()->create(['user_id' => $user->id]);
         $invoice = Invoice::factory()->create([
             'tenancy_id' => $tenancy->id,
-            'tenant_id' => $tenant->id,
+            'user_id' => $user->id,
             'status' => 'belum_dibayar',
-            'due_date' => now()->addDays(2)
+            'due_date' => today()
         ]);
 
         Artisan::call('whatsapp:reminders');
 
         $this->assertDatabaseHas('whatsapp_notifications', [
             'invoice_id' => $invoice->id,
-            'tenant_id' => $tenant->id,
+            'user_id' => $user->id,
             'message_type' => 'pengingat_jatuh_tempo'
         ]);
     }
 
     public function test_process_command_dispatches_jobs_and_updates_status()
     {
-        $owner = User::factory()->create(['role' => 'pemilik_kos', 'whatsapp_number' => '08123456789']);
-        $tenant = User::factory()->create(['role' => 'penyewa', 'whatsapp_number' => '08987654321']);
-        $tenancy = Tenancy::factory()->create(['tenant_id' => $tenant->id]);
+        $admin = User::factory()->create(['role' => 'admin', 'whatsapp_number' => '08123456789']);
+        $user = User::factory()->create(['role' => 'user', 'whatsapp_number' => '08987654321']);
+        $tenancy = Tenancy::factory()->create(['user_id' => $user->id]);
         $invoice = Invoice::factory()->create([
             'tenancy_id' => $tenancy->id,
-            'tenant_id' => $tenant->id,
-            'owner_id' => $owner->id,
+            'user_id' => $user->id,
+            'admin_id' => $admin->id,
         ]);
 
         $notif = WhatsappNotification::create([
             'invoice_id' => $invoice->id,
-            'tenant_id' => $tenant->id,
-            'owner_id' => $owner->id,
+            'user_id' => $user->id,
+            'admin_id' => $admin->id,
             'phone_number' => '08987654321',
             'message_type' => 'pembayaran_baru',
             'message_body' => 'Test message',

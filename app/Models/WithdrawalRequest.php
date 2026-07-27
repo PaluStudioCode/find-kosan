@@ -10,7 +10,7 @@ class WithdrawalRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'owner_id', 'amount', 'bank_name', 'account_number', 'account_holder_name', 'status',
+        'admin_id', 'amount', 'bank_name', 'account_number', 'account_holder_name', 'status',
         'owner_note', 'reviewed_by', 'reviewed_at', 'review_note', 'transferred_by',
         'transferred_at', 'transfer_reference', 'transfer_proof_path',
     ];
@@ -21,9 +21,9 @@ class WithdrawalRequest extends Model
         'transferred_at' => 'datetime',
     ];
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function reviewer()

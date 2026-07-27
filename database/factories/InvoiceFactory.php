@@ -19,8 +19,8 @@ class InvoiceFactory extends Factory
     {
         return [
             'tenancy_id' => \App\Models\Tenancy::factory(),
-            'tenant_id' => \App\Models\User::factory()->create(['role' => 'penyewa'])->id,
-            'owner_id' => \App\Models\User::factory()->create(['role' => 'pemilik_kos'])->id,
+            'user_id' => \App\Models\User::factory()->create(['role' => 'user'])->id,
+            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
             'period_start' => now(),
             'period_end' => now()->addMonth(),
             'amount' => 1000000,

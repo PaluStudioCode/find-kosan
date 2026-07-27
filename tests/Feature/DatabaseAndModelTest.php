@@ -35,21 +35,21 @@ class DatabaseAndModelTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('facilities', [
-            'name' => 'WiFi',
+            'name' => 'WiFi / Internet',
             'type' => 'kos'
         ]);
 
         $this->assertDatabaseHas('facilities', [
-            'name' => 'Kasur',
+            'name' => 'Kasur & Bantal',
             'type' => 'kamar'
         ]);
     }
 
     public function test_user_boarding_house_relationship()
     {
-        $user = User::factory()->create(['role' => 'pemilik_kos', 'status' => 'aktif']);
+        $user = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
         $boardingHouse = BoardingHouse::create([
-            'owner_id' => $user->id,
+            'admin_id' => $user->id,
             'name' => 'Kos Test',
             'description' => 'Desc',
             'address' => 'Addr',
@@ -57,6 +57,6 @@ class DatabaseAndModelTest extends TestCase
         ]);
 
         $this->assertEquals(1, $user->boardingHouses()->count());
-        $this->assertEquals($user->id, $boardingHouse->owner->id);
+        $this->assertEquals($user->id, $boardingHouse->admin->id);
     }
 }

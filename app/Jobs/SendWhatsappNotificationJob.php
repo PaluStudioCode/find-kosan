@@ -37,8 +37,8 @@ class SendWhatsappNotificationJob implements ShouldQueue
         if ($this->notification->send_via === 'admin') {
             $sessionId = 0; // Admin/System WA session
         } else {
-            $sessionId = $this->notification->owner_id
-                ?? $this->notification->invoice?->owner_id;
+            $sessionId = $this->notification->admin_id
+                ?? $this->notification->invoice?->admin_id;
         }
 
         if (is_null($sessionId)) {

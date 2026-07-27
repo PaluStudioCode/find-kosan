@@ -31,10 +31,6 @@ class Room extends Model
         return $this->belongsTo(BoardingHouse::class);
     }
 
-    public function photos()
-    {
-        return $this->hasMany(RoomPhoto::class);
-    }
 
     public function facilities()
     {

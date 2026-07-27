@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenancy_id')->constrained()->onDelete('cascade');
-            $table->foreignId('tenant_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
             $table->date('period_start');
             $table->date('period_end');
             $table->decimal('amount', 12, 2);
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['tenant_id', 'owner_id', 'due_date', 'status']);
+            $table->index(['user_id', 'admin_id', 'due_date', 'status']);
             $table->unique(['tenancy_id', 'period_start', 'period_end']);
         });
     }

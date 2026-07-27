@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('withdrawal_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('admin_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 12, 2);
             $table->string('bank_name', 100);
             $table->string('account_number', 50);
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('transfer_proof_path')->nullable();
             $table->timestamps();
 
-            $table->index(['owner_id', 'status', 'created_at']);
+            $table->index(['admin_id', 'status', 'created_at']);
             $table->index(['status', 'created_at']);
         });
     }

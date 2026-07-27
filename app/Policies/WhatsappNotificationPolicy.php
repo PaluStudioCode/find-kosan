@@ -15,12 +15,12 @@ class WhatsappNotificationPolicy
     public function view(User $user, WhatsappNotification $whatsappNotification): bool
     {
         if ($user->role === 'super_admin') return true;
-        if ($user->role === 'pemilik_kos') return $user->id === $whatsappNotification->invoice->owner_id;
-        return $user->id === $whatsappNotification->tenant_id;
+        if ($user->role === 'admin') return $user->id === $whatsappNotification->invoice->admin_id;
+        return $user->id === $whatsappNotification->user_id;
     }
 
     public function retry(User $user, WhatsappNotification $whatsappNotification): bool
     {
-        return $user->id === $whatsappNotification->invoice->owner_id;
+        return $user->id === $whatsappNotification->invoice->admin_id;
     }
 }

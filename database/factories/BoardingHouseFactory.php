@@ -18,7 +18,7 @@ class BoardingHouseFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_id' => \App\Models\User::factory()->create(['role' => 'pemilik_kos'])->id,
+            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
             'name' => fake()->company(),
             'description' => fake()->paragraph(),
             'address' => fake()->address(),

@@ -10,7 +10,7 @@ class WhatsappNotification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'invoice_id', 'tenant_id', 'owner_id', 'send_via', 'phone_number', 'message_type', 'message_body',
+        'invoice_id', 'user_id', 'admin_id', 'send_via', 'phone_number', 'message_type', 'message_body',
         'scheduled_date', 'status', 'sent_at', 'failed_reason', 'gateway_response',
     ];
 
@@ -25,13 +25,13 @@ class WhatsappNotification extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    public function tenant()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function owner()
+    public function admin()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

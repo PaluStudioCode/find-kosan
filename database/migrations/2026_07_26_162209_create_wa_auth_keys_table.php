@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('wa_auth_keys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
             $table->string('key_id', 255);
             $table->longText('key_data');
             $table->timestamps();
 
-            $table->unique(['owner_id', 'key_id'], 'uk_owner_key');
+            $table->unique(['admin_id', 'key_id'], 'uk_owner_key');
         });
     }
 

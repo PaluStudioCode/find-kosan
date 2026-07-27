@@ -24,6 +24,7 @@ class RegistrationTest extends TestCase
             'whatsapp_number' => '6281234567890',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'user',
         ]);
 
         $this->assertAuthenticated();

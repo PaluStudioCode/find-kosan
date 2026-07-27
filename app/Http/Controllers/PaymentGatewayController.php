@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Services\OwnerWalletService;
+use App\Services\AdminWalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,8 +24,8 @@ class PaymentGatewayController extends Controller
             'invoice_id' => 'required|exists:invoices,id'
         ]);
 
-        $invoice = Invoice::with(['tenant', 'tenancy.room.boardingHouse'])
-            ->where('tenant_id', $request->user()->id)
+        $invoice = Invoice::with(['user', 'tenancy.room.boardingHouse'])
+            ->where('user_id', $request->user()->id)
             ->findOrFail($request->invoice_id);
         
         if ($invoice->status === 'lunas') {
@@ -38,13 +38,13 @@ class PaymentGatewayController extends Controller
             'paymentAmount' => (int) $invoice->amount,
             'merchantOrderId' => $merchantOrderId,
             'productDetails' => 'Sewa Kamar ' . $invoice->tenancy->room->room_number . ' - ' . $invoice->tenancy->room->boardingHouse->name,
-            'email' => $invoice->tenant->email,
-            'phoneNumber' => $invoice->tenant->whatsapp_number ?? '081234567890',
+            'email' => $invoice->user->email,
+            'phoneNumber' => $invoice->user->whatsapp_number ?? '081234567890',
             'customerDetail' => array(
-                'firstName' => $invoice->tenant->name,
+                'firstName' => $invoice->user->name,
                 'lastName' => '',
-                'email' => $invoice->tenant->email,
-                'phoneNumber' => $invoice->tenant->whatsapp_number ?? '081234567890',
+                'email' => $invoice->user->email,
+                'phoneNumber' => $invoice->user->whatsapp_number ?? '081234567890',
             ),
             'itemDetails' => array(
                 array(
@@ -109,7 +109,7 @@ class PaymentGatewayController extends Controller
         ]);
         
         $invoice = Invoice::where('payment_reference', $request->reference)
-            ->where('tenant_id', $request->user()->id)
+            ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
         if (!preg_match('/^INV-' . $invoice->id . '-\d+$/', $request->merchant_order_id)) {
@@ -140,7 +140,7 @@ class PaymentGatewayController extends Controller
     private function markInvoicePaid(Invoice $invoice, string $paymentMethod): void
     {
         DB::transaction(function () use ($invoice, $paymentMethod) {
-            $invoice = Invoice::with(['tenancy.room', 'tenant'])
+            $invoice = Invoice::with(['tenancy.room', 'user'])
                 ->lockForUpdate()
                 ->findOrFail($invoice->id);
 
@@ -153,7 +153,7 @@ class PaymentGatewayController extends Controller
                 'payment_method' => $paymentMethod,
             ]);
 
-            app(OwnerWalletService::class)->creditPaidInvoice($invoice);
+            app(AdminWalletService::class)->creditPaidInvoice($invoice);
 
             $tenancy = $invoice->tenancy;
             if ($tenancy->status === 'nonaktif') {
@@ -167,8 +167,8 @@ class PaymentGatewayController extends Controller
             Payment::firstOrCreate(
                 ['invoice_id' => $invoice->id],
                 [
-                    'tenant_id' => $invoice->tenant_id,
-                    'owner_id' => $invoice->owner_id,
+                    'user_id' => $invoice->user_id,
+                    'admin_id' => $invoice->admin_id,
                     'amount' => $invoice->amount,
                     'payment_date' => now(),
                     'status' => 'diterima',
@@ -176,11 +176,13 @@ class PaymentGatewayController extends Controller
                 ]
             );
 
-            $owner = \App\Models\User::find($invoice->owner_id);
-            if ($owner && $owner->whatsapp_number) {
-                $tenantName = $invoice->tenant->name ?? 'Penyewa';
-                $kosName = $invoice->tenancy->room->boardingHouse->name ?? 'kos';
-                $roomNumber = $invoice->tenancy->room->room_number ?? '';
+            $user = $invoice->user;
+            $admin = \App\Models\User::find($invoice->admin_id);
+            $userName = $user->name ?? 'Penyewa';
+            $kosName = $invoice->tenancy->room->boardingHouse->name ?? 'kos';
+            $roomNumber = $invoice->tenancy->room->room_number ?? '';
+
+            if ($admin && $admin->whatsapp_number) {
                 \App\Models\WhatsappNotification::updateOrCreate(
                     [
                         'invoice_id' => $invoice->id,
@@ -188,11 +190,29 @@ class PaymentGatewayController extends Controller
                         'scheduled_date' => today(),
                     ],
                     [
-                        'tenant_id' => $invoice->tenant_id,
-                        'owner_id' => $invoice->owner_id,
+                        'user_id' => $invoice->user_id,
+                        'admin_id' => $invoice->admin_id,
                         'send_via' => 'admin',
-                        'phone_number' => $owner->whatsapp_number,
-                        'message_body' => "Halo {$owner->name}, pembayaran sewa dari {$tenantName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " telah diterima melalui Duitku.",
+                        'phone_number' => $admin->whatsapp_number,
+                        'message_body' => "Halo {$admin->name}, pembayaran sewa dari {$userName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " telah diterima melalui Duitku.\n\nLihat detail sewa: " . route('admin.tenancies.show', $invoice->tenancy_id),
+                        'status' => 'belum_dikirim',
+                    ]
+                );
+            }
+
+            if ($user && $user->whatsapp_number) {
+                \App\Models\WhatsappNotification::updateOrCreate(
+                    [
+                        'invoice_id' => $invoice->id,
+                        'message_type' => 'pembayaran_berhasil_penyewa',
+                        'scheduled_date' => today(),
+                    ],
+                    [
+                        'user_id' => $invoice->user_id,
+                        'admin_id' => $invoice->admin_id,
+                        'send_via' => 'admin',
+                        'phone_number' => $user->whatsapp_number,
+                        'message_body' => "Halo {$userName}, pembayaran sewa kamar {$roomNumber} di {$kosName} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " telah BERHASIL dikonfirmasi. Terima kasih!\n\nLihat detail sewa Anda:\n" . route('user.tenancies.show', $invoice->tenancy_id),
                         'status' => 'belum_dikirim',
                     ]
                 );

@@ -25,7 +25,7 @@ const showPassword = ref(false);
 const showPasswordConfirmation = ref(false);
 
 const submit = () => {
-    form.post(route('tenant.activation.store'), {
+    form.post(route('user.activation.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };

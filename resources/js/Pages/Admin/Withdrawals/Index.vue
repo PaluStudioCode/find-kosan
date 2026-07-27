@@ -16,27 +16,27 @@ const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
     <AppLayout>
         <Head title="Penarikan Pemilik" />
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Penarikan Pemilik</h2>
-            <p class="text-gray-500 mt-1">Tinjau, setujui, lalu selesaikan transfer manual kepada pemilik kos.</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Penarikan Pemilik</h2>
+            <p class="text-gray-500 dark:text-slate-400 mt-1">Tinjau, setujui, lalu selesaikan transfer manual kepada pemilik kos.</p>
         </div>
 
-        <Card>
-            <CardHeader><CardTitle>Daftar Permintaan Penarikan</CardTitle></CardHeader>
-            <CardContent class="p-0">
-                <div v-if="withdrawals.data.length" class="divide-y">
-                    <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <Card class="border-0 dark:bg-slate-900 shadow-sm dark:border-slate-800">
+            <CardHeader class="border-b dark:border-slate-800"><CardTitle class="dark:text-white">Daftar Permintaan Penarikan</CardTitle></CardHeader>
+            <CardContent class="p-0 border-0">
+                <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
+                    <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                         <div>
-                            <p class="font-bold text-lg">{{ formatRupiah(withdrawal.amount) }}</p>
-                            <p class="font-medium">{{ withdrawal.owner?.name }}</p>
-                            <p class="text-sm text-gray-500">{{ withdrawal.bank_name }} · {{ withdrawal.account_number }} a.n. {{ withdrawal.account_holder_name }}</p>
+                            <p class="font-bold text-lg dark:text-slate-200">{{ formatRupiah(withdrawal.amount) }}</p>
+                            <p class="font-medium dark:text-slate-300">{{ withdrawal.owner?.name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} · {{ withdrawal.account_number }} a.n. {{ withdrawal.account_holder_name }}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <StatusBadge :status="withdrawal.status" />
-                            <Link :href="route('admin.withdrawals.show', withdrawal.id)"><Button variant="outline">Tinjau</Button></Link>
+                            <Link :href="route('admin.withdrawals.show', withdrawal.id)"><Button variant="outline" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Tinjau</Button></Link>
                         </div>
                     </div>
                 </div>
-                <p v-else class="p-10 text-center text-gray-500">Belum ada permintaan penarikan.</p>
+                <p v-else class="p-10 text-center text-gray-500 dark:text-slate-500">Belum ada permintaan penarikan.</p>
             </CardContent>
         </Card>
     </AppLayout>

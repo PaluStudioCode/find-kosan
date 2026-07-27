@@ -140,11 +140,11 @@ const handleLocationSelected = async (location) => {
         <Head title="Tambah Kos" />
 
         <div class="mb-6">
-            <Link :href="route('owner.kos.index')" class="text-sm text-gray-500 hover:text-gray-900 flex items-center mb-4 inline-flex">
+            <Link :href="route('owner.kos.index')" class="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white flex items-center mb-4 inline-flex transition-colors">
                 <ChevronLeft class="w-4 h-4 mr-1" /> Kembali ke Daftar Kos
             </Link>
-            <h2 class="text-2xl font-bold text-gray-900">Tambah Properti Kos</h2>
-            <p class="text-gray-500 mt-1">Masukkan informasi dasar properti kos Anda.</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Tambah Properti Kos</h2>
+            <p class="text-gray-500 dark:text-slate-400 mt-1">Masukkan informasi dasar properti kos Anda.</p>
         </div>
 
         <form @submit.prevent="submit" class="space-y-8">
@@ -175,7 +175,7 @@ const handleLocationSelected = async (location) => {
                         <div class="space-y-2">
                             <Label for="public_contact_whatsapp_number">Nomor WhatsApp Publik</Label>
                             <Input id="public_contact_whatsapp_number" v-model="form.public_contact_whatsapp_number" placeholder="Misal: 081234567890" />
-                            <p class="text-xs text-gray-500">Nomor yang bisa dihubungi oleh calon penyewa.</p>
+                            <p class="text-xs text-gray-500 dark:text-slate-400">Nomor yang bisa dihubungi oleh calon penyewa.</p>
                             <p v-if="form.errors.public_contact_whatsapp_number" class="text-sm text-red-500">{{ form.errors.public_contact_whatsapp_number }}</p>
                         </div>
                     </div>
@@ -190,13 +190,13 @@ const handleLocationSelected = async (location) => {
                 <CardContent class="space-y-4">
                     <div class="mb-4">
                         <Label class="mb-2 block">Titik Lokasi Peta</Label>
-                        <div class="h-[400px] border rounded-md overflow-hidden relative">
+                        <div class="h-[400px] border dark:border-slate-700 rounded-md overflow-hidden relative">
                             <MapPicker @update:modelValue="handleLocationSelected" />
                         </div>
-                        <p v-if="form.latitude && form.longitude" class="text-xs text-green-600 mt-2 flex items-center">
+                        <p v-if="form.latitude && form.longitude" class="text-xs text-green-600 dark:text-green-400 mt-2 flex items-center">
                             <MapPin class="w-3 h-3 mr-1" /> Koordinat tersimpan: {{ form.latitude.toFixed(6) }}, {{ form.longitude.toFixed(6) }}
                         </p>
-                        <p v-if="isGeocoding" class="text-xs text-blue-600 mt-1 flex items-center">
+                        <p v-if="isGeocoding" class="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center">
                             <Loader2 class="w-3 h-3 mr-1 animate-spin" /> Mendeteksi alamat wilayah...
                         </p>
                     </div>
@@ -370,7 +370,7 @@ const handleLocationSelected = async (location) => {
                             </Label>
                         </div>
                     </div>
-                    <div v-else class="text-sm text-gray-500 italic">Belum ada master data fasilitas kos.</div>
+                    <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data fasilitas kos.</div>
                 </CardContent>
             </Card>
 

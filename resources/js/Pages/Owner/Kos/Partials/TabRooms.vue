@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,17 @@ const { toast } = useToast();
 const isEditing = ref(false);
 const editingRoomId = ref(null);
 const showModal = ref(false);
+
+onMounted(() => {
+    const params = new URLSearchParams(window.location.search);
+    const editRoomId = params.get('edit_room');
+    if (editRoomId) {
+        const room = props.kos.rooms.find(r => r.id == editRoomId);
+        if (room && !props.isLocked) {
+            openEditModal(room);
+        }
+    }
+});
 
 const form = useForm({
     name: '',
@@ -113,7 +124,7 @@ const formatPrice = (price) => {
 
 <template>
     <div class="space-y-6">
-        <div v-if="isLocked" class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-lg flex items-start mb-6">
+        <div v-if="isLocked" class="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 text-orange-800 dark:text-orange-400 p-4 rounded-lg flex items-start mb-6">
             <div class="mr-3 mt-0.5 flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
             </div>
@@ -123,19 +134,20 @@ const formatPrice = (price) => {
             </div>
         </div>
 
-        <div class="flex justify-between items-center border-b pb-4">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b dark:border-slate-800 pb-4">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">Tipe Kamar</h3>
-                <p class="text-sm text-gray-500 mt-1">Kelola tipe-tipe kamar yang tersedia di kos ini beserta harga dan fasilitasnya.</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-200">Tipe Kamar</h3>
+                <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">Kelola tipe-tipe kamar yang tersedia di kos ini beserta harga dan fasilitasnya.</p>
             </div>
-            <Button v-if="!isLocked" @click="openAddModal">
+            <Button v-if="!isLocked" @click="openAddModal" class="w-full sm:w-auto">
                 <Plus class="w-4 h-4 mr-2" /> Tambah Kamar
             </Button>
         </div>
 
         <!-- Table -->
-        <div class="border rounded-lg overflow-hidden">
-            <Table>
+        <div class="border dark:border-slate-800 rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Nomor / Nama</TableHead>
@@ -147,24 +159,24 @@ const formatPrice = (price) => {
                 </TableHeader>
                 <TableBody>
                     <TableRow v-if="!kos.rooms || kos.rooms.length === 0">
-                        <TableCell colspan="5" class="text-center h-24 text-gray-500">Belum ada kamar.</TableCell>
+                        <TableCell colspan="5" class="text-center h-24 text-gray-500 dark:text-slate-400">Belum ada kamar.</TableCell>
                     </TableRow>
                     <TableRow v-for="room in kos.rooms" :key="room.id">
                         <TableCell>
                             <div class="font-semibold">{{ room.room_number }}</div>
-                            <div class="text-sm text-gray-500">{{ room.name }}</div>
+                            <div class="text-sm text-gray-500 dark:text-slate-400">{{ room.name }}</div>
                         </TableCell>
                         <TableCell>
-                            {{ formatPrice(room.price) }} <span class="text-xs text-gray-500">/ {{ room.price_period }}</span>
+                            {{ formatPrice(room.price) }} <span class="text-xs text-gray-500 dark:text-slate-400">/ {{ room.price_period }}</span>
                         </TableCell>
                         <TableCell>{{ room.capacity }} orang</TableCell>
                         <TableCell>
                             <span class="px-2 py-1 text-xs rounded-full border" 
                                   :class="{
-                                      'bg-green-50 text-green-700 border-green-200': room.status === 'tersedia',
-                                      'bg-blue-50 text-blue-700 border-blue-200': room.status === 'disewa',
-                                      'bg-red-50 text-red-700 border-red-200': room.status === 'penuh',
-                                      'bg-gray-50 text-gray-700 border-gray-200': room.status === 'dalam_perbaikan'
+                                      'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900': room.status === 'tersedia',
+                                      'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900': room.status === 'disewa',
+                                      'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900': room.status === 'penuh',
+                                      'bg-gray-50 dark:bg-slate-800/50 text-gray-700 dark:text-slate-400 border-gray-200 dark:border-slate-800': room.status === 'dalam_perbaikan'
                                   }">
                                 {{ room.status }}
                             </span>
@@ -174,7 +186,7 @@ const formatPrice = (price) => {
                                 <Button variant="outline" size="sm" @click="openEditModal(room)" :disabled="isLocked">
                                     <Edit class="w-4 h-4 mr-1" /> Edit
                                 </Button>
-                                <Button variant="outline" size="sm" class="text-red-500 hover:text-red-700 hover:bg-red-50" @click="deleteRoom(room.id)" :disabled="isLocked">
+                                <Button variant="outline" size="sm" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30" @click="deleteRoom(room.id)" :disabled="isLocked">
                                     <Trash2 class="w-4 h-4" />
                                 </Button>
                             </div>
@@ -182,6 +194,7 @@ const formatPrice = (price) => {
                     </TableRow>
                 </TableBody>
             </Table>
+            </div>
         </div>
 
         <!-- Modal Form Add/Edit -->
@@ -218,7 +231,7 @@ const formatPrice = (price) => {
                         <div class="space-y-2">
                             <Label for="r_price">Harga <span class="text-red-500">*</span></Label>
                             <div class="relative">
-                                <span class="absolute left-3 top-2 text-gray-500">Rp</span>
+                                <span class="absolute left-3 top-2 text-gray-500 dark:text-slate-400">Rp</span>
                                 <Input id="r_price" type="number" v-model="form.price" class="pl-10" required />
                             </div>
                             <p v-if="form.errors.price" class="text-sm text-red-500">{{ form.errors.price }}</p>
@@ -272,9 +285,9 @@ const formatPrice = (price) => {
                         </div>
                     </div>
 
-                    <DialogFooter class="pt-4">
-                        <Button type="button" variant="outline" @click="closeModal">Batal</Button>
-                        <Button type="submit" :disabled="form.processing">
+                    <DialogFooter class="pt-4 flex flex-col sm:flex-row gap-2">
+                        <Button type="button" variant="outline" @click="closeModal" class="w-full sm:w-auto">Batal</Button>
+                        <Button type="submit" :disabled="form.processing" class="w-full sm:w-auto">
                             {{ isEditing ? 'Simpan Perubahan' : 'Tambah Kamar' }}
                         </Button>
                     </DialogFooter>

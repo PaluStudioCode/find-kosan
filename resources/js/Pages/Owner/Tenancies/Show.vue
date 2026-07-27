@@ -44,11 +44,11 @@ const submitEndTenancy = () => {
         <Head title="Detail Sewa Penyewa" />
 
         <div class="mb-6">
-            <Link :href="route('owner.tenancies.index')" class="text-sm text-gray-500 hover:text-gray-900 flex items-center mb-2 inline-flex">
+            <Link :href="route('owner.tenancies.index')" class="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white flex items-center mb-2 inline-flex transition-colors">
                 <ChevronLeft class="w-4 h-4 mr-1" /> Kembali ke Daftar Sewa
             </Link>
             <div class="flex items-center gap-3">
-                <h2 class="text-2xl font-bold text-gray-900">Detail Sewa: {{ tenancy.tenant?.name }}</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Detail Sewa: {{ tenancy.tenant?.name }}</h2>
                 <StatusBadge :status="tenancy.status" />
             </div>
         </div>
@@ -61,9 +61,9 @@ const submitEndTenancy = () => {
                         <CardTitle>Informasi Penyewa</CardTitle>
                     </CardHeader>
                     <CardContent class="grid grid-cols-2 gap-4">
-                        <div><p class="text-sm text-gray-500">Nama</p><p class="font-medium">{{ tenancy.tenant?.name }}</p></div>
-                        <div><p class="text-sm text-gray-500">Email</p><p class="font-medium">{{ tenancy.tenant?.email }}</p></div>
-                        <div><p class="text-sm text-gray-500">No. WhatsApp</p><p class="font-medium">{{ tenancy.tenant?.whatsapp_number || '-' }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Nama</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.name }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Email</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.email }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">No. WhatsApp</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.whatsapp_number || '-' }}</p></div>
                     </CardContent>
                 </Card>
 
@@ -73,59 +73,59 @@ const submitEndTenancy = () => {
                         <CardTitle>Informasi Kamar & Sewa</CardTitle>
                     </CardHeader>
                     <CardContent class="grid grid-cols-2 gap-4">
-                        <div><p class="text-sm text-gray-500">Kamar</p><p class="font-medium">{{ tenancy.room?.name }} (No. {{ tenancy.room?.room_number }})</p></div>
-                        <div><p class="text-sm text-gray-500">Kapasitas Dihuni</p><p class="font-medium">{{ tenancy.occupant_count }} Orang</p></div>
-                        <div><p class="text-sm text-gray-500">Mulai Sewa</p><p class="font-medium">{{ formatDate(tenancy.start_date) }}</p></div>
-                        <div><p class="text-sm text-gray-500">Kos</p><p class="font-medium">{{ tenancy.room?.boarding_house?.name }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Kamar</p><p class="font-medium dark:text-slate-200">{{ tenancy.room?.name }} (No. {{ tenancy.room?.room_number }})</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Kapasitas Dihuni</p><p class="font-medium dark:text-slate-200">{{ tenancy.occupant_count }} Orang</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Mulai Sewa</p><p class="font-medium dark:text-slate-200">{{ formatDate(tenancy.start_date) }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Kos</p><p class="font-medium dark:text-slate-200">{{ tenancy.room?.boarding_house?.name }}</p></div>
                     </CardContent>
                 </Card>
             </div>
 
             <div class="space-y-6">
-                <Card v-if="tenancy.status === 'selesai'" class="bg-gradient-to-br from-gray-50 to-slate-100 border-gray-200 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gray-400"></div>
+                <Card v-if="tenancy.status === 'selesai'" class="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-900/50 dark:to-slate-800/50 border-gray-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gray-400 dark:bg-slate-600"></div>
                     <CardContent class="py-10">
                         <div class="text-center space-y-3">
-                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-2 border border-gray-100">
-                                <CheckCircle class="w-8 h-8 text-gray-500" />
+                            <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto shadow-sm mb-2 border border-gray-100 dark:border-slate-700">
+                                <CheckCircle class="w-8 h-8 text-gray-500 dark:text-slate-400" />
                             </div>
-                            <h3 class="text-xl font-extrabold text-gray-900">Sewa Telah Selesai</h3>
-                            <p class="text-gray-600 text-sm max-w-sm mx-auto">Kontrak sewa dengan penyewa ini telah berakhir. Tidak ada tagihan baru yang akan dibuat.</p>
+                            <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">Sewa Telah Selesai</h3>
+                            <p class="text-gray-600 dark:text-slate-400 text-sm max-w-sm mx-auto">Kontrak sewa dengan penyewa ini telah berakhir. Tidak ada tagihan baru yang akan dibuat.</p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card v-else-if="activeInvoice && activeInvoice.status === 'lunas'" class="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                <Card v-else-if="activeInvoice && activeInvoice.status === 'lunas'" class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 border-emerald-200 dark:border-emerald-900/50 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 dark:bg-emerald-600"></div>
                     <CardContent class="py-10">
                         <div class="text-center space-y-3">
-                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm mb-2">
-                                <CheckCircle class="w-8 h-8 text-emerald-500" />
+                            <div class="w-16 h-16 bg-white dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto shadow-sm mb-2 border dark:border-emerald-900/30">
+                                <CheckCircle class="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
                             </div>
-                            <h3 class="text-xl font-extrabold text-emerald-900">Pembayaran Terverifikasi</h3>
-                            <p class="text-emerald-700 text-sm max-w-sm mx-auto">Tagihan periode ini sudah lunas. Penyewa aktif dan tidak memiliki tanggungan saat ini.</p>
+                            <h3 class="text-xl font-extrabold text-emerald-900 dark:text-emerald-400">Pembayaran Terverifikasi</h3>
+                            <p class="text-emerald-700 dark:text-emerald-500/80 text-sm max-w-sm mx-auto">Tagihan periode ini sudah lunas. Penyewa aktif dan tidak memiliki tanggungan saat ini.</p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card v-else-if="activeInvoice" class="border-gray-200 shadow-sm">
-                    <CardHeader class="border-b bg-gray-50/50 pb-4">
-                        <CardTitle class="text-gray-900 text-base">Status Tagihan Berjalan</CardTitle>
+                <Card v-else-if="activeInvoice" class="border-gray-200 dark:border-slate-800 shadow-sm">
+                    <CardHeader class="border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 pb-4">
+                        <CardTitle class="text-gray-900 dark:text-white text-base">Status Tagihan Berjalan</CardTitle>
                     </CardHeader>
                     <CardContent class="pt-6">
                         <div class="text-center">
-                            <p class="text-sm text-gray-500 mb-1">Total Tagihan</p>
-                            <p class="font-extrabold text-3xl text-gray-900 mb-4">{{ formatPrice(activeInvoice.amount) }}</p>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mb-1">Total Tagihan</p>
+                            <p class="font-extrabold text-3xl text-gray-900 dark:text-white mb-4">{{ formatPrice(activeInvoice.amount) }}</p>
                             <StatusBadge :status="activeInvoice.status" class="px-3 py-1 mb-2 inline-flex" />
-                            <p class="text-gray-500 text-xs mt-3">Menunggu penyewa melakukan pembayaran dan mengunggah bukti.</p>
+                            <p class="text-gray-500 dark:text-slate-400 text-xs mt-3">Menunggu penyewa melakukan pembayaran dan mengunggah bukti.</p>
                         </div>
                     </CardContent>
                 </Card>
 
                 <!-- Manajemen Sewa -->
-                <Card v-if="tenancy.status === 'aktif'" class="border-red-200 shadow-sm mt-6">
+                <Card v-if="tenancy.status === 'aktif'" class="border-red-200 dark:border-red-900/30 shadow-sm mt-6">
                     <CardContent class="pt-6">
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                        <p class="text-sm text-gray-600 dark:text-slate-400 mb-4 leading-relaxed">
                             Akhiri masa sewa jika penyewa telah keluar atau kontrak berakhir. Tindakan ini akan menghentikan sistem tagihan otomatis dan mengembalikan status ketersediaan kamar.
                         </p>
                         <Button variant="destructive" class="w-full font-bold" @click="showEndTenancyDialog = true">Akhiri Masa Sewa</Button>
@@ -138,15 +138,15 @@ const submitEndTenancy = () => {
 
         <!-- Confirm End Tenancy Dialog -->
         <Dialog :open="showEndTenancyDialog" @update:open="showEndTenancyDialog = $event">
-            <DialogContent class="sm:max-w-[425px]">
+            <DialogContent class="sm:max-w-[425px] dark:bg-slate-900 dark:border-slate-800">
                 <DialogHeader>
-                    <DialogTitle>Konfirmasi Akhiri Sewa</DialogTitle>
-                    <DialogDescription class="pt-3">
+                    <DialogTitle class="dark:text-white">Konfirmasi Akhiri Sewa</DialogTitle>
+                    <DialogDescription class="pt-3 dark:text-slate-400">
                         Apakah Anda yakin ingin mengakhiri masa sewa ini? Tagihan otomatis akan dihentikan dan status kamar akan diperbarui. Tindakan ini tidak dapat dibatalkan.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="mt-4 flex gap-2 sm:justify-end">
-                    <Button variant="outline" @click="showEndTenancyDialog = false">Batal</Button>
+                    <Button variant="outline" @click="showEndTenancyDialog = false" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
                     <Button variant="destructive" @click="submitEndTenancy">Ya, Akhiri Sewa</Button>
                 </DialogFooter>
             </DialogContent>

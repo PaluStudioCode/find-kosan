@@ -95,14 +95,14 @@ const showLegalDocsModal = ref(false);
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">
                     <Link :href="route('admin.verifications.index')">
-                        <Button variant="ghost" size="icon" class="rounded-full -ml-2 text-gray-500 hover:text-gray-900"><ChevronLeft class="w-5 h-5" /></Button>
+                        <Button variant="ghost" size="icon" class="rounded-full -ml-2 text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"><ChevronLeft class="w-5 h-5" /></Button>
                     </Link>
-                    <h2 class="text-xl font-semibold text-gray-900">Verifikasi: {{ kos.name }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Verifikasi: {{ kos.name }}</h2>
                     <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border"
                         :class="{
-                            'bg-orange-50 text-orange-700 border-orange-200': kos.status === 'menunggu_verifikasi',
-                            'bg-green-50 text-green-700 border-green-200': kos.status === 'disetujui',
-                            'bg-red-50 text-red-700 border-red-200': kos.status === 'ditolak'
+                            'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800': kos.status === 'menunggu_verifikasi',
+                            'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800': kos.status === 'dipublikasikan',
+                            'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800': kos.status === 'ditolak'
                         }">
                         {{ kos.status.replace('_', ' ') }}
                     </span>
@@ -110,107 +110,107 @@ const showLegalDocsModal = ref(false);
             </div>
 
             <!-- Revisi Warning -->
-            <div v-if="kos.pending_revisions" class="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
-                <AlertTriangle class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <div v-if="kos.pending_revisions" class="bg-blue-50/50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-900/50 flex items-start gap-3">
+                <AlertTriangle class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <div>
-                    <h4 class="font-bold text-blue-800 text-sm">Perhatian: Tinjauan Revisi Data</h4>
-                    <p class="text-blue-700 text-xs mt-1">Pengajuan ini merupakan perubahan data dari properti yang sudah ada. Menyetujui pengajuan ini akan memperbarui data publik.</p>
+                    <h4 class="font-bold text-blue-800 dark:text-blue-300 text-sm">Perhatian: Tinjauan Revisi Data</h4>
+                    <p class="text-blue-700 dark:text-blue-400 text-xs mt-1">Pengajuan ini merupakan perubahan data dari properti yang sudah ada. Menyetujui pengajuan ini akan memperbarui data publik.</p>
                 </div>
             </div>
 
             <!-- Single Clean Card -->
-            <Card class="shadow-sm border-gray-200 overflow-hidden">
-                <CardContent class="p-0">
+            <Card class="shadow-sm border-gray-200 dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+                <CardContent class="p-0 border-0">
                     <!-- Pihak Terkait & Wilayah (Grid) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x border-b border-gray-100">
-                        <div class="p-6 hover:bg-gray-50/50 transition-colors">
-                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Data Pemilik</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x dark:divide-slate-800 border-b border-gray-100 dark:border-slate-800">
+                        <div class="p-6 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                            <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Data Pemilik</p>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center font-bold text-primary dark:text-blue-400 shrink-0">
                                     {{ kos.owner?.name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate">{{ kos.owner?.name }}</p>
-                                    <p class="text-xs text-gray-500 truncate">{{ kos.owner?.email }}</p>
-                                    <p class="text-xs text-gray-500 truncate">{{ kos.owner?.whatsapp_number || '-' }}</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ kos.owner?.name }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ kos.owner?.email }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ kos.owner?.whatsapp_number || '-' }}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-6 hover:bg-gray-50/50 transition-colors">
-                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Wilayah Properti</p>
+                        <div class="p-6 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                            <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Wilayah Properti</p>
                             <div class="flex items-start gap-2">
                                 <MapPin class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ kos.city }}</p>
-                                    <p class="text-xs text-gray-500">{{ kos.district }}, {{ kos.subdistrict }}</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ kos.city }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400">{{ kos.district }}, {{ kos.subdistrict }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Informasi Dasar & Media -->
-                    <div class="p-6 border-b border-gray-100 space-y-4">
-                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Informasi Properti</p>
+                    <div class="p-6 border-b border-gray-100 dark:border-slate-800 space-y-4">
+                        <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Informasi Properti</p>
                         
-                        <div class="bg-gray-50 rounded-lg border border-gray-100 p-4">
-                            <p class="text-sm font-medium text-gray-800 mb-1">Alamat Lengkap</p>
-                            <p class="text-sm text-gray-600 mb-4">{{ kos.address }}</p>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700 p-4">
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">Alamat Lengkap</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ kos.address }}</p>
                             
-                            <p class="text-sm font-medium text-gray-800 mb-1">Deskripsi</p>
-                            <p class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{{ kos.description }}</p>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">Deskripsi</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">{{ kos.description }}</p>
                         </div>
                         
                         <div class="flex flex-wrap gap-2 pt-2">
-                            <Button @click="openPhotoSlider(0)" variant="outline" size="sm" class="text-blue-700 border-blue-200 hover:bg-blue-50 bg-blue-50/30">
+                            <Button @click="openPhotoSlider(0)" variant="outline" size="sm" class="text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900 hover:bg-blue-50 dark:hover:bg-blue-900/50 bg-blue-50/30 dark:bg-blue-900/20">
                                 <ImageIcon class="w-4 h-4 mr-2" /> {{ kos.photos?.length || 0 }} Foto Galeri
                             </Button>
-                            <Button @click="openMapModal" variant="outline" size="sm" class="text-green-700 border-green-200 hover:bg-green-50 bg-green-50/30">
+                            <Button @click="openMapModal" variant="outline" size="sm" class="text-green-700 dark:text-green-400 border-green-200 dark:border-green-900 hover:bg-green-50 dark:hover:bg-green-900/50 bg-green-50/30 dark:bg-green-900/20">
                                 <Map class="w-4 h-4 mr-2" /> Tinjau Titik Peta
                             </Button>
-                            <Button @click="showLegalDocsModal = true" variant="outline" size="sm" class="text-purple-700 border-purple-200 hover:bg-purple-50 bg-purple-50/30">
+                            <Button @click="showLegalDocsModal = true" variant="outline" size="sm" class="text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-900 hover:bg-purple-50 dark:hover:bg-purple-900/50 bg-purple-50/30 dark:bg-purple-900/20">
                                 <FileText class="w-4 h-4 mr-2" /> {{ kos.legal_documents?.length || 0 }} Dokumen Legal
                             </Button>
                         </div>
                     </div>
 
                     <!-- Fasilitas & Kamar -->
-                    <div class="p-6 border-b border-gray-100">
+                    <div class="p-6 border-b border-gray-100 dark:border-slate-800">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Fasilitas Umum</p>
+                                <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Fasilitas Umum</p>
                                 <div v-if="kos.facilities?.length > 0" class="flex flex-wrap gap-2">
-                                    <span v-for="f in kos.facilities" :key="f.id" class="px-2.5 py-1 bg-gray-50 border border-gray-200 rounded text-xs text-gray-700 flex items-center gap-1.5">
+                                    <span v-for="f in kos.facilities" :key="f.id" class="px-2.5 py-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded text-xs text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                                         <span v-html="f.icon" class="w-3.5 h-3.5"></span> {{ f.name }}
                                     </span>
                                 </div>
-                                <p v-else class="text-xs text-gray-500 italic">Tidak ada fasilitas.</p>
+                                <p v-else class="text-xs text-gray-500 dark:text-slate-500 italic">Tidak ada fasilitas.</p>
                             </div>
                             
                             <div>
-                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Daftar Kamar ({{ kos.rooms?.length || 0 }} Tipe)</p>
+                                <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Daftar Kamar ({{ kos.rooms?.length || 0 }} Tipe)</p>
                                 <div class="space-y-2">
-                                    <div v-for="room in kos.rooms" :key="room.id" class="p-3 border border-gray-100 bg-gray-50/50 rounded-lg flex justify-between items-center">
+                                    <div v-for="room in kos.rooms" :key="room.id" class="p-3 border border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 rounded-lg flex justify-between items-center">
                                         <div>
-                                            <p class="text-sm font-semibold text-gray-900">{{ room.name }}</p>
-                                            <p class="text-xs text-gray-500">Kapasitas {{ room.capacity }} orang</p>
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-slate-200">{{ room.name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-slate-400">Kapasitas {{ room.capacity }} orang</p>
                                         </div>
                                         <div class="text-right">
-                                            <p class="text-sm font-bold text-primary">Rp {{ Number(room.price).toLocaleString('id-ID') }}</p>
-                                            <p class="text-[10px] text-gray-500 uppercase">/ {{ room.price_period }}</p>
+                                            <p class="text-sm font-bold text-primary dark:text-blue-400">Rp {{ Number(room.price).toLocaleString('id-ID') }}</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-slate-500 uppercase">/ {{ room.price_period }}</p>
                                         </div>
                                     </div>
-                                    <p v-if="!kos.rooms?.length" class="text-xs text-gray-500 italic">Belum ada kamar yang didaftarkan.</p>
+                                    <p v-if="!kos.rooms?.length" class="text-xs text-gray-500 dark:text-slate-500 italic">Belum ada kamar yang didaftarkan.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Bar -->
-                    <div class="p-4 bg-gray-50/80 flex flex-col sm:flex-row items-center justify-between gap-3" v-if="kos.status === 'menunggu_verifikasi' || kos.pending_revisions">
-                        <Button type="button" @click="showRejectForm = true" variant="ghost" class="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm">
+                    <div class="p-4 bg-gray-50/80 dark:bg-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3" v-if="kos.status === 'menunggu_verifikasi' || kos.pending_revisions">
+                        <Button type="button" @click="showRejectForm = true" variant="ghost" class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 text-sm">
                             Tolak Pengajuan
                         </Button>
-                        <Button type="button" @click="confirmingApproval = true" class="w-full sm:w-auto px-8 shadow-sm bg-green-600 hover:bg-green-700 text-white">
+                        <Button type="button" @click="confirmingApproval = true" class="w-full sm:w-auto px-8 shadow-sm bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white">
                             Setujui & Publikasikan
                         </Button>
                     </div>
@@ -220,17 +220,17 @@ const showLegalDocsModal = ref(false);
 
         <!-- Reject Modal -->
         <Dialog :open="showRejectForm" @update:open="val => showRejectForm = val">
-            <DialogContent class="sm:max-w-md">
+            <DialogContent class="sm:max-w-md dark:bg-slate-900 dark:border-slate-800">
                 <DialogHeader>
-                    <DialogTitle class="flex items-center text-red-600"><AlertTriangle class="w-5 h-5 mr-2" /> Tolak Pengajuan</DialogTitle>
+                    <DialogTitle class="flex items-center text-red-600 dark:text-red-400"><AlertTriangle class="w-5 h-5 mr-2" /> Tolak Pengajuan</DialogTitle>
                 </DialogHeader>
                 <div class="py-2">
-                    <p class="text-sm text-gray-600 mb-3">Berikan alasan yang jelas mengapa pengajuan ini ditolak agar pemilik kos dapat memperbaikinya.</p>
-                    <Textarea v-model="rejectForm.note" placeholder="Misal: Dokumen KTP tidak jelas, foto buram..." rows="4" class="resize-none" />
+                    <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Berikan alasan yang jelas mengapa pengajuan ini ditolak agar pemilik kos dapat memperbaikinya.</p>
+                    <Textarea v-model="rejectForm.note" placeholder="Misal: Dokumen KTP tidak jelas, foto buram..." rows="4" class="resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-white" />
                     <p v-if="rejectForm.errors.note" class="text-xs text-red-500 mt-1">{{ rejectForm.errors.note }}</p>
                 </div>
                 <DialogFooter>
-                    <Button variant="ghost" @click="showRejectForm = false">Batal</Button>
+                    <Button variant="ghost" @click="showRejectForm = false" class="dark:text-slate-300">Batal</Button>
                     <Button variant="destructive" @click="reject" :disabled="rejectForm.processing">Kirim Penolakan</Button>
                 </DialogFooter>
             </DialogContent>
@@ -238,32 +238,32 @@ const showLegalDocsModal = ref(false);
 
         <!-- Modal List Dokumen Legalitas -->
         <Dialog :open="showLegalDocsModal" @update:open="val => showLegalDocsModal = val">
-            <DialogContent class="sm:max-w-md">
+            <DialogContent class="sm:max-w-md dark:bg-slate-900 dark:border-slate-800">
                 <DialogHeader>
-                    <DialogTitle class="flex items-center text-gray-900"><FileText class="w-5 h-5 mr-2 text-purple-600" /> Dokumen Legalitas</DialogTitle>
+                    <DialogTitle class="flex items-center text-gray-900 dark:text-white"><FileText class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" /> Dokumen Legalitas</DialogTitle>
                 </DialogHeader>
                 <div class="py-2">
-                    <div v-if="!kos.legal_documents || kos.legal_documents.length === 0" class="p-4 bg-red-50 rounded-lg border border-red-100 flex items-center gap-3">
+                    <div v-if="!kos.legal_documents || kos.legal_documents.length === 0" class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/50 flex items-center gap-3">
                         <AlertTriangle class="w-5 h-5 text-red-500 shrink-0" />
-                        <p class="text-sm text-red-700 font-medium">Kos tidak melampirkan dokumen legalitas.</p>
+                        <p class="text-sm text-red-700 dark:text-red-400 font-medium">Kos tidak melampirkan dokumen legalitas.</p>
                     </div>
                     <div v-else class="space-y-3">
                         <div v-for="doc in kos.legal_documents" :key="doc.id" 
-                            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer group"
+                            class="flex items-center justify-between p-3 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors cursor-pointer group"
                             @click="openDocPreview(doc)">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                <div class="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                                     <FileText class="w-4 h-4" />
                                 </div>
-                                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-700">{{ doc.document_type }}</p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-slate-200 truncate group-hover:text-blue-700 dark:group-hover:text-blue-300">{{ doc.document_type }}</p>
                             </div>
-                            <Eye class="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0" />
+                            <Eye class="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 shrink-0" />
                         </div>
-                        <p class="text-xs text-gray-500 text-center mt-4">Ketuk dokumen untuk melihat pratinjau.</p>
+                        <p class="text-xs text-gray-500 dark:text-slate-500 text-center mt-4">Ketuk dokumen untuk melihat pratinjau.</p>
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" @click="showLegalDocsModal = false">Tutup</Button>
+                    <Button variant="outline" @click="showLegalDocsModal = false" class="dark:border-slate-700 dark:text-slate-300">Tutup</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -293,65 +293,65 @@ const showLegalDocsModal = ref(false);
 
         <!-- Modal Preview Dokumen -->
         <Dialog :open="showDocPreview" @update:open="val => showDocPreview = val">
-            <DialogContent :hide-overlay="true" class="max-w-4xl h-[85vh] flex flex-col p-0 overflow-hidden shadow-2xl border-gray-300">
-                <DialogHeader class="p-4 border-b bg-gray-50 shrink-0">
-                    <DialogTitle class="flex items-center">
-                        <FileText class="w-5 h-5 mr-2 text-blue-600" /> Preview: {{ previewDocTitle }}
+            <DialogContent :hide-overlay="true" class="max-w-4xl h-[85vh] flex flex-col p-0 overflow-hidden shadow-2xl border-gray-300 dark:border-slate-800 dark:bg-slate-900">
+                <DialogHeader class="p-4 border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 shrink-0">
+                    <DialogTitle class="flex items-center dark:text-white">
+                        <FileText class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" /> Preview: {{ previewDocTitle }}
                     </DialogTitle>
                 </DialogHeader>
-                <div class="flex-grow w-full h-full bg-gray-100/50 p-4 flex items-center justify-center">
-                    <iframe v-if="previewDocUrl" :src="previewDocUrl" class="w-full h-full border rounded shadow-sm bg-white"></iframe>
+                <div class="flex-grow w-full h-full bg-gray-100/50 dark:bg-slate-900 p-4 flex items-center justify-center">
+                    <iframe v-if="previewDocUrl" :src="previewDocUrl" class="w-full h-full border dark:border-slate-700 rounded shadow-sm bg-white"></iframe>
                 </div>
-                <DialogFooter class="p-4 border-t bg-gray-50 shrink-0 flex justify-between sm:justify-between items-center">
-                    <a :href="previewDocUrl" target="_blank" download class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center">
+                <DialogFooter class="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 shrink-0 flex justify-between sm:justify-between items-center">
+                    <a :href="previewDocUrl" target="_blank" download class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center">
                         <Download class="w-4 h-4 mr-1" /> Unduh Dokumen
                     </a>
-                    <Button variant="outline" @click="showDocPreview = false">Tutup Preview</Button>
+                    <Button variant="outline" @click="showDocPreview = false" class="dark:border-slate-700 dark:text-slate-300">Tutup Preview</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
 
         <!-- Modal Peta -->
         <Dialog :open="showMapModal" @update:open="val => showMapModal = val">
-            <DialogContent class="max-w-3xl flex flex-col p-0 overflow-hidden">
-                <DialogHeader class="p-4 border-b bg-gray-50 shrink-0">
-                    <DialogTitle class="flex items-center">
-                        <Map class="w-5 h-5 mr-2 text-primary" /> Lokasi Properti: {{ kos.name }}
+            <DialogContent class="max-w-3xl flex flex-col p-0 overflow-hidden dark:border-slate-800">
+                <DialogHeader class="p-4 border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900 shrink-0">
+                    <DialogTitle class="flex items-center dark:text-white">
+                        <Map class="w-5 h-5 mr-2 text-primary dark:text-blue-400" /> Lokasi Properti: {{ kos.name }}
                     </DialogTitle>
                 </DialogHeader>
-                <div class="w-full bg-gray-100 p-0 m-0 border-none h-[60vh]">
+                <div class="w-full bg-gray-100 dark:bg-slate-950 p-0 m-0 border-none">
                     <MapPicker 
                         v-if="showMapModal"
                         :model-value="{ lat: kos.latitude || -6.200000, lng: kos.longitude || 106.816666 }" 
                         :readonly="true" 
-                        class="w-full h-full border-none"
+                        class="w-full border-none"
                     />
                 </div>
-                <DialogFooter class="p-4 border-t bg-gray-50 shrink-0">
-                    <Button variant="outline" @click="showMapModal = false">Tutup Peta</Button>
+                <DialogFooter class="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-900 shrink-0">
+                    <Button variant="outline" @click="showMapModal = false" class="dark:border-slate-700 dark:text-slate-300">Tutup Peta</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
 
         <!-- Modal Konfirmasi Setujui -->
         <Dialog :open="confirmingApproval" @update:open="val => confirmingApproval = val">
-            <DialogContent class="sm:max-w-md">
+            <DialogContent class="sm:max-w-md dark:bg-slate-900 dark:border-slate-800">
                 <DialogHeader>
-                    <div class="flex items-center gap-3 mb-2 text-green-600">
-                        <div class="p-2 bg-green-100 rounded-full shrink-0">
+                    <div class="flex items-center gap-3 mb-2 text-green-600 dark:text-green-400">
+                        <div class="p-2 bg-green-100 dark:bg-green-900/50 rounded-full shrink-0">
                             <CheckCircle class="w-5 h-5" />
                         </div>
-                        <DialogTitle>Setujui & Publikasikan?</DialogTitle>
+                        <DialogTitle class="dark:text-white">Setujui & Publikasikan?</DialogTitle>
                     </div>
                 </DialogHeader>
                 
-                <div class="py-2 text-sm text-gray-600">
-                    Apakah Anda yakin ingin menyetujui pengajuan ini? Properti <strong>{{ kos.name }}</strong> akan dipublikasikan dan dapat dilihat oleh semua calon penyewa.
+                <div class="py-2 text-sm text-gray-600 dark:text-slate-400">
+                    Apakah Anda yakin ingin menyetujui pengajuan ini? Properti <strong class="dark:text-slate-200">{{ kos.name }}</strong> akan dipublikasikan dan dapat dilihat oleh semua calon penyewa.
                 </div>
 
                 <DialogFooter class="mt-2">
-                    <Button variant="outline" @click="confirmingApproval = false">Batal</Button>
-                    <Button class="bg-green-600 hover:bg-green-700 text-white" @click="approve">Ya, Publikasikan</Button>
+                    <Button variant="outline" @click="confirmingApproval = false" class="dark:text-slate-300 dark:border-slate-700">Batal</Button>
+                    <Button class="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white" @click="approve">Ya, Publikasikan</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

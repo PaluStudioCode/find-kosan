@@ -17,8 +17,8 @@ class GuestOrTenant
     {
         if (auth()->check()) {
             $role = auth()->user()->role;
-            // Izinkan Admin untuk melihat halaman detail kos publik (untuk keperluan review laporan)
-            if ($role === 'super_admin' && $request->routeIs('public.kos.show')) {
+            // Izinkan Admin dan Owner untuk melihat halaman detail kos publik
+            if (($role === 'super_admin' || $role === 'pemilik_kos') && $request->routeIs('public.kos.show')) {
                 return $next($request);
             }
             if ($role === 'super_admin') {

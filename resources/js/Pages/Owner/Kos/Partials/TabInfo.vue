@@ -168,7 +168,7 @@ const handleLocationSelected = async (location) => {
 
 <template>
     <div class="space-y-8">
-        <div v-if="isLocked" class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-lg flex items-start mb-6">
+        <div v-if="isLocked" class="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 text-orange-800 dark:text-orange-400 p-4 rounded-lg flex items-start mb-6">
             <div class="mr-3 mt-0.5 flex-shrink-0">
                 <Loader2 class="w-5 h-5 animate-spin" />
             </div>
@@ -182,7 +182,7 @@ const handleLocationSelected = async (location) => {
             <form @submit.prevent="submit" class="space-y-8">
                 <!-- Informasi Dasar -->
                 <div class="space-y-4">
-                    <h3 class="text-lg font-semibold border-b pb-2">Informasi Dasar</h3>
+                    <h3 class="text-lg font-semibold border-b dark:border-slate-800 pb-2">Informasi Dasar</h3>
                     
                     <div class="space-y-2">
                         <Label for="name">Nama Kos <span class="text-red-500">*</span></Label>
@@ -212,20 +212,20 @@ const handleLocationSelected = async (location) => {
 
                 <!-- Lokasi -->
                 <div class="space-y-4 pt-4">
-                    <h3 class="text-lg font-semibold border-b pb-2">Lokasi</h3>
+                    <h3 class="text-lg font-semibold border-b dark:border-slate-800 pb-2">Lokasi</h3>
                     
                     <div class="mb-4">
                         <Label class="mb-2 block">Titik Lokasi Peta</Label>
-                        <div class="h-[400px] border rounded-md overflow-hidden relative">
+                        <div class="h-[400px] border dark:border-slate-800 rounded-md overflow-hidden relative">
                             <MapPicker 
                                 :modelValue="{ lat: form.latitude || -6.200000, lng: form.longitude || 106.816666 }" 
                                 @update:modelValue="handleLocationSelected" 
                             />
                         </div>
-                        <p v-if="form.latitude && form.longitude" class="text-xs text-green-600 mt-2 flex items-center">
+                        <p v-if="form.latitude && form.longitude" class="text-xs text-green-600 dark:text-green-400 mt-2 flex items-center">
                             <MapPin class="w-3 h-3 mr-1" /> Koordinat tersimpan: {{ form.latitude }}, {{ form.longitude }}
                         </p>
-                        <p v-if="isGeocoding" class="text-xs text-blue-600 mt-1 flex items-center">
+                        <p v-if="isGeocoding" class="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center">
                             <Loader2 class="w-3 h-3 mr-1 animate-spin" /> Mendeteksi alamat wilayah...
                         </p>
                     </div>
@@ -247,7 +247,7 @@ const handleLocationSelected = async (location) => {
                                         role="combobox"
                                         :aria-expanded="cityOpen"
                                         class="w-full justify-between font-normal"
-                                        :class="{ 'border-red-500': form.errors.city, 'text-gray-500': !form.city }"
+                                        :class="{ 'border-red-500': form.errors.city, 'text-gray-500 dark:text-slate-400': !form.city }"
                                     >
                                         {{ form.city || 'Pilih Kota/Kabupaten' }}
                                         <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -293,7 +293,7 @@ const handleLocationSelected = async (location) => {
                                         :aria-expanded="districtOpen"
                                         :disabled="!form.city || districts.length === 0"
                                         class="w-full justify-between font-normal"
-                                        :class="{ 'border-red-500': form.errors.district, 'text-gray-500': !form.district }"
+                                        :class="{ 'border-red-500': form.errors.district, 'text-gray-500 dark:text-slate-400': !form.district }"
                                     >
                                         {{ form.district || 'Pilih Kecamatan' }}
                                         <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -339,7 +339,7 @@ const handleLocationSelected = async (location) => {
                                         :aria-expanded="subdistrictOpen"
                                         :disabled="!form.district || subdistricts.length === 0"
                                         class="w-full justify-between font-normal"
-                                        :class="{ 'border-red-500': form.errors.subdistrict, 'text-gray-500': !form.subdistrict }"
+                                        :class="{ 'border-red-500': form.errors.subdistrict, 'text-gray-500 dark:text-slate-400': !form.subdistrict }"
                                     >
                                         {{ form.subdistrict || 'Pilih Kelurahan' }}
                                         <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -377,7 +377,7 @@ const handleLocationSelected = async (location) => {
 
                 <!-- Fasilitas Umum -->
                 <div class="space-y-4 pt-4">
-                    <h3 class="text-lg font-semibold border-b pb-2">Fasilitas Kos Umum</h3>
+                    <h3 class="text-lg font-semibold border-b dark:border-slate-800 pb-2">Fasilitas Kos Umum</h3>
                     <div v-if="facilities.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         <div v-for="facility in facilities" :key="facility.id" class="flex items-center space-x-2">
                             <Checkbox 
@@ -395,13 +395,13 @@ const handleLocationSelected = async (location) => {
                             </Label>
                         </div>
                     </div>
-                    <div v-else class="text-sm text-gray-500 italic">Belum ada master data fasilitas kos.</div>
+                    <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data fasilitas kos.</div>
                 </div>
 
 
 
-                <div class="flex justify-end pt-6 border-t mt-8">
-                    <Button type="submit" :disabled="form.processing || isLocked">
+                <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-6 border-t dark:border-slate-800 mt-8">
+                    <Button type="submit" :disabled="form.processing || isLocked" class="w-full sm:w-auto">
                         <span v-if="form.processing">Menyimpan...</span>
                         <span v-else>Simpan Perubahan</span>
                     </Button>

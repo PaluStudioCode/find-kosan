@@ -69,6 +69,15 @@ class UserController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
         ]);
 
+        if ($user->role !== $validated['role']) {
+            if ($user->role === 'pemilik_kos' && $user->boardingHouses()->exists()) {
+                return back()->with('error', 'Tidak dapat mengubah peran: pengguna ini sudah memiliki properti kos.');
+            }
+            if ($user->role === 'penyewa' && $user->tenanciesAsTenant()->exists()) {
+                return back()->with('error', 'Tidak dapat mengubah peran: pengguna ini sudah memiliki riwayat atau tagihan sewa.');
+            }
+        }
+
         $user->update($validated);
 
         if ($request->filled('password')) {

@@ -9,19 +9,36 @@ use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $ownerId = auth()->id();
+        $kosFilter = $request->input('kos_id');
+        $ratingFilter = $request->input('rating');
 
-        $reviews = BoardingHouseReview::whereHas('boardingHouse', function ($query) use ($ownerId) {
-                $query->where('owner_id', $ownerId);
+        $query = BoardingHouseReview::whereHas('boardingHouse', function ($q) use ($ownerId) {
+                $q->where('owner_id', $ownerId);
             })
-            ->with(['user:id,name,email,avatar_path', 'boardingHouse:id,name'])
-            ->latest()
-            ->paginate(10);
+            ->with(['user:id,name,email', 'boardingHouse:id,name']);
+
+        if ($kosFilter) {
+            $query->where('boarding_house_id', $kosFilter);
+        }
+
+        if ($ratingFilter) {
+            $query->where('rating', $ratingFilter);
+        }
+
+        $reviews = $query->latest()->paginate(10)->withQueryString();
+
+        $kosList = \App\Models\BoardingHouse::where('owner_id', $ownerId)->select('id', 'name')->get();
 
         return Inertia::render('Owner/Reviews/Index', [
-            'reviews' => $reviews
+            'reviews' => $reviews,
+            'kosList' => $kosList,
+            'filters' => [
+                'kos_id' => $kosFilter,
+                'rating' => $ratingFilter,
+            ]
         ]);
     }
 }

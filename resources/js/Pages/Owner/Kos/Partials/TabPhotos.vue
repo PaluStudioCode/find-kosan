@@ -125,7 +125,7 @@ const deletePhoto = () => {
 
 <template>
     <div class="space-y-12">
-        <div v-if="isLocked" class="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-lg flex items-start mb-6">
+        <div v-if="isLocked" class="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 text-orange-800 dark:text-orange-400 p-4 rounded-lg flex items-start mb-6">
             <div class="mr-3 mt-0.5 flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
             </div>
@@ -137,15 +137,15 @@ const deletePhoto = () => {
 
         <!-- Foto Kos -->
         <fieldset :disabled="isLocked" :class="{ 'opacity-60': isLocked }">
-            <div class="flex justify-between items-end mb-4 border-b pb-2">
+            <div class="flex justify-between items-end mb-4 border-b dark:border-slate-800 pb-2">
                 <div>
                     <h3 class="text-lg font-semibold">Galeri Foto Kos</h3>
-                    <p class="text-sm text-gray-500">Unggah foto-foto menarik properti Anda. Foto dengan bintang adalah foto utama.</p>
+                    <p class="text-sm text-gray-500 dark:text-slate-400">Unggah foto-foto menarik properti Anda. Foto dengan bintang adalah foto utama.</p>
                 </div>
             </div>
 
             <!-- Upload Area -->
-            <div class="mb-6 bg-gray-50 p-4 rounded border space-y-4">
+            <div class="mb-6 bg-gray-50 dark:bg-slate-800/50 p-4 rounded border dark:border-slate-800 space-y-4">
                 <div>
                     <Label class="mb-2 block">Pilih Foto (Bisa lebih dari 1, maks 2MB per file)</Label>
                     <Input 
@@ -159,9 +159,9 @@ const deletePhoto = () => {
 
                 <!-- Preview Selected -->
                 <div v-if="photoPreviews.length > 0" class="space-y-3">
-                    <p class="text-sm font-medium text-gray-700">{{ photoPreviews.length }} file dipilih:</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ photoPreviews.length }} file dipilih:</p>
                     <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                        <div v-for="(preview, idx) in photoPreviews" :key="idx" class="relative group border rounded overflow-hidden aspect-square">
+                        <div v-for="(preview, idx) in photoPreviews" :key="idx" class="relative group border dark:border-slate-800 rounded overflow-hidden aspect-square">
                             <img :src="preview.url" :alt="preview.name" class="w-full h-full object-cover" />
                             <button 
                                 type="button" 
@@ -172,7 +172,7 @@ const deletePhoto = () => {
                             </button>
                         </div>
                     </div>
-                    <Button @click="uploadPhotos" :disabled="isUploadingPhotos">
+                    <Button @click="uploadPhotos" :disabled="isUploadingPhotos" class="w-full md:w-auto">
                         <UploadCloud class="w-4 h-4 mr-2" /> 
                         {{ isUploadingPhotos ? 'Mengunggah...' : `Unggah ${photoPreviews.length} Foto` }}
                     </Button>
@@ -180,12 +180,12 @@ const deletePhoto = () => {
             </div>
 
             <!-- Existing Photos Grid -->
-            <div v-if="!kos.photos || kos.photos.length === 0" class="text-center py-8 text-gray-500 border rounded bg-gray-50 border-dashed">
+            <div v-if="!kos.photos || kos.photos.length === 0" class="text-center py-8 text-gray-500 dark:text-slate-400 border dark:border-slate-800 rounded bg-gray-50 dark:bg-slate-800/50 border-dashed">
                 Belum ada foto yang diunggah.
             </div>
             
             <div v-else class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <div v-for="photo in kos.photos" :key="photo.id" class="relative group border rounded overflow-hidden aspect-square">
+                <div v-for="photo in kos.photos" :key="photo.id" class="relative group border dark:border-slate-800 rounded overflow-hidden aspect-square">
                     <img :src="photo.file_path" class="w-full h-full object-cover" />
                     
                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-2">
@@ -223,9 +223,9 @@ const deletePhoto = () => {
                 Apakah Anda yakin ingin menghapus foto ini? Tindakan ini tidak dapat dibatalkan.
             </DialogDescription>
 
-            <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
-                <Button variant="outline" @click="closePhotoModal">Batal</Button>
-                <Button variant="destructive" @click="deletePhoto">Ya, Hapus</Button>
+            <DialogFooter class="mt-6 flex flex-col sm:flex-row justify-end gap-2">
+                <Button variant="outline" @click="closePhotoModal" class="w-full sm:w-auto">Batal</Button>
+                <Button variant="destructive" @click="deletePhoto" class="w-full sm:w-auto">Ya, Hapus</Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

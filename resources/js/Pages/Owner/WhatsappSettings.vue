@@ -202,22 +202,22 @@ onUnmounted(() => {
         <Head title="Pengaturan WhatsApp" />
 
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Pengaturan WhatsApp</h2>
-            <p class="text-gray-500 mt-1">Hubungkan akun WhatsApp Anda untuk mengirim notifikasi ke penyewa.</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Pengaturan WhatsApp</h2>
+            <p class="text-gray-500 dark:text-slate-400 mt-1">Hubungkan akun WhatsApp Anda untuk mengirim notifikasi ke penyewa.</p>
         </div>
 
         <div class="max-w-3xl mx-auto">
-            <Card class="overflow-hidden border-gray-200 shadow-sm">
-                <CardContent class="p-0">
+            <Card class="overflow-hidden border-0 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                <CardContent class="p-0 border-0">
                     <!-- Connected State -->
-                    <div v-if="isConnected" class="p-8 sm:p-12 text-center flex flex-col items-center bg-white">
-                        <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-5 ring-8 ring-green-50/50">
-                            <Wifi class="w-10 h-10 text-green-500" />
+                    <div v-if="isConnected" class="p-8 sm:p-12 text-center flex flex-col items-center bg-white dark:bg-slate-900 rounded-lg">
+                        <div class="w-20 h-20 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-5 ring-8 ring-green-50/50 dark:ring-green-900/20">
+                            <Wifi class="w-10 h-10 text-green-500 dark:text-green-400" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-900 tracking-tight">+{{ phoneNumber }}</h3>
-                        <p class="text-sm text-gray-500 mt-2">Terhubung sejak {{ formatDate(connectedAt) }}</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">+{{ phoneNumber }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">Terhubung sejak {{ formatDate(connectedAt) }}</p>
                         
-                        <div class="mt-8 p-4 bg-gray-50/80 border border-gray-100 rounded-xl text-sm text-gray-600 max-w-md w-full mx-auto leading-relaxed">
+                        <div class="mt-8 p-4 bg-gray-50/80 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl text-sm text-gray-600 dark:text-slate-300 max-w-md w-full mx-auto leading-relaxed">
                             Sistem akan otomatis mengirim pengingat tagihan dan konfirmasi pembayaran ke penyewa Anda melalui WhatsApp.
                         </div>
 
@@ -228,45 +228,45 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Disconnected State -->
-                    <div v-else-if="isDisconnected && !isLoading" class="p-8 sm:p-12 bg-white">
+                    <div v-else-if="isDisconnected && !isLoading" class="p-8 sm:p-12 bg-white dark:bg-slate-900 rounded-lg">
                         <div class="max-w-sm mx-auto">
                             <!-- Tabs for connection method -->
-                            <div class="flex p-1 bg-gray-100/80 rounded-xl mb-10">
+                            <div class="flex p-1 bg-gray-100/80 dark:bg-slate-800 rounded-xl mb-10">
                                 <button class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all"
-                                        :class="connectMethod === 'qr' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                                        :class="connectMethod === 'qr' ? 'bg-white shadow-sm text-gray-900 dark:bg-slate-700 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'"
                                         @click="connectMethod = 'qr'; errorMessage = ''">
                                     Scan QR Code
                                 </button>
                                 <button class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all"
-                                        :class="connectMethod === 'pairing' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                                        :class="connectMethod === 'pairing' ? 'bg-white shadow-sm text-gray-900 dark:bg-slate-700 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200'"
                                         @click="connectMethod = 'pairing'; errorMessage = ''">
                                     Kode Pairing
                                 </button>
                             </div>
 
-                            <div v-if="errorMessage" class="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 flex items-start">
+                            <div v-if="errorMessage" class="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-start">
                                 <span class="block">{{ errorMessage }}</span>
                             </div>
 
                             <div v-if="connectMethod === 'qr'" class="text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center mb-6 transform rotate-3">
-                                    <QrCode class="w-8 h-8 text-blue-500 -rotate-3" />
+                                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mx-auto flex items-center justify-center mb-6 transform rotate-3">
+                                    <QrCode class="w-8 h-8 text-blue-500 dark:text-blue-400 -rotate-3" />
                                 </div>
-                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Scan QR Code</h4>
-                                <p class="text-sm text-gray-500 mb-8 leading-relaxed">Gunakan fitur Perangkat Tertaut di aplikasi WhatsApp HP Anda untuk menyambungkan.</p>
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Scan QR Code</h4>
+                                <p class="text-sm text-gray-500 dark:text-slate-400 mb-8 leading-relaxed">Gunakan fitur Perangkat Tertaut di aplikasi WhatsApp HP Anda untuk menyambungkan.</p>
                                 <Button class="w-full h-11 shadow-sm" @click="startQrSession" :disabled="isLoading">Tampilkan QR Code</Button>
                             </div>
 
                             <div v-else class="text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <div class="w-16 h-16 bg-blue-50 rounded-2xl mx-auto flex items-center justify-center mb-6 transform rotate-3">
-                                    <KeyRound class="w-8 h-8 text-blue-500 -rotate-3" />
+                                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mx-auto flex items-center justify-center mb-6 transform rotate-3">
+                                    <KeyRound class="w-8 h-8 text-blue-500 dark:text-blue-400 -rotate-3" />
                                 </div>
-                                <h4 class="text-lg font-semibold text-gray-900 mb-2">Kode Pairing</h4>
-                                <p class="text-sm text-gray-500 mb-6 leading-relaxed">Dapatkan 8 digit kode pairing untuk ditautkan dengan nomor HP Anda.</p>
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Kode Pairing</h4>
+                                <p class="text-sm text-gray-500 dark:text-slate-400 mb-6 leading-relaxed">Dapatkan 8 digit kode pairing untuk ditautkan dengan nomor HP Anda.</p>
                                 
                                 <div class="text-left mb-8">
-                                    <Label for="pairingPhone" class="text-gray-700">Nomor WhatsApp</Label>
-                                    <Input id="pairingPhone" v-model="pairingPhoneInput" placeholder="Contoh: 08123456789" class="mt-2 h-11 bg-gray-50/50" @keyup.enter="startPairingSession" />
+                                    <Label for="pairingPhone" class="text-gray-700 dark:text-slate-300">Nomor WhatsApp</Label>
+                                    <Input id="pairingPhone" v-model="pairingPhoneInput" placeholder="Contoh: 08123456789" class="mt-2 h-11 bg-gray-50/50 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500" @keyup.enter="startPairingSession" />
                                 </div>
                                 <Button class="w-full h-11 shadow-sm" @click="startPairingSession" :disabled="isLoading">Dapatkan Kode</Button>
                             </div>
@@ -274,40 +274,40 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Connecting State -->
-                    <div v-else-if="isConnecting || isLoading" class="p-8 sm:p-12 text-center bg-white">
+                    <div v-else-if="isConnecting || isLoading" class="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-lg">
                         <div v-if="connectMethod === 'qr' && qrCodeImage" class="animate-in zoom-in-95 duration-300">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Scan QR Code Ini</h4>
-                            <p class="text-sm text-gray-500 mb-8">Buka <strong>Perangkat Tertaut</strong> di aplikasi WhatsApp Anda.</p>
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Scan QR Code Ini</h4>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mb-8">Buka <strong>Perangkat Tertaut</strong> di aplikasi WhatsApp Anda.</p>
                             
                             <div class="inline-block p-6 bg-white border border-gray-100 rounded-3xl shadow-sm mb-6">
                                 <img :src="qrCodeImage" alt="QR Code" class="w-56 h-56 mx-auto" />
                             </div>
                             <div class="flex flex-col items-center">
-                                <p class="text-xs font-medium text-blue-500 mb-6 flex items-center bg-blue-50 px-3 py-1.5 rounded-full">
+                                <p class="text-xs font-medium text-blue-500 dark:text-blue-400 mb-6 flex items-center bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-full">
                                     <RefreshCw class="w-3.5 h-3.5 mr-1.5 animate-spin" /> Diperbarui otomatis
                                 </p>
-                                <Button variant="outline" class="px-6" @click="stopSession" :disabled="isLoading">Batalkan</Button>
+                                <Button variant="outline" class="px-6 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" @click="stopSession" :disabled="isLoading">Batalkan</Button>
                             </div>
                         </div>
 
                         <div v-else-if="connectMethod === 'pairing' && pairingCode" class="animate-in zoom-in-95 duration-300">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Kode Pairing Anda</h4>
-                            <p class="text-sm text-gray-500 mb-8">Pilih <strong>Tautkan dengan nomor telepon saja</strong> di WA Anda.</p>
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Kode Pairing Anda</h4>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mb-8">Pilih <strong>Tautkan dengan nomor telepon saja</strong> di WA Anda.</p>
                             
-                            <div class="inline-block px-12 py-6 bg-gray-50 border border-gray-100 rounded-3xl mb-8">
-                                <span class="text-4xl md:text-5xl font-mono font-bold tracking-[0.25em] text-gray-900 ml-2">{{ pairingCode }}</span>
+                            <div class="inline-block px-12 py-6 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-3xl mb-8">
+                                <span class="text-4xl md:text-5xl font-mono font-bold tracking-[0.25em] text-gray-900 dark:text-white ml-2">{{ pairingCode }}</span>
                             </div>
                             <div class="flex flex-col items-center">
-                                <p class="text-sm text-gray-500 mb-6">Segera masukkan kode ini sebelum kadaluarsa.</p>
-                                <Button variant="outline" class="px-6" @click="stopSession" :disabled="isLoading">Batalkan</Button>
+                                <p class="text-sm text-gray-500 dark:text-slate-400 mb-6">Segera masukkan kode ini sebelum kadaluarsa.</p>
+                                <Button variant="outline" class="px-6 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" @click="stopSession" :disabled="isLoading">Batalkan</Button>
                             </div>
                         </div>
 
                         <div v-else class="py-20 animate-in fade-in duration-300">
-                            <Loader2 class="w-12 h-12 text-blue-500 animate-spin mx-auto mb-6" />
-                            <h4 class="text-lg font-semibold text-gray-900">Mempersiapkan Koneksi</h4>
-                            <p class="text-sm text-gray-500 mt-2">Mohon tunggu beberapa detik...</p>
-                            <Button variant="outline" class="mt-10" @click="stopSession" :disabled="isLoading">Batalkan</Button>
+                            <Loader2 class="w-12 h-12 text-blue-500 dark:text-blue-400 animate-spin mx-auto mb-6" />
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Mempersiapkan Koneksi</h4>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">Mohon tunggu beberapa detik...</p>
+                            <Button variant="outline" class="mt-10 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" @click="stopSession" :disabled="isLoading">Batalkan</Button>
                         </div>
                     </div>
                 </CardContent>

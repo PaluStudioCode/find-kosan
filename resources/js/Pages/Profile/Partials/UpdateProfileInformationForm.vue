@@ -20,6 +20,7 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    whatsapp_number: user.whatsapp_number || '',
 });
 </script>
 
@@ -59,6 +60,20 @@ const form = useForm({
                         :class="{ 'border-destructive': form.errors.email }"
                     />
                     <p v-if="form.errors.email" class="text-sm text-destructive">{{ form.errors.email }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <Label for="whatsapp_number">Nomor WhatsApp</Label>
+                    <Input
+                        id="whatsapp_number"
+                        type="text"
+                        v-model="form.whatsapp_number"
+                        placeholder="Contoh: 08123456789"
+                        autocomplete="tel"
+                        :class="{ 'border-destructive': form.errors.whatsapp_number }"
+                    />
+                    <p v-if="form.errors.whatsapp_number" class="text-sm text-destructive">{{ form.errors.whatsapp_number }}</p>
+                    <p class="text-xs text-muted-foreground">Nomor ini akan digunakan untuk mengirimkan notifikasi tagihan/pembayaran.</p>
                 </div>
 
                 <div v-if="mustVerifyEmail && user.email_verified_at === null">

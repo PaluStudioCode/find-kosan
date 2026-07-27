@@ -3,7 +3,11 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun } from 'lucide-vue-next';
+import { useDark, useToggle } from '@vueuse/core';
+
+const isDark = useDark();
+const toggleDark = useToggle(isDark);
 
 const isMobileMenuOpen = ref(false);
 
@@ -70,24 +74,54 @@ const isActive = (routeName) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="min-h-screen bg-gray-50 dark:bg-slate-950 flex transition-colors duration-300">
     <!-- Sidebar Desktop -->
-    <aside class="hidden md:flex flex-col w-64 bg-white border-r fixed h-full z-40">
-      <div class="h-16 flex items-center px-6 border-b">
-        <Link href="/" class="text-xl font-bold text-primary">Kos Online</Link>
+    <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 fixed h-full z-40 transition-colors duration-300">
+      <div class="h-16 flex items-center px-6 border-b dark:border-slate-800">
+        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400">Kos Online</Link>
       </div>
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
         <template v-for="item in navItems" :key="item.name">
           <Link :href="route(item.route)" 
-                class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors"
-                :class="{ 'bg-primary/10 text-primary': isActive(item.route) }">
+                class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800 dark:text-slate-300 transition-colors"
+                :class="{ 'bg-primary/10 text-primary dark:bg-blue-900/50 dark:text-blue-400': isActive(item.route) }">
             <component :is="item.icon" class="w-5 h-5" />
             {{ item.name }}
           </Link>
         </template>
       </nav>
-      <div class="p-4 border-t">
-        <Link :href="route('logout')" method="post" as="button" class="flex items-center gap-3 px-3 py-2 w-full text-left rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+      <div class="p-4 border-t dark:border-slate-800">
+        <Link :href="route('logout')" method="post" as="button" class="flex items-center gap-3 px-3 py-2 w-full text-left rounded-md text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors">
+          <LogOut class="w-5 h-5" />
+          Logout
+        </Link>
+      </div>
+    </aside>
+
+    <!-- Sidebar Mobile Overlay -->
+    <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity" @click="isMobileMenuOpen = false"></div>
+    
+    <!-- Sidebar Mobile -->
+    <aside :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" class="md:hidden flex flex-col w-64 bg-white dark:bg-slate-900 border-r dark:border-slate-800 fixed h-full z-50 transition-transform duration-300 ease-in-out top-0 left-0">
+      <div class="h-16 flex items-center justify-between px-6 border-b dark:border-slate-800">
+        <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400">Kos Online</Link>
+        <button @click="isMobileMenuOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+        <template v-for="item in navItems" :key="item.name">
+          <Link :href="route(item.route)" 
+                @click="isMobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-800 dark:text-slate-300 transition-colors"
+                :class="{ 'bg-primary/10 text-primary dark:bg-blue-900/50 dark:text-blue-400': isActive(item.route) }">
+            <component :is="item.icon" class="w-5 h-5" />
+            {{ item.name }}
+          </Link>
+        </template>
+      </nav>
+      <div class="p-4 border-t dark:border-slate-800">
+        <Link :href="route('logout')" method="post" as="button" @click="isMobileMenuOpen = false" class="flex items-center gap-3 px-3 py-2 w-full text-left rounded-md text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors">
           <LogOut class="w-5 h-5" />
           Logout
         </Link>
@@ -97,36 +131,42 @@ const isActive = (routeName) => {
     <!-- Main Content -->
     <div class="flex-1 flex flex-col md:pl-64">
       <!-- Topbar -->
-      <header class="h-16 bg-white border-b flex items-center justify-between px-4 sm:px-6 z-30 sticky top-0">
+      <header class="h-16 bg-white dark:bg-slate-900 border-b dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 z-30 sticky top-0 transition-colors duration-300">
         <div class="flex items-center gap-4">
-          <Button variant="ghost" size="icon" class="md:hidden" @click="isMobileMenuOpen = !isMobileMenuOpen">
+          <Button variant="ghost" size="icon" class="md:hidden dark:text-slate-300" @click="isMobileMenuOpen = !isMobileMenuOpen">
             <Menu class="w-5 h-5" />
           </Button>
           <slot name="header">
-            <h1 class="text-lg font-semibold text-gray-900">Dashboard</h1>
+            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Dashboard</h1>
           </slot>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <!-- Dark Mode Toggle -->
+          <Button variant="ghost" size="icon" @click="toggleDark()">
+            <Sun v-if="isDark" class="w-5 h-5 text-yellow-500" />
+            <Moon v-else class="w-5 h-5 text-slate-500" />
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" class="gap-2">
+              <Button variant="ghost" class="gap-2 dark:text-slate-200">
                 <User class="w-4 h-4" />
                 <span class="hidden sm:inline">{{ $page.props.auth.user.name }}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-56">
-              <div class="px-2 py-1.5 text-sm text-gray-500">
+            <DropdownMenuContent align="end" class="w-56 dark:bg-slate-800 dark:border-slate-700">
+              <div class="px-2 py-1.5 text-sm text-gray-500 dark:text-slate-400">
                 {{ $page.props.auth.user.email }}
-                <div class="capitalize mt-1 text-xs px-2 py-0.5 bg-gray-100 rounded inline-block">{{ $page.props.auth.user.role.replace('_', ' ') }}</div>
+                <div class="capitalize mt-1 text-xs px-2 py-0.5 bg-gray-100 dark:bg-slate-700 rounded inline-block">{{ $page.props.auth.user.role.replace('_', ' ') }}</div>
               </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
+              <DropdownMenuSeparator class="dark:bg-slate-700" />
+              <DropdownMenuItem asChild class="dark:focus:bg-slate-700 dark:text-slate-200">
                 <Link :href="route('profile.edit')" class="w-full cursor-pointer flex items-center">
                   Profil
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link :href="route('logout')" method="post" as="button" class="w-full text-left text-red-600 cursor-pointer flex items-center">
+              <DropdownMenuItem asChild class="dark:focus:bg-slate-700">
+                <Link :href="route('logout')" method="post" as="button" class="w-full text-left text-red-600 dark:text-red-400 cursor-pointer flex items-center">
                   Logout
                 </Link>
               </DropdownMenuItem>
@@ -136,7 +176,7 @@ const isActive = (routeName) => {
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 p-4 sm:p-6 lg:p-8">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 text-slate-900 dark:text-slate-100 transition-colors duration-300">
         <slot />
       </main>
     </div>

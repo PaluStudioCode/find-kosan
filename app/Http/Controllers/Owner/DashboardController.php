@@ -15,25 +15,94 @@ class DashboardController extends Controller
     {
         $ownerId = auth()->user()->id;
 
-        $totalKos = BoardingHouse::where('owner_id', $ownerId)->count();
+        // 1. Pendapatan Bulan Ini
+        $currentMonthRevenue = \App\Models\Invoice::where('owner_id', $ownerId)
+            ->where('status', 'lunas')
+            ->whereMonth('updated_at', now()->month)
+            ->whereYear('updated_at', now()->year)
+            ->sum('amount');
+
+        // 2. Tingkat Keterisian (Occupancy Rate)
         $totalRooms = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->count();
-        
-        $availableRooms = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
-            $q->where('owner_id', $ownerId);
-        })->where('status', 'tersedia')->count();
-
         $occupiedRooms = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
-        })->where('status', 'disewa')->count();
+        })->where('status', 'terisi')->count();
+        $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
-        $pendingPaymentsCount = Payment::whereHas('invoice', function ($q) use ($ownerId) {
-            $q->where('owner_id', $ownerId);
-        })->where('status', 'menunggu_konfirmasi')->count();
+        // 3. Tagihan Belum Dibayar / Jatuh Tempo
+        $pendingInvoicesCount = \App\Models\Invoice::where('owner_id', $ownerId)
+            ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
+            ->count();
 
-        $recentPayments = Payment::with(['invoice.tenancy.room.boardingHouse', 'invoice.tenant'])
-            ->whereHas('invoice', function ($q) use ($ownerId) {
+        // 4. Saldo Dompet
+        $wallet = \App\Models\OwnerWallet::where('owner_id', $ownerId)->first();
+        $walletBalance = $wallet ? $wallet->available_balance : 0;
+
+        // Fetch Recent Transactions (lunas invoices)
+        $recentTransactions = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'tenant'])
+            ->where('owner_id', $ownerId)
+            ->where('status', 'lunas')
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
+        // Revenue Chart Data (Last 6 Months)
+        $revenueChartLabels = [];
+        $revenueChartData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $revenueChartLabels[] = $date->translatedFormat('M Y');
+            
+            $monthlyRevenue = \App\Models\Invoice::where('owner_id', $ownerId)
+                ->where('status', 'lunas')
+                ->whereMonth('updated_at', $date->month)
+                ->whereYear('updated_at', $date->year)
+                ->sum('amount');
+                
+            $revenueChartData[] = $monthlyRevenue;
+        }
+
+        // Property Capacity Status
+        $propertiesCapacity = \App\Models\BoardingHouse::where('owner_id', $ownerId)
+            ->withCount([
+                'rooms as total_rooms',
+                'rooms as occupied_rooms' => function ($q) {
+                    $q->where('status', 'terisi');
+                }
+            ])
+            ->get()
+            ->map(function ($kos) {
+                return [
+                    'name' => $kos->name,
+                    'occupied_rooms' => $kos->occupied_rooms,
+                    'vacant_rooms' => $kos->total_rooms - $kos->occupied_rooms,
+                ];
+            });
+
+        // Upcoming Due Invoices (H-3 to Overdue)
+        $upcomingDueInvoices = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'tenant'])
+            ->where('owner_id', $ownerId)
+            ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
+            ->where('due_date', '<=', now()->addDays(3))
+            ->orderBy('due_date', 'asc')
+            ->take(5)
+            ->get();
+
+        // Vacant Rooms List
+        $vacantRooms = \App\Models\Room::with(['boardingHouse'])
+            ->whereHas('boardingHouse', function ($q) use ($ownerId) {
+                $q->where('owner_id', $ownerId);
+            })
+            ->where('status', 'tersedia')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Recent Reviews
+        $recentReviews = \App\Models\BoardingHouseReview::with(['user', 'boardingHouse'])
+            ->whereHas('boardingHouse', function ($q) use ($ownerId) {
                 $q->where('owner_id', $ownerId);
             })
             ->latest()
@@ -47,14 +116,23 @@ class DashboardController extends Controller
 
         return Inertia::render('Owner/Dashboard', [
             'metrics' => [
-                'totalKos' => $totalKos,
-                'totalRooms' => $totalRooms,
-                'availableRooms' => $availableRooms,
+                'currentMonthRevenue' => $currentMonthRevenue,
+                'occupancyRate' => $occupancyRate,
                 'occupiedRooms' => $occupiedRooms,
-                'pendingPayments' => $pendingPaymentsCount,
+                'totalRooms' => $totalRooms,
+                'pendingInvoices' => $pendingInvoicesCount,
+                'walletBalance' => $walletBalance,
             ],
-            'recentPayments' => $recentPayments,
+            'recentTransactions' => $recentTransactions,
             'activityLogs' => $activityLogs,
+            'upcomingDueInvoices' => $upcomingDueInvoices,
+            'vacantRooms' => $vacantRooms,
+            'recentReviews' => $recentReviews,
+            'charts' => [
+                'revenueLabels' => $revenueChartLabels,
+                'revenueData' => $revenueChartData,
+                'propertiesCapacity' => $propertiesCapacity,
+            ]
         ]);
     }
 }

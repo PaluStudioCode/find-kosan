@@ -195,7 +195,8 @@ onUnmounted(() => {
                             <div>
                                 <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5 mb-1"><User class="w-3.5 h-3.5" /> Pemilik / Kontak</p>
                                 <p class="font-medium text-slate-900">{{ tenancy.boarding_house?.owner?.name }}</p>
-                                <p class="text-sm text-slate-600">{{ tenancy.boarding_house?.public_contact_whatsapp_number || '-' }}</p>
+                                <p class="text-sm text-slate-600" v-if="tenancy.status !== 'nonaktif'">{{ tenancy.boarding_house?.public_contact_whatsapp_number || '-' }}</p>
+                                <p class="text-[11px] text-orange-600 italic mt-0.5" v-else>Kontak akan terbuka setelah pembayaran pertama lunas.</p>
                             </div>
                         </div>
                         <div class="p-5 space-y-4 bg-slate-50/30">

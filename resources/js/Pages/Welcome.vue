@@ -242,6 +242,14 @@ onBeforeUnmount(() => {
 
             <div class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:pb-32 lg:pt-20">
                 <div class="relative z-10 max-w-2xl -mt-12 lg:-mt-24">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 text-sm font-medium rounded-full bg-white/10 text-teal-300 border border-white/10 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                        </span>
+                        Sistem Manajemen Kos Terpadu
+                    </div>
+                    
                     <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
                         Temukan ruang untuk
                         <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-2">hidup lebih dekat.</span>

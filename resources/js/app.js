@@ -7,6 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h, Fragment } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PageTransition from './Components/PageTransition.vue';
+import Vue3Lottie from 'vue3-lottie';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -26,6 +27,7 @@ createInertiaApp({
         })
             .use(plugin)
             .use(ZiggyVue)
+            .use(Vue3Lottie)
             .mount(el);
     },
     progress: {

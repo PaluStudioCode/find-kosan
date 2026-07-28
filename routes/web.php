@@ -16,7 +16,9 @@ Route::middleware([GuestOrTenant::class])->group(function () {
         ->name('page.show');
 });
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
+use App\Http\Controllers\SuperAdmin\MasterDataController;
 use App\Http\Controllers\SuperAdmin\FacilityController;
+use App\Http\Controllers\SuperAdmin\RuleController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\SuperAdmin\VerificationController as SuperAdminVerificationController;
 use App\Http\Controllers\SuperAdmin\WithdrawalController;
@@ -66,7 +68,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
             Route::resource('reports', App\Http\Controllers\SuperAdmin\ReportController::class)->only(['index', 'show', 'update', 'destroy']);
-            Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show']);
+            
+            Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
+            Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show', 'index']);
+            Route::resource('rules', RuleController::class)->except(['create', 'edit', 'show', 'index']);
+            
             Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
             Route::get('/withdrawals/{withdrawal}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
             Route::post('/withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
@@ -91,6 +97,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             // Kos Property Management
             Route::resource('kos', AdminKosController::class)->parameters(['kos' => 'kos'])->withTrashed();
+            Route::post('kos/{kos}/rooms/bulk', [AdminRoomController::class, 'bulkStore'])->name('kos.rooms.bulk');
             Route::resource('kos.rooms', AdminRoomController::class)->except(['index', 'show'])->parameters(['kos' => 'kos', 'rooms' => 'room']);
             Route::post('kos/{kos}/photos', [AdminKosPhotoController::class, 'store'])->name('kos.photos.store');
             Route::put('kos/{kos}/photos/{photo}', [AdminKosPhotoController::class, 'update'])->name('kos.photos.update');

@@ -405,20 +405,31 @@ onUnmounted(() => {
                             </CardHeader>
                             <CardContent>
                                 <form @submit.prevent="submitSettings" class="space-y-6">
-                                    <div class="space-y-2">
-                                        <Label for="about_us">Tentang Kami</Label>
-                                        <Textarea id="about_us" v-model="form.about_us" class="min-h-[150px] font-mono text-sm" placeholder="Tulis cerita atau profil singkat perusahaan Anda di sini... (Mendukung format paragraf biasa)" />
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <Label for="terms_conditions">Syarat & Ketentuan</Label>
-                                        <Textarea id="terms_conditions" v-model="form.terms_conditions" class="min-h-[200px] font-mono text-sm" placeholder="1. Definisi&#10;2. Kewajiban Pengguna..." />
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <Label for="privacy_policy">Kebijakan Privasi</Label>
-                                        <Textarea id="privacy_policy" v-model="form.privacy_policy" class="min-h-[200px] font-mono text-sm" placeholder="Data apa saja yang kami kumpulkan dan bagaimana kami mengelolanya..." />
-                                    </div>
+                                    <Tabs defaultValue="about_us" class="w-full">
+                                        <TabsList class="grid w-full grid-cols-3">
+                                            <TabsTrigger value="about_us">Tentang Kami</TabsTrigger>
+                                            <TabsTrigger value="terms_conditions">Syarat & Ketentuan</TabsTrigger>
+                                            <TabsTrigger value="privacy_policy">Kebijakan Privasi</TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="about_us" class="pt-4">
+                                            <div class="space-y-2">
+                                                <Label for="about_us" class="sr-only">Tentang Kami</Label>
+                                                <Textarea id="about_us" v-model="form.about_us" class="min-h-[400px] text-sm" placeholder="Tulis cerita atau profil singkat perusahaan Anda di sini... (Mendukung format paragraf biasa)" />
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent value="terms_conditions" class="pt-4">
+                                            <div class="space-y-2">
+                                                <Label for="terms_conditions" class="sr-only">Syarat & Ketentuan</Label>
+                                                <Textarea id="terms_conditions" v-model="form.terms_conditions" class="min-h-[400px] text-sm" placeholder="1. Definisi&#10;2. Kewajiban Pengguna..." />
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent value="privacy_policy" class="pt-4">
+                                            <div class="space-y-2">
+                                                <Label for="privacy_policy" class="sr-only">Kebijakan Privasi</Label>
+                                                <Textarea id="privacy_policy" v-model="form.privacy_policy" class="min-h-[400px] text-sm" placeholder="Data apa saja yang kami kumpulkan dan bagaimana kami mengelolanya..." />
+                                            </div>
+                                        </TabsContent>
+                                    </Tabs>
 
                                     <div class="flex justify-end pt-4 border-t dark:border-slate-800">
                                         <Button type="submit" :disabled="form.processing" class="gap-2">

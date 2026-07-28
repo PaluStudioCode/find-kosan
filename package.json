@@ -35,6 +35,7 @@
         "tailwindcss-animate": "^1.0.7",
         "three": "^0.185.1",
         "vue-chartjs": "^5.3.4",
-        "vue-sonner": "^2.0.9"
+        "vue-sonner": "^2.0.9",
+        "vue3-lottie": "^3.3.1"
     }
 }

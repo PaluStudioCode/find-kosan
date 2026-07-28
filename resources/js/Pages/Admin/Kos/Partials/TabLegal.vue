@@ -1,10 +1,10 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/toast/use-toast';
 import { FileText, Trash2, UploadCloud, AlertCircle, AlertTriangle } from 'lucide-vue-next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
@@ -13,7 +13,6 @@ const props = defineProps({
     isLocked: Boolean
 });
 
-const { toast } = useToast();
 
 const form = useForm({
     document_type: 'identitas_pemilik_pengelola',
@@ -28,7 +27,7 @@ const uploadDocument = () => {
             form.reset('file');
         },
         onError: (err) => {
-            if (err.file) toast({ title: 'Gagal', description: err.file, variant: 'destructive' });
+            if (err.file) toast.error(err.file);
         }
     });
 };
@@ -58,7 +57,7 @@ const deleteDocument = () => {
             closeDocModal();
         },
         onError: () => {
-            toast({ title: 'Gagal', description: 'Gagal menghapus dokumen.', variant: 'destructive' });
+            toast.error('Gagal menghapus dokumen.');
             closeDocModal();
         }
     });

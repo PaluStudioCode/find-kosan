@@ -1,4 +1,5 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -6,15 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Download, CheckCircle, XCircle, FileText, Eye, MapPin, Home, User, Map, Check, AlertTriangle, Image as ImageIcon } from 'lucide-vue-next';
-import { useToast } from '@/components/ui/toast/use-toast';
+import { ChevronLeft, ChevronRight, Download, CheckCircle, XCircle, FileText, Eye, MapPin, Home, User, Map, Check, X, AlertTriangle, Image as ImageIcon } from 'lucide-vue-next';
 import MapPicker from '@/Components/MapPicker.vue';
 
 const props = defineProps({
     kos: Object
 });
 
-const { toast } = useToast();
 const rejectForm = useForm({ note: '' });
 const showRejectForm = ref(false);
 
@@ -25,7 +24,7 @@ const approve = () => {
         preserveScroll: true,
         onSuccess: () => {
             confirmingApproval.value = false;
-            toast({ title: 'Berhasil', description: 'Kos disetujui dan dipublikasikan.' });
+            toast.success('Kos disetujui dan dipublikasikan.');
         },
     });
 };
@@ -33,7 +32,7 @@ const approve = () => {
 const reject = () => {
     rejectForm.post(route('superadmin.verifications.reject', props.kos.id), {
         onSuccess: () => {
-            toast({ title: 'Berhasil', description: 'Kos ditolak.' });
+            toast.success('Kos ditolak.');
             showRejectForm.value = false;
         },
     });
@@ -64,6 +63,15 @@ const prevPhoto = () => {
     }
 };
 
+const photoCategories = {
+    'bangunan_depan': 'Tampak Depan',
+    'dalam_kamar': 'Dalam Kamar',
+    'kamar_mandi': 'Kamar Mandi',
+    'fasilitas_umum': 'Fasilitas Umum',
+    'lingkungan': 'Lingkungan',
+    'lainnya': 'Lainnya'
+};
+
 // Map Modal State
 const showMapModal = ref(false);
 
@@ -84,6 +92,40 @@ const openDocPreview = (doc) => {
 
 // Legal Docs Modal State
 const showLegalDocsModal = ref(false);
+
+// Grouped Rooms Computation
+const groupedRooms = computed(() => {
+    if (!props.kos.rooms) return [];
+    
+    const groups = {};
+    props.kos.rooms.forEach(room => {
+        const roomName = room.name || 'Kamar Standar';
+        const key = `${roomName}-${room.price}-${room.price_period}-${room.capacity}`;
+        
+        if (!groups[key]) {
+            groups[key] = {
+                ...room,
+                name: roomName,
+                count: 1,
+                room_numbers: [room.room_number]
+            };
+        } else {
+            groups[key].count++;
+            groups[key].room_numbers.push(room.room_number);
+        }
+    });
+    
+    return Object.values(groups).map(group => {
+        let display_numbers = group.room_numbers.slice(0, 5).join(', ');
+        if (group.room_numbers.length > 5) {
+            display_numbers += ` ... (+${group.room_numbers.length - 5} lainnya)`;
+        }
+        return {
+            ...group,
+            display_numbers
+        };
+    });
+});
 </script>
 
 <template>
@@ -184,19 +226,33 @@ const showLegalDocsModal = ref(false);
                                     </span>
                                 </div>
                                 <p v-else class="text-xs text-gray-500 dark:text-slate-500 italic">Tidak ada fasilitas.</p>
+
+                                <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3 mt-6">Peraturan Kos</p>
+                                <div v-if="kos.rules?.length > 0" class="flex flex-wrap gap-2">
+                                    <span v-for="r in kos.rules" :key="r.id" class="px-2.5 py-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded text-xs flex items-center gap-1.5 font-medium" :class="r.is_positive ? 'text-teal-700 dark:text-teal-400' : 'text-red-600 dark:text-red-400'">
+                                        <Check v-if="r.is_positive" class="w-3.5 h-3.5 shrink-0" />
+                                        <X v-else class="w-3.5 h-3.5 shrink-0" />
+                                        {{ r.name }}
+                                    </span>
+                                </div>
+                                <p v-else class="text-xs text-gray-500 dark:text-slate-500 italic">Tidak ada peraturan.</p>
                             </div>
                             
                             <div>
-                                <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Daftar Kamar ({{ kos.rooms?.length || 0 }} Tipe)</p>
+                                <p class="text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Daftar Kamar ({{ groupedRooms.length }} Tipe, Total {{ kos.rooms?.length || 0 }} Kamar)</p>
                                 <div class="space-y-2">
-                                    <div v-for="room in kos.rooms" :key="room.id" class="p-3 border border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 rounded-lg flex justify-between items-center">
-                                        <div>
-                                            <p class="text-sm font-semibold text-gray-900 dark:text-slate-200">{{ room.name }}</p>
-                                            <p class="text-xs text-gray-500 dark:text-slate-400">Kapasitas {{ room.capacity }} orang</p>
+                                    <div v-for="(group, idx) in groupedRooms" :key="idx" class="p-3 border border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 rounded-lg flex justify-between items-start">
+                                        <div class="min-w-0 pr-2">
+                                            <div class="flex items-center gap-2 mb-0.5">
+                                                <p class="text-sm font-semibold text-gray-900 dark:text-slate-200 truncate">{{ group.name }}</p>
+                                                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 rounded text-[10px] font-bold shrink-0">{{ group.count }} Kamar</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-slate-400">Kapasitas {{ group.capacity }} orang</p>
+                                            <p class="text-[10px] text-gray-400 dark:text-slate-500 mt-1 line-clamp-1" :title="'Semua Nomor: ' + group.room_numbers.join(', ')">No: {{ group.display_numbers }}</p>
                                         </div>
-                                        <div class="text-right">
-                                            <p class="text-sm font-bold text-primary dark:text-blue-400">Rp {{ Number(room.price).toLocaleString('id-ID') }}</p>
-                                            <p class="text-[10px] text-gray-500 dark:text-slate-500 uppercase">/ {{ room.price_period }}</p>
+                                        <div class="text-right shrink-0">
+                                            <p class="text-sm font-bold text-primary dark:text-blue-400">Rp {{ Number(group.price).toLocaleString('id-ID') }}</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-slate-500 uppercase">/ {{ group.price_period }}</p>
                                         </div>
                                     </div>
                                     <p v-if="!kos.rooms?.length" class="text-xs text-gray-500 dark:text-slate-500 italic">Belum ada kamar yang didaftarkan.</p>
@@ -280,6 +336,12 @@ const showLegalDocsModal = ref(false);
                 
                 <div class="relative flex-grow flex items-center justify-center p-4 h-full w-full" v-if="kos.photos?.length > 0">
                     <img :src="kos.photos[currentPhotoIndex].file_path" class="max-h-full max-w-full object-contain drop-shadow-lg" />
+                    
+                    <!-- Kategori Foto (Sangat Jelas di Bawah Tengah) -->
+                    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md text-white px-6 py-2 rounded-full font-bold tracking-wide border border-white/30 shadow-2xl z-50 flex items-center gap-2">
+                        <ImageIcon class="w-4 h-4 opacity-80" />
+                        {{ photoCategories[kos.photos[currentPhotoIndex].category] || 'Lainnya' }}
+                    </div>
                     
                     <Button variant="secondary" size="icon" @click="prevPhoto" class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full opacity-70 hover:opacity-100 transition-opacity">
                         <ChevronLeft class="w-6 h-6" />

@@ -13,33 +13,53 @@ class VerificationController extends Controller
 {
     public function index(Request $request)
     {
+        $status = $request->get('status', 'menunggu_verifikasi');
+
         $query = BoardingHouse::with('admin')->latest();
 
-        // Default to pending verifications if no status selected
-        if ($request->has('status') && $request->status !== 'all') {
-            if ($request->status === 'revisi') {
+        if ($status !== 'all') {
+            if ($status === 'revisi') {
                 $query->whereNotNull('pending_revisions');
             } else {
-                $query->where('status', $request->status);
+                $query->where('status', $status);
+                if ($status === 'dipublikasikan') {
+                    // Optional: if you don't want them in dipublikasikan while revising
+                    // $query->whereNull('pending_revisions'); 
+                }
             }
-        } else if (!$request->has('status')) {
-            $query->where(function($q) {
-                $q->where('status', 'menunggu_verifikasi')
-                  ->orWhereNotNull('pending_revisions');
-            });
         }
 
         $verifications = $query->paginate(15)->withQueryString();
 
         return Inertia::render('SuperAdmin/Verifications/Index', [
             'verifications' => $verifications,
-            'filters' => request()->all(['status'])
+            'filters' => ['status' => $status]
         ]);
     }
 
     public function show(BoardingHouse $kos)
     {
-        $kos->load(['admin', 'legalDocuments', 'photos', 'rooms', 'facilities']);
+        $kos->load([
+            'admin', 
+            'facilities', 
+            'rules',
+            'rooms.facilities', 
+            'photos',
+            'legalDocuments'
+        ]);
+
+        // If there is a shadow revision, overlay it so the Admin sees the proposed changes
+        if ($kos->pending_revisions) {
+            $kos->fill($kos->pending_revisions);
+            
+            if (isset($kos->pending_revisions['facility_ids'])) {
+                $kos->setRelation('facilities', \App\Models\Facility::whereIn('id', $kos->pending_revisions['facility_ids'])->get());
+            }
+            
+            if (isset($kos->pending_revisions['rule_ids'])) {
+                $kos->setRelation('rules', \App\Models\Rule::whereIn('id', $kos->pending_revisions['rule_ids'])->get());
+            }
+        }
 
         return Inertia::render('SuperAdmin/Verifications/Show', [
             'kos' => $kos
@@ -51,8 +71,21 @@ class VerificationController extends Controller
         if ($kos->status === 'menunggu_verifikasi' || $kos->pending_revisions) {
             // Check for shadow revision
             if ($kos->pending_revisions) {
+                $revisions = $kos->pending_revisions;
+                
+                // Sync many-to-many relationships if present in revisions
+                if (isset($revisions['facility_ids'])) {
+                    $kos->facilities()->sync($revisions['facility_ids']);
+                    unset($revisions['facility_ids']);
+                }
+                
+                if (isset($revisions['rule_ids'])) {
+                    $kos->rules()->sync($revisions['rule_ids']);
+                    unset($revisions['rule_ids']);
+                }
+
                 // Apply pending revisions
-                $kos->update($kos->pending_revisions);
+                $kos->update($revisions);
                 $kos->pending_revisions = null;
             }
             

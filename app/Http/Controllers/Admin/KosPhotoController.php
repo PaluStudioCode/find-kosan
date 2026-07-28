@@ -18,6 +18,7 @@ class KosPhotoController extends Controller
         }
 
         $request->validate([
+            'category' => 'required|string|in:bangunan_depan,dalam_kamar,kamar_mandi,fasilitas_umum,lingkungan,lainnya',
             'photos' => 'required|array|min:1',
             'photos.*' => 'image|max:2048',
         ]);
@@ -33,6 +34,7 @@ class KosPhotoController extends Controller
                 'file_path' => '/storage/' . $path,
                 'is_primary' => $isMain,
                 'sort_order' => $maxSort + $index + 1,
+                'category' => $request->category,
             ]);
         }
 

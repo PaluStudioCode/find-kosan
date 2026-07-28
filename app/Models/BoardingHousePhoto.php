@@ -11,7 +11,7 @@ class BoardingHousePhoto extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'boarding_house_id', 'file_path', 'caption', 'sort_order', 'is_primary',
+        'boarding_house_id', 'file_path', 'caption', 'sort_order', 'is_primary', 'category',
     ];
 
     protected $casts = [

@@ -34,8 +34,9 @@ class PublicKosController extends Controller
 
         $kos->load([
             'facilities',
+            'rules',
             'rooms' => function ($q) {
-                $q->where('status', 'tersedia')->with('facilities', 'photos');
+                $q->where('status', 'tersedia')->with('facilities');
             },
             'photos' => function ($q) {
                 $q->orderBy('is_primary', 'desc');

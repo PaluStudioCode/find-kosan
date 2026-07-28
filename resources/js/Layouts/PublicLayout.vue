@@ -84,7 +84,7 @@ const scrollToSection = (id) => {
             
             <nav class="hidden md:flex gap-6 items-center">
                 <template v-if="landing">
-                    <Link :href="route('public.kos.index')" class="text-sm transition-all text-slate-500 hover:text-slate-900 font-medium">Cari Kos</Link>
+                    <a href="#peta-kos" @click.prevent="scrollToSection('#peta-kos')" :class="['text-sm transition-all', activeSection === 'peta-kos' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Eksplor Lokasi</a>
                     <a href="#cara-kerja" @click.prevent="scrollToSection('#cara-kerja')" :class="['text-sm transition-all', activeSection === 'cara-kerja' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Cara Kerja</a>
                     <a href="#keamanan" @click.prevent="scrollToSection('#keamanan')" :class="['text-sm transition-all', activeSection === 'keamanan' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Keamanan</a>
                     <a href="#pemilik" @click.prevent="scrollToSection('#pemilik')" :class="['text-sm transition-all', activeSection === 'pemilik' ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium']">Untuk Pemilik</a>
@@ -94,8 +94,11 @@ const scrollToSection = (id) => {
                     <Link :href="route('public.kos.index')" :class="route().current('public.kos.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
                         Cari Kos
                     </Link>
-                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'" :href="route('user.tenancies.index')" :class="route().current('tenant.tenancies.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
+                    <Link v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'" :href="route('user.tenancies.index')" :class="route().current('user.tenancies.*') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
                         Sewa Kos Saya
+                    </Link>
+                    <Link :href="route('page.show', 'tentang-kami')" preserve-state preserve-scroll :class="route().current('page.show') ? 'text-teal-600 font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'" class="text-sm transition-all">
+                        Informasi Umum
                     </Link>
                 </template>
             </nav>

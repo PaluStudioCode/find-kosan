@@ -16,6 +16,7 @@ import TabVerification from './Partials/TabVerification.vue';
 const props = defineProps({
     kos: Object,
     kosFacilitiesList: Array,
+    kosRulesList: Array,
     roomFacilitiesList: Array,
 });
 
@@ -75,7 +76,7 @@ const tabs = [
             </div>
             
             <div class="p-6">
-                <TabInfo v-if="activeTab === 'info'" :kos="kos" :facilities="kosFacilitiesList" :is-locked="isLocked" />
+                <TabInfo v-if="activeTab === 'info'" :kos="kos" :facilities="kosFacilitiesList" :rules="kosRulesList" :is-locked="isLocked" />
                 <TabRooms v-if="activeTab === 'rooms'" :kos="kos" :facilities="roomFacilitiesList" :is-locked="isLocked" />
                 <TabPhotos v-if="activeTab === 'photos'" :kos="kos" :is-locked="isLocked" />
                 <TabLegal v-if="activeTab === 'legal'" :kos="kos" :is-locked="isLocked" />

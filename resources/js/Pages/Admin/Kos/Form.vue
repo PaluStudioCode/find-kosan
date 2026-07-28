@@ -1,4 +1,5 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { ref, onMounted, nextTick } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,11 +14,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ChevronLeft, MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 import MapPicker from '@/Components/MapPicker.vue';
-import { useToast } from '@/components/ui/toast/use-toast';
 import axios from 'axios';
 
 const props = defineProps({
-    facilities: Array
+    facilities: Array,
+    rules: Array
 });
 
 const form = useForm({
@@ -31,18 +32,18 @@ const form = useForm({
     longitude: null,
     public_contact_name: '',
     public_contact_whatsapp_number: '',
-    facilities: []
+    facilities: [],
+    rules: []
 });
 
-const { toast } = useToast();
 
 const submit = () => {
     form.post(route('admin.kos.store'), {
         onSuccess: () => {
-            toast({ title: 'Berhasil', description: 'Data kos berhasil disimpan sebagai draft.' });
+            toast.success('Data kos berhasil disimpan sebagai draft.');
         },
         onError: () => {
-            toast({ title: 'Gagal', description: 'Periksa kembali data yang Anda masukkan.', variant: 'destructive' });
+            toast.error('Periksa kembali data yang Anda masukkan.');
         }
     });
 };
@@ -365,12 +366,37 @@ const handleLocationSelected = async (location) => {
                                 }"
                             />
                             <Label :for="`facility-${facility.id}`" class="text-sm font-normal cursor-pointer flex items-center gap-2">
-                                <span v-html="facility.icon"></span>
                                 {{ facility.name }}
                             </Label>
                         </div>
                     </div>
                     <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data fasilitas kos.</div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Peraturan & Tata Tertib</CardTitle>
+                    <CardDescription>Pilih peraturan yang berlaku untuk kos Anda.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div v-if="rules && rules.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-for="rule in rules" :key="rule.id" class="flex items-center space-x-2">
+                            <Checkbox 
+                                :id="`rule-${rule.id}`" 
+                                :value="rule.id" 
+                                :modelValue="form.rules.includes(rule.id)"
+                                @update:modelValue="(checked) => {
+                                    if (checked) form.rules.push(rule.id);
+                                    else form.rules = form.rules.filter(id => id !== rule.id);
+                                }"
+                            />
+                            <Label :for="`rule-${rule.id}`" class="text-sm font-normal cursor-pointer flex items-center gap-2 leading-tight">
+                                {{ rule.name }}
+                            </Label>
+                        </div>
+                    </div>
+                    <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data peraturan kos.</div>
                 </CardContent>
             </Card>
 

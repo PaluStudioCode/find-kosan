@@ -1,4 +1,5 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -11,13 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, CheckCircle, AlertCircle, Clock, XCircle } from 'lucide-vue-next';
-import { useToast } from '@/components/ui/toast/use-toast';
 
 const props = defineProps({
     reports: Array,
 });
 
-const { toast } = useToast();
 const showModal = ref(false);
 
 const form = useForm({
@@ -36,7 +35,7 @@ const submit = () => {
     form.post(route('reports.store'), {
         onSuccess: () => {
             showModal.value = false;
-            toast({ title: 'Berhasil', description: 'Laporan Anda telah dikirim dan akan segera diproses oleh Admin.' });
+            toast.success('Laporan Anda telah dikirim dan akan segera diproses oleh Admin.');
         }
     });
 };

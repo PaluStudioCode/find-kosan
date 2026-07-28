@@ -1,4 +1,5 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -6,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/toast/use-toast';
 import { ChevronLeft, Info, CheckCircle2, MessageCircle, ShieldAlert } from 'lucide-vue-next';
 import StatusBadge from '@/Components/StatusBadge.vue';
 
@@ -16,7 +16,6 @@ const props = defineProps({
     report: Object,
 });
 
-const { toast } = useToast();
 
 const form = useForm({
     status: 'selesai',
@@ -39,7 +38,7 @@ const submit = () => {
     form.put(route('superadmin.reports.update', props.report.id), {
         onSuccess: () => {
             isActionModalOpen.value = false;
-            toast({ title: 'Berhasil', description: 'Status laporan diperbarui.' });
+            toast.success('Status laporan diperbarui.');
         }
     });
 };
@@ -56,7 +55,7 @@ const deleteReport = () => {
     router.delete(route('superadmin.reports.destroy', props.report.id), {
         onSuccess: () => {
             closeModal();
-            toast({ title: 'Berhasil', description: 'Laporan tidak valid berhasil dihapus.' });
+            toast.success('Laporan tidak valid berhasil dihapus.');
         },
         onFinish: () => {
             isDeleting.value = false;

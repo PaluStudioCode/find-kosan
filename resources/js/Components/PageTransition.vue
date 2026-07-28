@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Building2 } from 'lucide-vue-next';
+import { Building2, MapPin, Search } from 'lucide-vue-next';
 
 const isTransitioning = ref(false);
+const transitionType = ref('default');
 let timeout = null;
 
 onMounted(() => {
@@ -27,6 +28,12 @@ onMounted(() => {
         if (targetPath.startsWith('/admin') || targetPath.startsWith('/superadmin') || targetPath.startsWith('/user') || targetPath.startsWith('/profile') || targetPath.startsWith('/reports')) {
             return;
         }
+
+        if (targetPath === '/kos' || targetPath.startsWith('/kos/')) {
+            transitionType.value = 'clouds';
+        } else {
+            transitionType.value = 'default';
+        }
         
         isTransitioning.value = true;
     });
@@ -47,6 +54,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <!-- Default Transition -->
     <transition
         enter-active-class="transition-all duration-300 ease-out"
         enter-from-class="opacity-0 scale-105"
@@ -55,7 +63,7 @@ onUnmounted(() => {
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
     >
-        <div v-if="isTransitioning" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-teal-600">
+        <div v-if="isTransitioning && transitionType === 'default'" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-teal-600">
             <!-- Modern Animated Logo -->
             <div class="relative flex h-24 w-24 items-center justify-center rounded-2xl bg-white shadow-2xl animate-bounce">
                 <Building2 class="h-12 w-12 text-teal-600 animate-pulse" />
@@ -73,4 +81,114 @@ onUnmounted(() => {
             </div>
         </div>
     </transition>
+
+    <!-- Clash of Clans Style Clouds Transition -->
+    <transition
+        enter-active-class="transition-all duration-700 ease-out"
+        enter-from-class="coc-clouds-open"
+        enter-to-class="coc-clouds-closed"
+        leave-active-class="transition-all duration-[800ms] ease-in"
+        leave-from-class="coc-clouds-closed"
+        leave-to-class="coc-clouds-open"
+    >
+        <div v-if="isTransitioning && transitionType === 'clouds'" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center overflow-hidden">
+            
+            <!-- White Background overlay that fades in slightly delayed to ensure full coverage -->
+            <div class="absolute inset-0 bg-white transition-opacity duration-300" 
+                 :class="isTransitioning ? 'opacity-100 delay-300' : 'opacity-0'"></div>
+                 
+
+
+            <!-- LAYER 1: Background Fog (Heavily Blurred, Soft Gray) -->
+            <svg viewBox="0 0 800 800" class="cloud-left absolute top-[-10%] left-[-20%] w-[160vw] h-[140vh] text-slate-200 fill-current blur-3xl opacity-80 transition-transform duration-1000 ease-out z-10" style="transition-delay: 0ms;">
+                <circle cx="300" cy="400" r="250" />
+                <circle cx="500" cy="300" r="300" />
+                <circle cx="700" cy="500" r="250" />
+                <rect x="200" y="300" width="600" height="500" />
+            </svg>
+            <svg viewBox="0 0 800 800" class="cloud-right absolute top-[-10%] right-[-20%] w-[160vw] h-[140vh] text-slate-200 fill-current blur-3xl opacity-80 transition-transform duration-1000 ease-out z-10" style="transform: scaleX(-1); transition-delay: 0ms;">
+                <circle cx="300" cy="400" r="250" />
+                <circle cx="500" cy="300" r="300" />
+                <circle cx="700" cy="500" r="250" />
+                <rect x="200" y="300" width="600" height="500" />
+            </svg>
+
+            <!-- LAYER 2: Midground Mist (Medium Blur, White) -->
+            <svg viewBox="0 0 800 800" class="cloud-left absolute top-[0%] left-[-15%] w-[140vw] h-[120vh] text-slate-100 fill-current blur-xl opacity-90 transition-transform duration-700 ease-out z-20" style="transition-delay: 100ms;">
+                <circle cx="250" cy="400" r="180" />
+                <circle cx="450" cy="250" r="220" />
+                <circle cx="650" cy="350" r="190" />
+                <circle cx="750" cy="550" r="150" />
+                <rect x="200" y="300" width="550" height="400" />
+            </svg>
+            <svg viewBox="0 0 800 800" class="cloud-right absolute top-[0%] right-[-15%] w-[140vw] h-[120vh] text-slate-100 fill-current blur-xl opacity-90 transition-transform duration-700 ease-out z-20" style="transform: scaleX(-1); transition-delay: 100ms;">
+                <circle cx="250" cy="450" r="160" />
+                <circle cx="450" cy="300" r="240" />
+                <circle cx="650" cy="400" r="200" />
+                <circle cx="750" cy="600" r="170" />
+                <rect x="200" y="350" width="550" height="400" />
+            </svg>
+
+            <!-- LAYER 3: Foreground Dense Clouds (Slight Blur for softness, Pure White) -->
+            <svg viewBox="0 0 1200 600" class="cloud-top absolute top-[-20%] left-[-10%] w-[120vw] h-[150vh] text-white fill-current blur-md drop-shadow-[0_25px_35px_rgba(0,0,0,0.15)] transition-transform duration-[800ms] ease-out z-30" style="transition-delay: 150ms;">
+                <circle cx="200" cy="200" r="180" />
+                <circle cx="450" cy="300" r="250" />
+                <circle cx="750" cy="250" r="220" />
+                <circle cx="1000" cy="150" r="160" />
+                <rect x="100" y="0" width="1000" height="250" />
+            </svg>
+            <svg viewBox="0 0 1200 600" class="cloud-bottom absolute bottom-[-20%] left-[-10%] w-[120vw] h-[150vh] text-white fill-current blur-md drop-shadow-[0_-25px_35px_rgba(0,0,0,0.15)] transition-transform duration-[800ms] ease-out z-30" style="transition-delay: 200ms;">
+                <circle cx="250" cy="400" r="190" />
+                <circle cx="550" cy="250" r="260" />
+                <circle cx="850" cy="350" r="230" />
+                <circle cx="1050" cy="450" r="170" />
+                <rect x="150" y="350" width="950" height="250" />
+            </svg>
+
+            <!-- Foreground Elements (Text inside clouds) -->
+            <div class="cloud-content relative z-20 flex flex-col items-center transition-all duration-300">
+                <div class="relative flex items-center justify-center mb-6">
+                    <Search class="h-16 w-16 text-teal-600 drop-shadow-xl animate-bounce" stroke-width="2.5" />
+                </div>
+                
+                <h2 class="text-4xl font-extrabold text-teal-800 tracking-tight drop-shadow-sm">
+                    Mencari Lokasi...
+                </h2>
+                <div class="mt-4 flex items-center gap-3">
+                    <div class="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+            </div>
+        </div>
+    </transition>
 </template>
+
+<style scoped>
+.coc-clouds-open .cloud-left { transform: translateX(-110%); }
+.coc-clouds-open .cloud-right { transform: translateX(110%) scaleX(-1); }
+.coc-clouds-open .cloud-top { transform: translateY(-110%); }
+.coc-clouds-open .cloud-bottom { transform: translateY(110%); }
+.coc-clouds-open .cloud-content { opacity: 0; transform: scale(0.5); }
+
+.coc-clouds-closed .cloud-left { transform: translateX(0); }
+.coc-clouds-closed .cloud-right { transform: translateX(0) scaleX(-1); }
+.coc-clouds-closed .cloud-top { transform: translateY(0); }
+.coc-clouds-closed .cloud-bottom { transform: translateY(0); }
+.coc-clouds-closed .cloud-content { opacity: 1; transform: scale(1); transition-delay: 500ms; }
+@keyframes float-cloud-1 {
+    0% { transform: translateX(-5%); }
+    50% { transform: translateX(5%); }
+    100% { transform: translateX(-5%); }
+}
+@keyframes float-cloud-2 {
+    0% { transform: translateX(5%); }
+    50% { transform: translateX(-5%); }
+    100% { transform: translateX(5%); }
+}
+@keyframes float-pin {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+</style>

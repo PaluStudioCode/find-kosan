@@ -1,4 +1,5 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -16,11 +17,10 @@ import {
     Star,
     MessageSquare,
     Flag,
-    LogIn,
+    Check,
 } from 'lucide-vue-next';
 // Note: ChevronLeft/Right used for lightbox, BedDouble for empty rooms state
 import { ref, computed } from 'vue';
-import { useToast } from '@/components/ui/toast/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
@@ -47,7 +47,6 @@ const props = defineProps({
     },
 });
 
-const { toast } = useToast();
 
 const formatRupiah = (amount) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
@@ -87,13 +86,14 @@ const openBookModal = (room) => {
 };
 
 const submitBooking = () => {
-    form.post(route('user.tenancies.store', bookingRoom.value.id), {
+    const roomIdToBook = bookingRoom.value.available_room_id || bookingRoom.value.id;
+    form.post(route('user.tenancies.store', roomIdToBook), {
         onSuccess: () => {
             bookingRoom.value = null;
         },
         onError: (err) => {
-            if (err.start_date) toast({ title: 'Gagal', description: err.start_date, variant: 'destructive' });
-            if (err.occupant_count) toast({ title: 'Gagal', description: err.occupant_count, variant: 'destructive' });
+            if (err.start_date) toast.error(err.start_date);
+            if (err.occupant_count) toast.error(err.occupant_count);
         }
     });
 };
@@ -143,13 +143,52 @@ const formatReviewDate = (date) => {
     }).format(new Date(date));
 };
 
+const photoCategories = {
+    'bangunan_depan': 'Tampak Depan',
+    'dalam_kamar': 'Dalam Kamar',
+    'kamar_mandi': 'Kamar Mandi',
+    'fasilitas_umum': 'Fasilitas Umum',
+    'lingkungan': 'Lingkungan',
+    'lainnya': 'Lainnya'
+};
+
 // --- Computed ---
-const kosPhotos = computed(() => props.kos.photos.map(p => ({ id: p.id, url: p.file_path, caption: p.caption })));
+const kosPhotos = computed(() => props.kos.photos.map(p => ({ id: p.id, url: p.file_path, caption: p.caption, category: p.category })));
 const availableRooms = computed(() => props.kos.rooms.filter(r => r.status === 'tersedia'));
 const unavailableRooms = computed(() => props.kos.rooms.filter(r => r.status !== 'tersedia'));
 const cheapestPrice = computed(() => {
     if (props.kos.rooms.length === 0) return null;
     return Math.min(...props.kos.rooms.map(r => r.price));
+});
+
+const groupedRooms = computed(() => {
+    if (!props.kos.rooms) return [];
+    
+    const groups = {};
+    props.kos.rooms.forEach(room => {
+        const roomName = room.name || 'Kamar Standar';
+        const key = `${roomName}-${room.price}-${room.capacity}`;
+        
+        if (!groups[key]) {
+            groups[key] = {
+                ...room,
+                name: roomName,
+                total_count: 1,
+                available_count: room.status === 'tersedia' ? 1 : 0,
+                available_room_id: room.status === 'tersedia' ? room.id : null,
+            };
+        } else {
+            groups[key].total_count++;
+            if (room.status === 'tersedia') {
+                groups[key].available_count++;
+                if (!groups[key].available_room_id) {
+                    groups[key].available_room_id = room.id;
+                }
+            }
+        }
+    });
+    
+    return Object.values(groups);
 });
 </script>
 
@@ -175,6 +214,7 @@ const cheapestPrice = computed(() => {
                 <div v-else-if="kosPhotos.length === 2" class="grid grid-cols-2 gap-1 h-[320px] sm:h-[400px]">
                     <div v-for="(photo, i) in kosPhotos.slice(0, 2)" :key="photo.id" class="cursor-pointer group relative overflow-hidden" @click="openLightbox(kosPhotos, i)">
                         <img :src="photo.url" :alt="photo.caption || kos.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <span class="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded">{{ photoCategories[photo.category] || 'Lainnya' }}</span>
                     </div>
                 </div>
 
@@ -182,6 +222,7 @@ const cheapestPrice = computed(() => {
                 <div v-else class="grid grid-cols-4 grid-rows-2 gap-1 h-[280px] sm:h-[380px]">
                     <div class="col-span-2 row-span-2 cursor-pointer group relative overflow-hidden" @click="openLightbox(kosPhotos, 0)">
                         <img :src="kosPhotos[0].url" :alt="kosPhotos[0].caption || kos.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <span class="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded">{{ photoCategories[kosPhotos[0].category] || 'Lainnya' }}</span>
                     </div>
                     <div class="cursor-pointer group relative overflow-hidden" @click="openLightbox(kosPhotos, 1)">
                         <img :src="kosPhotos[1].url" :alt="kosPhotos[1].caption" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -232,12 +273,24 @@ const cheapestPrice = computed(() => {
                     </div>
 
                     <!-- Facilities -->
-                    <div v-if="kos.facilities.length > 0">
+                    <div v-if="kos.facilities.length > 0" :class="{'border-b border-slate-200 pb-6': kos.rules && kos.rules.length > 0}">
                         <h2 class="text-lg font-bold text-slate-900 mb-4">Fasilitas Umum</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             <div v-for="fac in kos.facilities" :key="fac.id" class="flex items-center gap-3 text-sm text-slate-700 font-medium">
                                 <CheckCircle2 class="w-5 h-5 text-teal-500 shrink-0" />
                                 <span>{{ fac.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rules -->
+                    <div v-if="kos.rules && kos.rules.length > 0">
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">Peraturan Kos</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div v-for="rule in kos.rules" :key="rule.id" class="flex items-start gap-3 text-sm font-medium" :class="rule.is_positive ? 'text-teal-700' : 'text-red-600'">
+                                <Check v-if="rule.is_positive" class="w-5 h-5 shrink-0 mt-0.5" />
+                                <X v-else class="w-5 h-5 shrink-0 mt-0.5" />
+                                <span class="leading-tight mt-0.5">{{ rule.name }}</span>
                             </div>
                         </div>
                     </div>
@@ -294,54 +347,54 @@ const cheapestPrice = computed(() => {
             <div id="daftar-kamar" class="mt-12 scroll-mt-24 border-t border-slate-200 pt-8">
                 <h2 class="text-2xl font-extrabold text-slate-900 mb-6">Pilihan Kamar</h2>
 
-                <div v-if="kos.rooms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div v-if="groupedRooms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div 
-                        v-for="room in kos.rooms" 
-                        :key="room.id" 
+                        v-for="(group, idx) in groupedRooms" 
+                        :key="idx" 
                         class="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-lg hover:border-teal-200 transition-all duration-300 flex flex-col"
-                        :class="{ 'opacity-60': room.status !== 'tersedia' }"
+                        :class="{ 'opacity-60': group.available_count === 0 }"
                     >
                         <!-- Header: Name + Status -->
                         <div class="flex items-start justify-between gap-3 mb-4">
-                            <div>
-                                <h3 class="font-bold text-lg text-slate-900 leading-tight">{{ room.name || `Kamar ${room.room_number}` }}</h3>
+                            <div class="min-w-0 pr-2">
+                                <h3 class="font-bold text-lg text-slate-900 leading-tight truncate" :title="group.name">{{ group.name }}</h3>
                                 <p class="text-sm text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
-                                    No. {{ room.room_number }} · <Users class="w-4 h-4 text-slate-400" /> {{ room.capacity }} org
+                                    <Users class="w-4 h-4 text-slate-400" /> {{ group.capacity }} org
                                 </p>
                             </div>
-                            <span v-if="room.status !== 'tersedia'" class="shrink-0 bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg">
+                            <span v-if="group.available_count === 0" class="shrink-0 bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg">
                                 Penuh
                             </span>
-                            <span v-else class="shrink-0 bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-lg">
-                                Tersedia
+                            <span v-else class="shrink-0 bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-lg text-center leading-tight">
+                                {{ group.available_count }} Kamar<br>Tersedia
                             </span>
                         </div>
 
                         <!-- Price -->
                         <div class="mb-4">
-                            <span class="text-2xl font-extrabold text-slate-900">{{ formatRupiah(room.price) }}</span>
-                            <span class="text-sm font-medium text-slate-500 ml-1">/ {{ room.price_period }}</span>
+                            <span class="text-2xl font-extrabold text-slate-900">{{ formatRupiah(group.price) }}</span>
+                            <span class="text-sm font-medium text-slate-500 ml-1">/ {{ group.price_period }}</span>
                         </div>
 
                         <!-- Description -->
-                        <p v-if="room.description" class="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">{{ room.description }}</p>
+                        <p v-if="group.description" class="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">{{ group.description }}</p>
 
                         <!-- Room Facilities -->
-                        <div v-if="room.facilities.length > 0" class="mb-6 flex flex-wrap gap-2">
+                        <div v-if="group.facilities && group.facilities.length > 0" class="mb-6 flex flex-wrap gap-2">
                             <!-- Display first 3, then popover for rest to save space -->
-                            <span v-for="fac in room.facilities.slice(0, 3)" :key="fac.id" class="inline-flex items-center gap-1 bg-slate-50 text-slate-600 text-[11px] font-semibold px-2.5 py-1 rounded-md border border-slate-100">
+                            <span v-for="fac in group.facilities.slice(0, 3)" :key="fac.id" class="inline-flex items-center gap-1 bg-slate-50 text-slate-600 text-[11px] font-semibold px-2.5 py-1 rounded-md border border-slate-100">
                                 {{ fac.name }}
                             </span>
-                            <Popover v-if="room.facilities.length > 3">
+                            <Popover v-if="group.facilities.length > 3">
                                 <PopoverTrigger as-child>
                                     <button type="button" class="inline-flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-teal-600 text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-100 transition-colors">
-                                        +{{ room.facilities.length - 3 }} lainnya
+                                        +{{ group.facilities.length - 3 }} lainnya
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent class="w-56 p-3 rounded-xl border-slate-100 shadow-xl" align="start">
                                     <p class="text-xs font-bold text-slate-900 mb-2">Fasilitas Kamar</p>
                                     <div class="flex flex-col gap-1.5">
-                                        <div v-for="fac in room.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                                        <div v-for="fac in group.facilities" :key="fac.id" class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                             <CheckCircle2 class="w-3 h-3 text-teal-500 shrink-0" />
                                             {{ fac.name }}
                                         </div>
@@ -352,10 +405,10 @@ const cheapestPrice = computed(() => {
 
                         <!-- Action (pushed to bottom) -->
                         <div class="mt-auto">
-                            <template v-if="room.status === 'tersedia'">
+                            <template v-if="group.available_count > 0">
                                 <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'">
-                                    <Button class="w-full rounded-full font-bold h-11 bg-slate-900 hover:bg-slate-800 text-white transition-all hover:-translate-y-0.5 shadow-md" @click="openBookModal(room)">
-                                        Pesan Kamar Ini
+                                    <Button class="w-full rounded-full font-bold h-11 bg-slate-900 hover:bg-slate-800 text-white transition-all hover:-translate-y-0.5 shadow-md" @click="openBookModal(group)">
+                                        Pesan Tipe Kamar Ini
                                     </Button>
                                 </template>
                                 <template v-else-if="!$page.props.auth.user">
@@ -547,6 +600,7 @@ const cheapestPrice = computed(() => {
                 
                 <div class="text-center py-3 text-white/60 text-sm">
                     {{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}
+                    <span v-if="lightboxPhotos[lightboxIndex]?.category" class="ml-2 px-2 py-0.5 bg-white/20 text-white rounded text-xs">{{ photoCategories[lightboxPhotos[lightboxIndex].category] || 'Lainnya' }}</span>
                     <span v-if="lightboxPhotos[lightboxIndex]?.caption" class="ml-2">— {{ lightboxPhotos[lightboxIndex].caption }}</span>
                 </div>
             </DialogContent>

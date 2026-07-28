@@ -11,16 +11,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 import MapPicker from '@/Components/MapPicker.vue';
-import { useToast } from '@/components/ui/toast/use-toast';
 import axios from 'axios';
 
 const props = defineProps({
     kos: Object,
     facilities: Array,
+    rules: Array,
     isLocked: Boolean
 });
 
-const { toast } = useToast();
 
 const sourceData = computed(() => {
     // If there's a pending revision, we might want to show it or at least indicate it. 
@@ -39,18 +38,13 @@ const form = useForm({
     longitude: sourceData.value.longitude || null,
     public_contact_name: sourceData.value.public_contact_name || '',
     public_contact_whatsapp_number: sourceData.value.public_contact_whatsapp_number || '',
-    facilities: sourceData.value.facilities ? sourceData.value.facilities.map(f => f.id) : []
+    facilities: sourceData.value.facilities ? sourceData.value.facilities.map(f => f.id) : [],
+    rules: sourceData.value.rules ? sourceData.value.rules.map(r => r.id) : []
 });
 
 const submit = () => {
     form.put(route('admin.kos.update', props.kos.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            toast({
-                title: "Berhasil",
-                description: "Data kos berhasil diperbarui.",
-            });
-        }
+        preserveScroll: true
     });
 };
 
@@ -390,12 +384,33 @@ const handleLocationSelected = async (location) => {
                                 }"
                             />
                             <Label :for="`facility-${facility.id}`" class="text-sm font-normal cursor-pointer flex items-center gap-2">
-                                <span v-html="facility.icon"></span>
                                 {{ facility.name }}
                             </Label>
                         </div>
                     </div>
                     <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data fasilitas kos.</div>
+                </div>
+
+                <!-- Peraturan Kos -->
+                <div class="space-y-4 pt-4">
+                    <h3 class="text-lg font-semibold border-b dark:border-slate-800 pb-2">Peraturan & Tata Tertib</h3>
+                    <div v-if="rules && rules.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-for="rule in rules" :key="rule.id" class="flex items-center space-x-2">
+                            <Checkbox 
+                                :id="`rule-${rule.id}`" 
+                                :value="rule.id" 
+                                :modelValue="form.rules.includes(rule.id)"
+                                @update:modelValue="(checked) => {
+                                    if (checked) form.rules.push(rule.id);
+                                    else form.rules = form.rules.filter(id => id !== rule.id);
+                                }"
+                            />
+                            <Label :for="`rule-${rule.id}`" class="text-sm font-normal cursor-pointer flex items-center gap-2 leading-tight">
+                                {{ rule.name }}
+                            </Label>
+                        </div>
+                    </div>
+                    <div v-else class="text-sm text-gray-500 dark:text-slate-400 italic">Belum ada master data peraturan kos.</div>
                 </div>
 
 

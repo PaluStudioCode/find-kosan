@@ -1,10 +1,10 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/toast/use-toast';
 import { Trash2, Star, UploadCloud, ImagePlus, X, AlertTriangle } from 'lucide-vue-next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
@@ -13,13 +13,22 @@ const props = defineProps({
     isLocked: Boolean
 });
 
-const { toast } = useToast();
 
 // --- Gallery Photo (Multiple) ---
 const selectedPhotos = ref([]);
 const photoPreviews = ref([]);
 const photoInputRef = ref(null);
 const isUploadingPhotos = ref(false);
+const selectedCategory = ref('bangunan_depan');
+
+const photoCategories = {
+    'bangunan_depan': 'Tampak Depan',
+    'dalam_kamar': 'Dalam Kamar',
+    'kamar_mandi': 'Kamar Mandi',
+    'fasilitas_umum': 'Fasilitas Umum',
+    'lingkungan': 'Lingkungan',
+    'lainnya': 'Lainnya'
+};
 
 const handlePhotoSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -27,7 +36,7 @@ const handlePhotoSelect = (e) => {
 
     for (const file of files) {
         if (file.size > 2 * 1024 * 1024) {
-            toast({ title: 'Gagal', description: `File "${file.name}" melebihi batas 2MB.`, variant: 'destructive' });
+            toast.error(`File "${file.name}" melebihi batas 2MB.`);
             continue;
         }
         selectedPhotos.value.push(file);
@@ -49,13 +58,14 @@ const removeSelectedPhoto = (index) => {
 
 const uploadPhotos = () => {
     if (selectedPhotos.value.length === 0) {
-        toast({ title: 'Peringatan', description: 'Pilih minimal 1 foto untuk diunggah.', variant: 'destructive' });
+        toast.error('Pilih minimal 1 foto untuk diunggah.');
         return;
     }
 
     isUploadingPhotos.value = true;
 
     const formData = new FormData();
+    formData.append('category', selectedCategory.value);
     selectedPhotos.value.forEach((file) => {
         formData.append('photos[]', file);
     });
@@ -70,7 +80,7 @@ const uploadPhotos = () => {
         onError: (err) => {
             // Handle both single and array error formats
             const errorMsg = err.photos || err['photos.0'] || Object.values(err).flat().join(', ');
-            toast({ title: 'Gagal', description: errorMsg || 'Terjadi kesalahan saat mengunggah.', variant: 'destructive' });
+            toast.error(errorMsg || 'Terjadi kesalahan saat mengunggah.');
         },
         onFinish: () => {
             isUploadingPhotos.value = false;
@@ -85,7 +95,7 @@ const setMainPhoto = (photoId) => {
             // Notifikasi sukses ditangani oleh layout global (flash.success)
         },
         onError: () => {
-            toast({ title: 'Gagal', description: 'Gagal mengubah foto utama.', variant: 'destructive' });
+            toast.error('Gagal mengubah foto utama.');
         }
     });
 };
@@ -114,7 +124,7 @@ const deletePhoto = () => {
             closePhotoModal();
         },
         onError: () => {
-            toast({ title: 'Gagal', description: 'Gagal menghapus foto.', variant: 'destructive' });
+            toast.error('Gagal menghapus foto.');
             closePhotoModal();
         }
     });
@@ -146,15 +156,23 @@ const deletePhoto = () => {
 
             <!-- Upload Area -->
             <div class="mb-6 bg-gray-50 dark:bg-slate-800/50 p-4 rounded border dark:border-slate-800 space-y-4">
-                <div>
-                    <Label class="mb-2 block">Pilih Foto (Bisa lebih dari 1, maks 2MB per file)</Label>
-                    <Input 
-                        ref="photoInputRef"
-                        type="file" 
-                        accept="image/*" 
-                        multiple
-                        @change="handlePhotoSelect"
-                    />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <Label class="mb-2 block">Kategori Foto</Label>
+                        <select v-model="selectedCategory" class="w-full flex h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300">
+                            <option v-for="(label, key) in photoCategories" :key="key" :value="key">{{ label }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <Label class="mb-2 block">Pilih Foto (Bisa lebih dari 1, maks 2MB/file)</Label>
+                        <Input 
+                            ref="photoInputRef"
+                            type="file" 
+                            accept="image/*" 
+                            multiple
+                            @change="handlePhotoSelect"
+                        />
+                    </div>
                 </div>
 
                 <!-- Preview Selected -->
@@ -197,8 +215,12 @@ const deletePhoto = () => {
                         </Button>
                     </div>
 
-                    <div v-if="photo.is_primary" class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 p-1 rounded-full shadow-md">
+                    <div v-if="photo.is_primary" class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 p-1 rounded-full shadow-md z-10">
                         <Star class="w-4 h-4 fill-current" />
+                    </div>
+
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 text-center truncate">
+                        {{ photoCategories[photo.category] || 'Lainnya' }}
                     </div>
                 </div>
             </div>

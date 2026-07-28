@@ -27,7 +27,8 @@ class KosController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Kos/Form', [
-            'facilities' => Facility::where('type', 'kos')->get()
+            'facilities' => Facility::where('type', 'kos')->get(),
+            'rules' => \App\Models\Rule::all()
         ]);
     }
 
@@ -47,18 +48,24 @@ class KosController extends Controller
             'payment_instructions' => 'nullable|string',
             'payment_proof_required' => 'boolean',
             'facilities' => 'nullable|array',
-            'facilities.*' => 'exists:facilities,id'
+            'facilities.*' => 'exists:facilities,id',
+            'rules' => 'nullable|array',
+            'rules.*' => 'exists:rules,id'
         ]);
 
         $facilityIds = $validated['facilities'] ?? [];
         unset($validated['facilities']);
+        
+        $ruleIds = $validated['rules'] ?? [];
+        unset($validated['rules']);
 
         $validated['admin_id'] = auth()->id();
         $validated['status'] = 'draft';
 
-        DB::transaction(function () use ($validated, $facilityIds) {
+        DB::transaction(function () use ($validated, $facilityIds, $ruleIds) {
             $kos = BoardingHouse::create($validated);
             $kos->facilities()->sync($facilityIds);
+            $kos->rules()->sync($ruleIds);
         });
 
         return redirect()->route('admin.kos.index')->with('success', 'Data kos berhasil disimpan sebagai draft.');
@@ -70,7 +77,8 @@ class KosController extends Controller
         
         $kos->load([
             'facilities', 
-            'rooms.facilities', 'rooms.photos',
+            'rules',
+            'rooms.facilities',
             'photos' => function($q) {
                 $q->orderBy('is_primary', 'desc');
             }, 
@@ -83,6 +91,7 @@ class KosController extends Controller
         return Inertia::render('Admin/Kos/Show', [
             'kos' => $kos,
             'kosFacilitiesList' => Facility::where('type', 'kos')->get(),
+            'kosRulesList' => \App\Models\Rule::all(),
             'roomFacilitiesList' => Facility::where('type', 'kamar')->get()
         ]);
     }
@@ -108,19 +117,28 @@ class KosController extends Controller
             'payment_instructions' => 'nullable|string',
             'payment_proof_required' => 'boolean',
             'facilities' => 'nullable|array',
-            'facilities.*' => 'exists:facilities,id'
+            'facilities.*' => 'exists:facilities,id',
+            'rules' => 'nullable|array',
+            'rules.*' => 'exists:rules,id'
         ]);
 
         $facilityIds = $validated['facilities'] ?? [];
         unset($validated['facilities']);
+        
+        $ruleIds = $validated['rules'] ?? [];
+        unset($validated['rules']);
 
-        DB::transaction(function () use ($validated, $facilityIds, $kos) {
+        DB::transaction(function () use ($validated, $facilityIds, $ruleIds, $kos) {
             if ($kos->status === 'dipublikasikan') {
+                // Store relationship changes in pending_revisions too
+                $validated['facility_ids'] = $facilityIds;
+                $validated['rule_ids'] = $ruleIds;
                 $kos->pending_revisions = $validated;
                 $kos->save();
             } else {
                 $kos->update($validated);
                 $kos->facilities()->sync($facilityIds);
+                $kos->rules()->sync($ruleIds);
             }
         });
 

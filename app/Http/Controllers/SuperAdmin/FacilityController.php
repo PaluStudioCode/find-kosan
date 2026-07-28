@@ -11,32 +11,6 @@ use Illuminate\Validation\Rule;
 class FacilityController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $query = Facility::query();
-
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->has('type') && $request->type !== 'all') {
-            $query->where('type', $request->type);
-        }
-
-        $facilities = $query->orderBy('type')
-            ->orderBy('name')
-            ->paginate(5)
-            ->withQueryString();
-
-        return Inertia::render('SuperAdmin/Facilities/Index', [
-            'facilities' => $facilities,
-            'filters' => $request->only(['search', 'type']),
-        ]);
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)

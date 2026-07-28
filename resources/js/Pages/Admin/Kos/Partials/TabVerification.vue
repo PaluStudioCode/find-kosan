@@ -1,8 +1,8 @@
 <script setup>
+import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toast/use-toast';
 import { CheckCircle, Clock, XCircle, AlertTriangle, ShieldCheck } from 'lucide-vue-next';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -11,7 +11,6 @@ const props = defineProps({
     kos: Object
 });
 
-const { toast } = useToast();
 
 const confirmingVerification = ref(false);
 
@@ -31,7 +30,7 @@ const requestVerification = () => {
             closeVerificationModal();
         },
         onError: (err) => {
-            toast({ title: 'Gagal', description: err.error || 'Terjadi kesalahan.', variant: 'destructive' });
+            toast.error(err.error || 'Terjadi kesalahan.');
             closeVerificationModal();
         }
     });

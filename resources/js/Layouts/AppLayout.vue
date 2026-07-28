@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings, Database } from 'lucide-vue-next';
 import { useDark, useToggle } from '@vueuse/core';
 
 const isDark = useDark();
@@ -38,7 +38,7 @@ const navItems = computed(() => {
     if (role === 'super_admin') {
         items.push({ name: 'Dashboard', route: 'superadmin.dashboard', icon: LayoutDashboard });
         items.push({ name: 'Verifikasi Kos', route: 'superadmin.verifications.index', icon: Building2 });
-        items.push({ name: 'Master Fasilitas', route: 'superadmin.facilities.index', icon: LayoutList });
+        items.push({ name: 'Master Data', route: 'superadmin.master-data.index', icon: Database });
         items.push({ name: 'Laporan', route: 'superadmin.reports.index', icon: Flag });
         items.push({ name: 'Penarikan Dana', route: 'superadmin.withdrawals.index', icon: Landmark });
         items.push({ name: 'Manajemen Pengguna', route: 'superadmin.users.index', icon: UserCog });

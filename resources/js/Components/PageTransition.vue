@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Building2, MapPin, Search } from 'lucide-vue-next';
+import { Home, MapPin, Search } from 'lucide-vue-next';
 
 const isTransitioning = ref(false);
 const transitionType = ref('default');
@@ -24,18 +24,25 @@ onMounted(() => {
         // Cek URL tujuan
         const targetPath = visit.url.pathname;
         
-        // Jangan tampilkan transisi jika berada di area dashboard (admin, superadmin, user, dll)
-        if (targetPath.startsWith('/admin') || targetPath.startsWith('/superadmin') || targetPath.startsWith('/user') || targetPath.startsWith('/profile') || targetPath.startsWith('/reports')) {
-            return;
-        }
+        // Halaman autentikasi
+        const isAuthPage = targetPath === '/login' || 
+                           targetPath === '/register' || 
+                           targetPath.startsWith('/forgot-password') || 
+                           targetPath.startsWith('/reset-password');
+                           
+        // Halaman peta kos
+        const isMapPage = targetPath === '/kos' || targetPath.startsWith('/kos/');
 
-        if (targetPath === '/kos' || targetPath.startsWith('/kos/')) {
+        if (isMapPage) {
             transitionType.value = 'clouds';
-        } else {
+            isTransitioning.value = true;
+        } else if (isAuthPage) {
             transitionType.value = 'default';
+            isTransitioning.value = true;
+        } else {
+            // Selain halaman peta dan autentikasi, jangan ada transisi
+            isTransitioning.value = false;
         }
-        
-        isTransitioning.value = true;
     });
 
     router.on('finish', () => {
@@ -54,31 +61,63 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <!-- Default Transition -->
+    <!-- Friendly & Cozy Default Transition -->
     <transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 scale-105"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition-all duration-500 ease-in-out"
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-400 ease-in"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
     >
-        <div v-if="isTransitioning && transitionType === 'default'" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-teal-600">
-            <!-- Modern Animated Logo -->
-            <div class="relative flex h-24 w-24 items-center justify-center rounded-2xl bg-white shadow-2xl animate-bounce">
-                <Building2 class="h-12 w-12 text-teal-600 animate-pulse" />
+        <div v-if="isTransitioning && transitionType === 'default'" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-teal-50/95 backdrop-blur-sm">
+            
+            <!-- Character Animation: Cute Hopping Mascot -->
+            <div class="relative flex flex-col items-center justify-center h-32 w-32">
+                <!-- Mascot Body -->
+                <div class="relative w-20 h-20 animate-[hop_0.8s_ease-in-out_infinite] z-10">
+                    <!-- Main Body (Teal Blob) -->
+                    <div class="absolute inset-0 bg-teal-400 rounded-full shadow-inner overflow-hidden">
+                        <!-- Belly reflection -->
+                        <div class="absolute -bottom-2 -right-2 w-16 h-16 bg-teal-300 rounded-full opacity-50"></div>
+                    </div>
+                    
+                    <!-- Left Eye -->
+                    <div class="absolute top-7 left-4 w-2.5 h-3.5 bg-slate-800 rounded-full animate-[blink_3s_infinite]"></div>
+                    <!-- Right Eye -->
+                    <div class="absolute top-7 right-4 w-2.5 h-3.5 bg-slate-800 rounded-full animate-[blink_3s_infinite]"></div>
+                    
+                    <!-- Cheeks (Blush) -->
+                    <div class="absolute top-9 left-2 w-3 h-2 bg-pink-300 rounded-full opacity-70"></div>
+                    <div class="absolute top-9 right-2 w-3 h-2 bg-pink-300 rounded-full opacity-70"></div>
+                    
+                    <!-- Mouth / Beak -->
+                    <div class="absolute top-9 left-1/2 -translate-x-1/2 w-3 h-2.5 bg-yellow-400 rounded-full"></div>
+                    
+                    <!-- Left Wing -->
+                    <div class="absolute top-10 -left-3 w-5 h-7 bg-teal-500 rounded-full origin-top-right animate-[flap-left_0.8s_ease-in-out_infinite]"></div>
+                    <!-- Right Wing -->
+                    <div class="absolute top-10 -right-3 w-5 h-7 bg-teal-500 rounded-full origin-top-left animate-[flap-right_0.8s_ease-in-out_infinite]"></div>
+                </div>
+                
+                <!-- Floor Shadow (Shrinks when jumping) -->
+                <div class="absolute bottom-4 w-12 h-3 bg-teal-900 rounded-full blur-[2px] animate-[shadow-shrink_0.8s_ease-in-out_infinite]"></div>
             </div>
             
-            <h2 class="mt-8 text-3xl font-extrabold text-white tracking-widest animate-pulse drop-shadow-md">
-                CariKosan
-            </h2>
-            
-            <!-- Loading Dots -->
-            <div class="mt-5 flex gap-2">
-                <span class="h-2.5 w-2.5 rounded-full bg-teal-100 animate-bounce" style="animation-delay: 0ms"></span>
-                <span class="h-2.5 w-2.5 rounded-full bg-teal-100 animate-bounce" style="animation-delay: 150ms"></span>
-                <span class="h-2.5 w-2.5 rounded-full bg-teal-100 animate-bounce" style="animation-delay: 300ms"></span>
+            <!-- Friendly Text -->
+            <div class="mt-6 flex flex-col items-center">
+                <h2 class="text-xl font-bold text-teal-800 tracking-wide">
+                    Tunggu sebentar ya...
+                </h2>
+                
+                <!-- Playful Chat-style Bouncing Dots -->
+                <div class="mt-4 flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-teal-400 animate-bounce" style="animation-delay: 0ms"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-teal-400 animate-bounce" style="animation-delay: 150ms"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-teal-400 animate-bounce" style="animation-delay: 300ms"></span>
+                </div>
             </div>
+            
         </div>
     </transition>
 
@@ -190,5 +229,25 @@ onUnmounted(() => {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0px); }
+}
+@keyframes hop {
+    0%, 100% { transform: translateY(0) scaleY(0.95) scaleX(1.05); }
+    50% { transform: translateY(-25px) scaleY(1.05) scaleX(0.95); }
+}
+@keyframes blink {
+    0%, 94%, 98%, 100% { transform: scaleY(1); }
+    96% { transform: scaleY(0.1); }
+}
+@keyframes flap-left {
+    0%, 100% { transform: rotate(20deg); }
+    50% { transform: rotate(-40deg); }
+}
+@keyframes flap-right {
+    0%, 100% { transform: rotate(-20deg); }
+    50% { transform: rotate(40deg); }
+}
+@keyframes shadow-shrink {
+    0%, 100% { transform: scaleX(1); opacity: 0.25; }
+    50% { transform: scaleX(0.5); opacity: 0.1; }
 }
 </style>

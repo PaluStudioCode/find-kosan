@@ -158,4 +158,10 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:user'])->grou
 });
 Route::post('/duitku/callback', [PaymentGatewayController::class, 'callback'])->name('duitku.callback');
 
+// Google Login
+Route::middleware('guest')->group(function () {
+    Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback']);
+});
+
 require __DIR__.'/auth.php';

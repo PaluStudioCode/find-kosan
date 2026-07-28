@@ -20,6 +20,7 @@
 /storage/pail
 /vendor
 /codex
+client_secret_*.json
 Homestead.json
 Homestead.yaml
 Thumbs.db

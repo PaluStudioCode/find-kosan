@@ -21,14 +21,26 @@ onMounted(() => {
             return;
         }
 
+        // Cek URL saat ini
+        const currentPath = window.location.pathname;
+
         // Cek URL tujuan
         const targetPath = visit.url.pathname;
         
         // Halaman autentikasi
-        const isAuthPage = targetPath === '/login' || 
+        const isCurrentAuthPage = currentPath === '/login' || 
+                                  currentPath === '/register' || 
+                                  currentPath.startsWith('/forgot-password') || 
+                                  currentPath.startsWith('/reset-password');
+
+        const isTargetAuthPage = targetPath === '/login' || 
                            targetPath === '/register' || 
                            targetPath.startsWith('/forgot-password') || 
                            targetPath.startsWith('/reset-password');
+                           
+        if (isCurrentAuthPage && isTargetAuthPage) {
+            return;
+        }
                            
         // Halaman peta kos
         const isMapPage = targetPath === '/kos' || targetPath.startsWith('/kos/');
@@ -36,7 +48,7 @@ onMounted(() => {
         if (isMapPage) {
             transitionType.value = 'clouds';
             isTransitioning.value = true;
-        } else if (isAuthPage) {
+        } else if (isTargetAuthPage) {
             transitionType.value = 'default';
             isTransitioning.value = true;
         } else {

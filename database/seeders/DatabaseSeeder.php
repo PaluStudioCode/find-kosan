@@ -22,6 +22,12 @@ class DatabaseSeeder extends Seeder
         foreach ($directoriesToClean as $dir) {
             Storage::disk('public')->deleteDirectory($dir);
             Storage::disk('public')->makeDirectory($dir);
+
+            // Fix Docker permission issue: pastikan web server bisa tulis & baca walau dibuat oleh Root
+            $path = storage_path('app/public/' . $dir);
+            if (file_exists($path)) {
+                @chmod($path, 0777);
+            }
         }
 
         // Super Admin

@@ -257,7 +257,7 @@ onBeforeUnmount(() => {
                     <div class="mt-6 flex flex-col gap-3 sm:flex-row w-full">
                         <Link :href="route('public.kos.index')">
                             <Button class="group h-11 w-full rounded-full bg-teal-500 px-6 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 hover:-translate-y-0.5 sm:w-auto">
-                                Mulai Cari Kos Sekarang
+                                Cari Kos
                                 <ArrowRight class="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                             </Button>
                         </Link>

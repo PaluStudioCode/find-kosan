@@ -178,38 +178,5 @@ class KosController extends Controller
         return redirect()->route('admin.kos.index')->with('success', 'Kos berhasil dihapus.');
     }
 
-    public function uploadQris(Request $request, BoardingHouse $kos)
-    {
-        if ($kos->admin_id !== auth()->id()) abort(403);
-        if ($kos->status === 'menunggu_verifikasi') {
-            return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
-        }
 
-        $request->validate(['qris_image' => 'required|image|max:2048']);
-
-        if ($kos->payment_qris_image_path) {
-            $oldPath = str_replace('/storage/', '', $kos->payment_qris_image_path);
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
-        }
-
-        $path = $request->file('qris_image')->store('qris', 'public');
-        $kos->update(['payment_qris_image_path' => '/storage/' . $path]);
-
-        return back()->with('success', 'QRIS berhasil diunggah.');
-    }
-    public function deleteQris(BoardingHouse $kos)
-    {
-        if ($kos->admin_id !== auth()->id()) abort(403);
-        if ($kos->status === 'menunggu_verifikasi') {
-            return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
-        }
-
-        if ($kos->payment_qris_image_path) {
-            $oldPath = str_replace('/storage/', '', $kos->payment_qris_image_path);
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
-            $kos->update(['payment_qris_image_path' => null]);
-        }
-
-        return back()->with('success', 'QRIS berhasil dihapus.');
-    }
 }

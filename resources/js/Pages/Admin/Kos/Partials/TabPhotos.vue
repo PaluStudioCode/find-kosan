@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
@@ -141,7 +141,7 @@ const deletePhoto = () => {
             </div>
             <div>
                 <h4 class="font-semibold">Data Sedang Ditinjau</h4>
-                <p class="text-sm mt-1">Anda tidak dapat mengubah foto atau QRIS selama proses peninjauan oleh Super Admin berlangsung.</p>
+                <p class="text-sm mt-1">Anda tidak dapat mengubah foto selama proses peninjauan oleh Super Admin berlangsung.</p>
             </div>
         </div>
 

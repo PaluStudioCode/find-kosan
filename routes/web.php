@@ -102,8 +102,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('kos/{kos}/photos', [AdminKosPhotoController::class, 'store'])->name('kos.photos.store');
             Route::put('kos/{kos}/photos/{photo}', [AdminKosPhotoController::class, 'update'])->name('kos.photos.update');
             Route::delete('kos/{kos}/photos/{photo}', [AdminKosPhotoController::class, 'destroy'])->name('kos.photos.destroy');
-            Route::post('kos/{kos}/qris', [AdminKosController::class, 'uploadQris'])->name('kos.qris');
-            Route::delete('kos/{kos}/qris', [AdminKosController::class, 'deleteQris'])->name('kos.qris.destroy');
+
             Route::post('kos/{kos}/legal-documents', [AdminLegalDocumentController::class, 'store'])->name('kos.legal-documents.store');
             Route::delete('kos/{kos}/legal-documents/{legalDocument}', [AdminLegalDocumentController::class, 'destroy'])->name('kos.legal-documents.destroy');
             Route::post('kos/{kos}/verify', [AdminKosController::class, 'requestVerification'])->name('kos.verify');

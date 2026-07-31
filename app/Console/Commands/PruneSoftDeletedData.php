@@ -46,13 +46,7 @@ class PruneSoftDeletedData extends Command
 
         $count = 0;
         foreach ($deletedKos as $kos) {
-            // 1. Delete QRIS Image
-            if ($kos->payment_qris_image_path) {
-                $qrisPath = str_replace('/storage/', '', $kos->payment_qris_image_path);
-                if (Storage::disk('public')->exists($qrisPath)) {
-                    Storage::disk('public')->delete($qrisPath);
-                }
-            }
+
 
             // 2. Delete Boarding House Photos
             $photos = BoardingHousePhoto::withTrashed()->where('boarding_house_id', $kos->id)->get();

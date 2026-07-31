@@ -239,7 +239,7 @@ onBeforeUnmount(() => {
 
         <div ref="landingPage">
         <!-- 1. Modern Hero -->
-        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-center">
+        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-32 lg:pt-40 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-start">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
             <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-16">

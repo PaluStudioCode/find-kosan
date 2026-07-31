@@ -13,6 +13,14 @@ class KosReviewController extends Controller
     {
         abort_unless($kos->status === 'dipublikasikan', 404);
 
+        $hasRented = \App\Models\Tenancy::where('user_id', $request->user()->id)
+            ->where('boarding_house_id', $kos->id)
+            ->exists();
+
+        if (!$hasRented) {
+            return back()->with('error', 'Anda harus pernah menyewa kos ini sebelum dapat memberikan ulasan.');
+        }
+
         $validated = $request->validate([
             'rating' => ['required', 'integer', 'between:1,5'],
             'comment' => ['required', 'string', 'min:5', 'max:1000'],

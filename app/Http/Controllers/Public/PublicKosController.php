@@ -55,10 +55,15 @@ class PublicKosController extends Controller
             ->first();
 
         $currentReview = null;
+        $hasRented = false;
         if ($request->user()?->role === 'user') {
             $currentReview = $kos->reviews()
                 ->where('user_id', $request->user()->id)
                 ->first();
+            
+            $hasRented = \App\Models\Tenancy::where('user_id', $request->user()->id)
+                ->where('boarding_house_id', $kos->id)
+                ->exists();
         }
 
         return Inertia::render('Public/Kos/Show', [
@@ -71,6 +76,7 @@ class PublicKosController extends Controller
                 'total' => (int) $reviewSummary->total,
             ],
             'currentReview' => $currentReview,
+            'hasRented' => $hasRented,
         ]);
     }
 }

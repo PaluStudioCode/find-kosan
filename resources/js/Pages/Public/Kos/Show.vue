@@ -44,6 +44,10 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    hasRented: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 
@@ -453,7 +457,7 @@ const groupedRooms = computed(() => {
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div class="lg:col-span-1">
                         <form
-                            v-if="$page.props.auth.user && $page.props.auth.user.role === 'user'"
+                            v-if="$page.props.auth.user && $page.props.auth.user.role === 'user' && hasRented"
                             class="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
                             @submit.prevent="submitReview"
                         >
@@ -511,8 +515,14 @@ const groupedRooms = computed(() => {
                             </Button>
                         </form>
 
-                        <div v-else class="rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-6 text-center">
-                            <LogIn class="mx-auto h-8 w-8 text-teal-500" />
+                        <div v-else-if="$page.props.auth.user && $page.props.auth.user.role === 'user' && !hasRented" class="rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-6 text-center">
+                            <MessageSquare class="mx-auto h-8 w-8 text-teal-500" />
+                            <h3 class="mt-3 font-semibold text-slate-900">Belum bisa mengulas</h3>
+                            <p class="mt-1 text-sm text-slate-500">Anda harus pernah menyewa kos ini terlebih dahulu sebelum dapat memberikan rating dan komentar.</p>
+                        </div>
+
+                        <div v-else-if="!$page.props.auth.user" class="rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-6 text-center">
+                            <MessageSquare class="mx-auto h-8 w-8 text-teal-500" />
                             <h3 class="mt-3 font-semibold text-slate-900">Punya pengalaman di kos ini?</h3>
                             <p class="mt-1 text-sm text-slate-500">Masuk sebagai penyewa untuk memberi rating dan komentar.</p>
                             <Link :href="route('login')" class="mt-4 inline-block">

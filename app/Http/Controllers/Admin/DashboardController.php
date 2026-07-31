@@ -52,7 +52,7 @@ class DashboardController extends Controller
         $revenueChartLabels = [];
         $revenueChartData = [];
         for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
+            $date = now()->startOfMonth()->subMonths($i);
             $revenueChartLabels[] = $date->translatedFormat('M Y');
             
             $monthlyRevenue = \App\Models\Invoice::where('admin_id', $adminId)

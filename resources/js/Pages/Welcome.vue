@@ -245,6 +245,13 @@ onBeforeUnmount(() => {
             <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-8">
                 <div class="relative z-10 max-w-2xl flex flex-col">
                     
+                    <div class="w-fit inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-medium rounded-full bg-white/10 text-teal-300 border border-white/10 backdrop-blur-md">
+                        <span class="relative flex h-2 w-2">
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                        </span>
+                        Cari Kos Gak Pake Ribet 🚀
+                    </div>
+
                     <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Ketemu Kos Idaman,
                         <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-1">Lebih Cepat & Gampang.</span>

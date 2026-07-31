@@ -115,7 +115,6 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/tenancies', [AdminTenancyController::class, 'index'])->name('tenancies.index');
             Route::get('/tenancies/{tenancy}', [AdminTenancyController::class, 'show'])->name('tenancies.show');
             Route::post('/tenancies/{tenancy}/end', [AdminTenancyController::class, 'endTenancy'])->name('tenancies.end');
-            Route::post('/payments/{payment}/confirm', [AdminTenancyController::class, 'confirmPayment'])->name('payments.confirm');
 
             Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
@@ -137,7 +136,6 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/rooms/{room}/book', [TenancyController::class, 'store'])->name('tenancies.store');
             Route::get('/tenancies', [TenancyController::class, 'index'])->name('tenancies.index');
             Route::get('/tenancies/{tenancy}', [TenancyController::class, 'show'])->name('tenancies.show');
-            Route::post('/invoices/{invoice}/payment', [TenancyController::class, 'uploadPayment'])->name('invoices.payment');
             Route::post('/kos/{kos}/review', [KosReviewController::class, 'store'])->name('kos.reviews.store');
         });
     });

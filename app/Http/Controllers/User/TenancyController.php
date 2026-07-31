@@ -124,47 +124,7 @@ class TenancyController extends Controller
             'status' => 'belum_dibayar',
         ]);
 
-        if ($room->boardingHouse->admin->whatsapp_number) {
-            WhatsappNotification::create([
-                'invoice_id' => $invoice->id,
-                'user_id' => $room->boardingHouse->admin_id,
-                'admin_id' => $room->boardingHouse->admin_id,
-                'send_via' => 'admin',
-                'phone_number' => $room->boardingHouse->admin->whatsapp_number,
-                'message_type' => 'pembayaran_baru',
-                'message_body' => 'Penyewaan baru! Mohon periksa tagihan Anda.',
-                'scheduled_date' => now(),
-                'status' => 'belum_dikirim',
-            ]);
-        }
-
         return redirect()->route('user.tenancies.show', $tenancy->id);
     }
 
-    public function uploadPayment(Request $request, Invoice $invoice)
-    {
-        if ($invoice->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'proof_file' => 'required|image|max:2048',
-        ]);
-
-        $path = $request->file('proof_file')->store('payments', 'public');
-
-        $payment = Payment::create([
-            'invoice_id' => $invoice->id,
-            'user_id' => auth()->id(),
-            'admin_id' => $invoice->admin_id,
-            'amount' => $invoice->amount,
-            'payment_date' => now(),
-            'proof_file_path' => '/storage/'.$path,
-            'status' => 'menunggu_konfirmasi',
-        ]);
-
-        $invoice->update(['status' => 'menunggu_konfirmasi']);
-
-        return back()->with('success', 'Bukti pembayaran berhasil diunggah.');
-    }
 }

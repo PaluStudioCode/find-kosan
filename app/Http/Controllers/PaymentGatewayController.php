@@ -202,7 +202,7 @@ class PaymentGatewayController extends Controller
                         'admin_id' => $invoice->admin_id,
                         'send_via' => 'admin',
                         'phone_number' => $admin->whatsapp_number,
-                        'message_body' => "Halo {$admin->name}, pembayaran sewa dari {$userName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->amount, 0, ',', '.')." telah diterima melalui Duitku.\n\nLihat detail sewa: ".route('admin.tenancies.show', $invoice->tenancy_id),
+                        'message_body' => "Halo {$admin->name}, pembayaran sewa dari {$userName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->amount, 0, ',', '.')." telah berhasil diterima.\n\nLihat detail sewa: ".route('admin.tenancies.show', $invoice->tenancy_id),
                         'status' => 'belum_dikirim',
                     ]
                 );

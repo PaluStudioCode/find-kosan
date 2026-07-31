@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { Building2 } from 'lucide-vue-next';
 import AuthFeatureShowcase from '@/components/AuthFeatureShowcase.vue';
@@ -18,7 +18,7 @@ watch(() => page.props.flash, (flash) => {
 <template>
     <div class="flex min-h-screen w-full bg-white">
         <!-- Left Side: Form (Mobile + Desktop) -->
-        <div class="flex w-full flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none">
+        <div class="flex w-full flex-col justify-start pt-16 lg:pt-32 px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none">
             <div class="mx-auto w-full max-w-md py-12">
                 <!-- Logo -->
                 <div class="mb-10 flex justify-center lg:justify-start">

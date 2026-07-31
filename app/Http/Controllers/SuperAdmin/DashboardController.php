@@ -38,7 +38,7 @@ class DashboardController extends Controller
         // Menyusun array bulan (label)
         $growthLabels = [];
         for ($i = 5; $i >= 0; $i--) {
-            $growthLabels[] = now()->subMonths($i)->format('M Y');
+            $growthLabels[] = now()->startOfMonth()->subMonths($i)->format('M Y');
         }
 
         $growthOwnersData = array_fill(0, 6, 0);

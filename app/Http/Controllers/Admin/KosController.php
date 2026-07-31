@@ -13,7 +13,7 @@ class KosController extends Controller
 {
     public function index()
     {
-        $boardingHouses = BoardingHouse::withTrashed()->where('admin_id', auth()->id())
+        $boardingHouses = BoardingHouse::where('admin_id', auth()->id())
             ->with(['photos' => function($q) { $q->where('is_primary', true); }])
             ->withCount('rooms')
             ->latest()

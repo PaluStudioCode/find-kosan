@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -38,7 +38,6 @@ const submit = () => {
     form.put(route('superadmin.reports.update', props.report.id), {
         onSuccess: () => {
             isActionModalOpen.value = false;
-            toast.success('Status laporan diperbarui.');
         }
     });
 };
@@ -55,7 +54,6 @@ const deleteReport = () => {
     router.delete(route('superadmin.reports.destroy', props.report.id), {
         onSuccess: () => {
             closeModal();
-            toast.success('Laporan tidak valid berhasil dihapus.');
         },
         onFinish: () => {
             isDeleting.value = false;

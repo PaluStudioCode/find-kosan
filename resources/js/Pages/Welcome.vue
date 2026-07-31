@@ -657,7 +657,7 @@ onBeforeUnmount(() => {
                             />
                         </div>
 
-                        <p class="line-clamp-4 text-sm leading-relaxed text-slate-600 italic">â€œ{{ review.comment }}â€</p>
+                        <p class="line-clamp-4 text-sm leading-relaxed text-slate-600 italic">"{{ review.comment }}"</p>
 
                         <div class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
                             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-50 text-sm font-bold text-teal-700">

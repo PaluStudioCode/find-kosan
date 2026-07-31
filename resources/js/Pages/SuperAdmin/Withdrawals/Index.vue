@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +28,7 @@ const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
                         <div>
                             <p class="font-bold text-lg dark:text-slate-200">{{ formatRupiah(withdrawal.amount) }}</p>
                             <p class="font-medium dark:text-slate-300">{{ withdrawal.admin?.name }}</p>
-                            <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} Â· {{ withdrawal.account_number }} a.n. {{ withdrawal.account_holder_name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} - {{ withdrawal.account_number }} a.n. {{ withdrawal.account_holder_name }}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <StatusBadge :status="withdrawal.status" />

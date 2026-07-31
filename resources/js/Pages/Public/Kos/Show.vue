@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
@@ -600,7 +600,7 @@ const groupedRooms = computed(() => {
                 <div class="text-center py-3 text-white/60 text-sm">
                     {{ lightboxIndex + 1 }} / {{ lightboxPhotos.length }}
                     <span v-if="lightboxPhotos[lightboxIndex]?.category" class="ml-2 px-2 py-0.5 bg-white/20 text-white rounded text-xs">{{ photoCategories[lightboxPhotos[lightboxIndex].category] || 'Lainnya' }}</span>
-                    <span v-if="lightboxPhotos[lightboxIndex]?.caption" class="ml-2">â€” {{ lightboxPhotos[lightboxIndex].caption }}</span>
+                    <span v-if="lightboxPhotos[lightboxIndex]?.caption" class="ml-2">- {{ lightboxPhotos[lightboxIndex].caption }}</span>
                 </div>
             </DialogContent>
         </Dialog>

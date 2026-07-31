@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -144,7 +144,7 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                         <div v-for="withdrawal in withdrawals" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                                 <div class="flex-1">
                                     <p class="font-semibold dark:text-white">{{ formatRupiah(withdrawal.amount) }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} Â· {{ withdrawal.account_number }} Â· {{ withdrawal.account_holder_name }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} - {{ withdrawal.account_number }} - {{ withdrawal.account_holder_name }}</p>
                                     
                                     <div v-if="withdrawal.status === 'ditolak' && withdrawal.review_note" class="mt-2 p-2.5 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-900/50 rounded-md">
                                         <p class="text-sm text-red-700 dark:text-red-400 font-medium">Alasan Penolakan:</p>

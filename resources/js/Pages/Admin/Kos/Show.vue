@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -45,7 +45,7 @@ const tabs = [
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ kos.name }}</h2>
                     <StatusBadge :status="kos.status" />
                     <span v-if="kos.status === 'nonaktif' && kos.reports && kos.reports.length > 0" class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50">
-                        âš ï¸ CEK TAB VERIFIKASI
+                        ⚠️ CEK TAB VERIFIKASI
                     </span>
                 </div>
                 <p v-if="kos.pending_revisions" class="text-xs text-blue-600 mt-2 bg-blue-50 px-2 py-1 rounded inline-block border border-blue-200 dark:text-blue-400 dark:bg-blue-900/30 dark:border-blue-900/50">

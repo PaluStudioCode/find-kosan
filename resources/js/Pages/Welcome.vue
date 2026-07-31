@@ -242,8 +242,8 @@ onBeforeUnmount(() => {
         <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-center">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
-            <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full">
-                <div class="relative z-10 max-w-2xl mx-auto flex flex-col items-center text-center">
+            <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-12 w-full mt-0 lg:-mt-12">
+                <div class="relative z-10 max-w-2xl flex flex-col">
                     
                     <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Ketemu Kos Idaman,
@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
                         Tinggal buka peta, cek fasilitas, baca review jujur penyewa lain, langsung booking. Bayar dan kelola tagihan bulanan? Semua beres dari HP-mu!
                     </p>
 
-                    <div class="mt-6 flex flex-col gap-3 sm:flex-row justify-center w-full">
+                    <div class="mt-6 flex flex-col gap-3 sm:flex-row w-full">
                         <Link :href="route('public.kos.index')">
                             <Button class="group h-11 w-full rounded-full bg-teal-500 px-6 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 hover:-translate-y-0.5 sm:w-auto">
                                 Mulai Cari Kos Sekarang
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
                         </a>
                     </div>
 
-                    <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-slate-400">
+                    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-slate-400">
                         <span class="flex items-center gap-1.5">
                             <Check class="h-4 w-4 text-teal-400" />
                             Pencarian peta

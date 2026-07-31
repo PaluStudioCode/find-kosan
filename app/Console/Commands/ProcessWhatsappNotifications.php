@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\WhatsappNotification;
 use App\Jobs\SendWhatsappNotificationJob;
+use App\Models\WhatsappNotification;
 use Illuminate\Console\Command;
 
 class ProcessWhatsappNotifications extends Command
@@ -37,6 +37,6 @@ class ProcessWhatsappNotifications extends Command
             SendWhatsappNotificationJob::dispatch($notification);
         }
 
-        $this->info("All pending notifications have been dispatched.");
+        $this->info('All pending notifications have been dispatched.');
     }
 }

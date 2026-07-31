@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BoardingHouse;
 use App\Models\BoardingHouseReview;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,8 +17,8 @@ class ReviewController extends Controller
         $ratingFilter = $request->input('rating');
 
         $query = BoardingHouseReview::whereHas('boardingHouse', function ($q) use ($adminId) {
-                $q->where('admin_id', $adminId);
-            })
+            $q->where('admin_id', $adminId);
+        })
             ->with(['user:id,name,email', 'boardingHouse:id,name']);
 
         if ($kosFilter) {
@@ -30,7 +31,7 @@ class ReviewController extends Controller
 
         $reviews = $query->latest()->paginate(10)->withQueryString();
 
-        $kosList = \App\Models\BoardingHouse::where('admin_id', $adminId)->select('id', 'name')->get();
+        $kosList = BoardingHouse::where('admin_id', $adminId)->select('id', 'name')->get();
 
         return Inertia::render('Admin/Reviews/Index', [
             'reviews' => $reviews,
@@ -38,7 +39,7 @@ class ReviewController extends Controller
             'filters' => [
                 'kos_id' => $kosFilter,
                 'rating' => $ratingFilter,
-            ]
+            ],
         ]);
     }
 }

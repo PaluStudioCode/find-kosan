@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\AdminWallet;
 use App\Models\AdminWalletTransaction;
+use App\Models\Setting;
 use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class WalletController extends Controller
             ['available_balance' => 0, 'pending_withdrawal_balance' => 0]
         );
 
-        $minWithdrawal = (float) (\App\Models\Setting::getSetting('min_withdrawal') ?: 50000);
+        $minWithdrawal = (float) (Setting::getSetting('min_withdrawal') ?: 50000);
 
         return Inertia::render('Admin/Wallet/Index', [
             'wallet' => $wallet,
@@ -42,16 +43,16 @@ class WalletController extends Controller
 
     public function storeWithdrawal(Request $request)
     {
-        $minWithdrawal = (float) (\App\Models\Setting::getSetting('min_withdrawal') ?: 50000);
+        $minWithdrawal = (float) (Setting::getSetting('min_withdrawal') ?: 50000);
 
         $validated = $request->validate([
-            'amount' => ['required', 'numeric', 'min:' . $minWithdrawal],
+            'amount' => ['required', 'numeric', 'min:'.$minWithdrawal],
             'bank_name' => 'required|string|max:100',
             'account_number' => 'required|string|max:50',
             'account_holder_name' => 'required|string|max:150',
             'owner_note' => 'nullable|string|max:1000',
         ], [
-            'amount.min' => 'Minimal penarikan adalah Rp ' . number_format($minWithdrawal, 0, ',', '.'),
+            'amount.min' => 'Minimal penarikan adalah Rp '.number_format($minWithdrawal, 0, ',', '.'),
         ]);
 
         DB::transaction(function () use ($request, $validated) {

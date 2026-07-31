@@ -14,7 +14,10 @@ class RoomPolicy
 
     public function view(User $user, Room $room): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $room->boardingHouse->admin_id;
     }
 

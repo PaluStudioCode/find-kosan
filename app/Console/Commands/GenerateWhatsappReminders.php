@@ -36,7 +36,9 @@ class GenerateWhatsappReminders extends Command
         $count = 0;
         foreach ($invoices as $invoice) {
             $user = $invoice->user;
-            if (!$user || !$user->whatsapp_number) continue;
+            if (! $user || ! $user->whatsapp_number) {
+                continue;
+            }
 
             // Avoid generating duplicate reminder for the same date
             $exists = WhatsappNotification::where('invoice_id', $invoice->id)
@@ -44,14 +46,14 @@ class GenerateWhatsappReminders extends Command
                 ->where('scheduled_date', today())
                 ->exists();
 
-            if (!$exists) {
+            if (! $exists) {
                 WhatsappNotification::create([
                     'invoice_id' => $invoice->id,
                     'user_id' => $user->id,
                     'admin_id' => $invoice->admin_id,
                     'phone_number' => $user->whatsapp_number,
                     'message_type' => 'pengingat_jatuh_tempo',
-                    'message_body' => "Halo {$user->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp" . number_format($invoice->amount, 0, ',', '.') . " jatuh tempo HARI INI (" . $invoice->due_date->format('d M Y') . ").\n\nSilakan segera lakukan pembayaran melalui tautan berikut:\n" . route('user.tenancies.show', $invoice->tenancy_id),
+                    'message_body' => "Halo {$user->name}, ini adalah pengingat bahwa tagihan sewa kamar Anda di {$invoice->tenancy->room->boardingHouse->name} sebesar Rp".number_format($invoice->amount, 0, ',', '.').' jatuh tempo HARI INI ('.$invoice->due_date->format('d M Y').").\n\nSilakan segera lakukan pembayaran melalui tautan berikut:\n".route('user.tenancies.show', $invoice->tenancy_id),
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);

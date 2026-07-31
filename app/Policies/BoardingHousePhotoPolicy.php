@@ -14,7 +14,10 @@ class BoardingHousePhotoPolicy
 
     public function view(User $user, BoardingHousePhoto $boardingHousePhoto): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $boardingHousePhoto->boardingHouse->admin_id;
     }
 

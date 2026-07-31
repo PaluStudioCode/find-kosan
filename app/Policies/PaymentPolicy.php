@@ -14,8 +14,13 @@ class PaymentPolicy
 
     public function view(User $user, Payment $payment): bool
     {
-        if ($user->role === 'super_admin') return true;
-        if ($user->role === 'admin') return $user->id === $payment->admin_id;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+        if ($user->role === 'admin') {
+            return $user->id === $payment->admin_id;
+        }
+
         return $user->id === $payment->user_id;
     }
 

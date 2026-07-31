@@ -14,7 +14,7 @@ return new class extends Migration
             ->each(function (object $invoice) {
                 $wallet = DB::table('admin_wallets')->where('admin_id', $invoice->admin_id)->first();
 
-                if (!$wallet) {
+                if (! $wallet) {
                     $walletId = DB::table('admin_wallets')->insertGetId([
                         'admin_id' => $invoice->admin_id,
                         'available_balance' => 0,
@@ -27,7 +27,7 @@ return new class extends Migration
                 }
 
                 $exists = DB::table('admin_wallet_transactions')->where('invoice_id', $invoice->id)->exists();
-                if (!$exists) {
+                if (! $exists) {
                     DB::table('admin_wallet_transactions')->insert([
                         'admin_wallet_id' => $walletId,
                         'invoice_id' => $invoice->id,

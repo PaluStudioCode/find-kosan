@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\BoardingHouse;
 use App\Models\Room;
+use App\Models\Tenancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use App\Models\Tenancy;
 
 class Phase6PropertyManagementTest extends TestCase
 {
@@ -54,12 +54,12 @@ class Phase6PropertyManagementTest extends TestCase
         ]);
 
         $response->assertSessionHas('success');
-        
+
         $kos->refresh();
         $this->assertEquals('dipublikasikan', $kos->status);
         $this->assertNotNull($kos->pending_revisions);
         $this->assertEquals('Kos Berubah', $kos->pending_revisions['name']);
-        
+
         $this->assertNotEquals('Kos Berubah', $kos->name);
     }
 
@@ -124,20 +124,20 @@ class Phase6PropertyManagementTest extends TestCase
         $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id, 'status' => 'draft']);
 
         $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");
-        $response->assertSessionHas('error'); 
+        $response->assertSessionHas('error');
 
         $file = UploadedFile::fake()->create('ktp.pdf', 100, 'application/pdf');
         $this->actingAs($admin)->post("/admin/kos/{$kos->id}/legal-documents", [
             'document_type' => 'identitas_pemilik_pengelola',
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");
-        $response->assertSessionHas('error'); 
+        $response->assertSessionHas('error');
 
         $photo = UploadedFile::fake()->image('kos.jpg');
         $this->actingAs($admin)->post("/admin/kos/{$kos->id}/photos", [
-            'photos' => [$photo]
+            'photos' => [$photo],
         ]);
 
         $response = $this->actingAs($admin)->post("/admin/kos/{$kos->id}/verify");

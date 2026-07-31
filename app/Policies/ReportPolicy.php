@@ -14,7 +14,10 @@ class ReportPolicy
 
     public function view(User $user, Report $report): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $report->reporter_id;
     }
 

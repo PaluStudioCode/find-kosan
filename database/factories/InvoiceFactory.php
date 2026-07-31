@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Invoice;
+use App\Models\Tenancy;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,9 +20,9 @@ class InvoiceFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenancy_id' => \App\Models\Tenancy::factory(),
-            'user_id' => \App\Models\User::factory()->create(['role' => 'user'])->id,
-            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
+            'tenancy_id' => Tenancy::factory(),
+            'user_id' => User::factory()->create(['role' => 'user'])->id,
+            'admin_id' => User::factory()->create(['role' => 'admin'])->id,
             'period_start' => now(),
             'period_end' => now()->addMonth(),
             'amount' => 1000000,

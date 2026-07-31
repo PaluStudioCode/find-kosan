@@ -14,8 +14,13 @@ class TenancyPolicy
 
     public function view(User $user, Tenancy $tenancy): bool
     {
-        if ($user->role === 'super_admin') return true;
-        if ($user->role === 'admin') return $user->id === $tenancy->admin_id;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+        if ($user->role === 'admin') {
+            return $user->id === $tenancy->admin_id;
+        }
+
         return $user->id === $tenancy->user_id;
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class WhatsappService
 {
     protected string $baseUrl;
+
     protected ?string $apiKey;
 
     public function __construct()
@@ -21,7 +22,7 @@ class WhatsappService
      */
     protected function request()
     {
-        $http = Http::baseUrl($this->baseUrl . '/api')
+        $http = Http::baseUrl($this->baseUrl.'/api')
             ->timeout(30)
             ->acceptJson();
 
@@ -44,7 +45,8 @@ class WhatsappService
 
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
-            Log::error("WA Service startSession error: " . $e->getMessage());
+            Log::error('WA Service startSession error: '.$e->getMessage());
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -62,7 +64,8 @@ class WhatsappService
 
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
-            Log::error("WA Service startSessionWithPairingCode error: " . $e->getMessage());
+            Log::error('WA Service startSessionWithPairingCode error: '.$e->getMessage());
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -74,9 +77,11 @@ class WhatsappService
     {
         try {
             $response = $this->request()->post("/sessions/{$adminId}/stop");
+
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
-            Log::error("WA Service stopSession error: " . $e->getMessage());
+            Log::error('WA Service stopSession error: '.$e->getMessage());
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -88,9 +93,11 @@ class WhatsappService
     {
         try {
             $response = $this->request()->get("/sessions/{$adminId}/status");
+
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
-            Log::error("WA Service getStatus error: " . $e->getMessage());
+            Log::error('WA Service getStatus error: '.$e->getMessage());
+
             return ['success' => false, 'status' => 'disconnected', 'error' => $e->getMessage()];
         }
     }
@@ -102,9 +109,11 @@ class WhatsappService
     {
         try {
             $response = $this->request()->get("/sessions/{$adminId}/qr");
+
             return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
         } catch (\Exception $e) {
-            Log::error("WA Service getQrCode error: " . $e->getMessage());
+            Log::error('WA Service getQrCode error: '.$e->getMessage());
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -122,7 +131,7 @@ class WhatsappService
 
             $data = $response->json() ?? [];
 
-            if (!empty($data['success'])) {
+            if (! empty($data['success'])) {
                 return [
                     'status' => true,
                     'response' => $data,
@@ -134,10 +143,11 @@ class WhatsappService
                 'reason' => $data['reason'] ?? $data['error'] ?? 'Unknown error',
             ];
         } catch (\Exception $e) {
-            Log::error("WA Service sendMessage error: " . $e->getMessage());
+            Log::error('WA Service sendMessage error: '.$e->getMessage());
+
             return [
                 'status' => false,
-                'reason' => 'WA Service tidak dapat dihubungi: ' . $e->getMessage(),
+                'reason' => 'WA Service tidak dapat dihubungi: '.$e->getMessage(),
             ];
         }
     }

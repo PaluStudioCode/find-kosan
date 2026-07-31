@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Facility;
-use App\Models\BoardingHouse;
-use App\Models\Room;
+use App\Models\Rule;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         // Bersihkan folder file yang di-upload agar tidak menumpuk (Orphaned files)
         $directoriesToClean = ['kos_photos', 'legal_docs', 'payment_receipts'];
         foreach ($directoriesToClean as $dir) {
-            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory($dir);
-            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($dir);
+            Storage::disk('public')->deleteDirectory($dir);
+            Storage::disk('public')->makeDirectory($dir);
         }
 
         // Super Admin
@@ -58,7 +58,6 @@ class DatabaseSeeder extends Seeder
             'whatsapp_number' => '085151246624',
             'email_verified_at' => Carbon::now(),
         ]);
-
 
         // Master Data Facilities
         $facilities = [
@@ -108,7 +107,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($rules as $rule) {
-            \App\Models\Rule::firstOrCreate([
+            Rule::firstOrCreate([
                 'name' => $rule['name'],
             ], [
                 'is_positive' => $rule['is_positive'],

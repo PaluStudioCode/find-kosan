@@ -5,7 +5,6 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Rule;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class RuleController extends Controller
 {
@@ -30,7 +29,7 @@ class RuleController extends Controller
     public function update(Request $request, Rule $rule)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100|unique:rules,name,' . $rule->id,
+            'name' => 'required|string|max:100|unique:rules,name,'.$rule->id,
             'is_positive' => 'required|boolean',
         ]);
 

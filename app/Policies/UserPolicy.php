@@ -13,7 +13,10 @@ class UserPolicy
 
     public function view(User $user, User $model): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $model->id;
     }
 
@@ -24,7 +27,10 @@ class UserPolicy
 
     public function update(User $user, User $model): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $model->id;
     }
 

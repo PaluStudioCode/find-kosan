@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
+use App\Models\AdminWallet;
 use App\Models\BoardingHouse;
+use App\Models\BoardingHouseReview;
+use App\Models\Invoice;
 use App\Models\Room;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,7 +19,7 @@ class DashboardController extends Controller
         $adminId = auth()->user()->id;
 
         // 1. Pendapatan Bulan Ini
-        $currentMonthRevenue = \App\Models\Invoice::where('admin_id', $adminId)
+        $currentMonthRevenue = Invoice::where('admin_id', $adminId)
             ->where('status', 'lunas')
             ->whereMonth('updated_at', now()->month)
             ->whereYear('updated_at', now()->year)
@@ -32,16 +35,16 @@ class DashboardController extends Controller
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
         // 3. Tagihan Belum Dibayar / Jatuh Tempo
-        $pendingInvoicesCount = \App\Models\Invoice::where('admin_id', $adminId)
+        $pendingInvoicesCount = Invoice::where('admin_id', $adminId)
             ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
             ->count();
 
         // 4. Saldo Dompet
-        $wallet = \App\Models\AdminWallet::where('admin_id', $adminId)->first();
+        $wallet = AdminWallet::where('admin_id', $adminId)->first();
         $walletBalance = $wallet ? $wallet->available_balance : 0;
 
         // Fetch Recent Transactions (lunas invoices)
-        $recentTransactions = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'user'])
+        $recentTransactions = Invoice::with(['tenancy.room.boardingHouse', 'user'])
             ->where('admin_id', $adminId)
             ->where('status', 'lunas')
             ->latest('updated_at')
@@ -54,23 +57,23 @@ class DashboardController extends Controller
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->startOfMonth()->subMonths($i);
             $revenueChartLabels[] = $date->translatedFormat('M Y');
-            
-            $monthlyRevenue = \App\Models\Invoice::where('admin_id', $adminId)
+
+            $monthlyRevenue = Invoice::where('admin_id', $adminId)
                 ->where('status', 'lunas')
                 ->whereMonth('updated_at', $date->month)
                 ->whereYear('updated_at', $date->year)
                 ->sum('amount');
-                
+
             $revenueChartData[] = $monthlyRevenue;
         }
 
         // Property Capacity Status
-        $propertiesCapacity = \App\Models\BoardingHouse::where('admin_id', $adminId)
+        $propertiesCapacity = BoardingHouse::where('admin_id', $adminId)
             ->withCount([
                 'rooms as total_rooms',
                 'rooms as occupied_rooms' => function ($q) {
                     $q->where('status', 'terisi');
-                }
+                },
             ])
             ->get()
             ->map(function ($kos) {
@@ -82,7 +85,7 @@ class DashboardController extends Controller
             });
 
         // Upcoming Due Invoices (H-3 to Overdue)
-        $upcomingDueInvoices = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'user'])
+        $upcomingDueInvoices = Invoice::with(['tenancy.room.boardingHouse', 'user'])
             ->where('admin_id', $adminId)
             ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
             ->where('due_date', '<=', now()->addDays(3))
@@ -91,7 +94,7 @@ class DashboardController extends Controller
             ->get();
 
         // Vacant Rooms List
-        $vacantRooms = \App\Models\Room::with(['boardingHouse'])
+        $vacantRooms = Room::with(['boardingHouse'])
             ->whereHas('boardingHouse', function ($q) use ($adminId) {
                 $q->where('admin_id', $adminId);
             })
@@ -101,7 +104,7 @@ class DashboardController extends Controller
             ->get();
 
         // Recent Reviews
-        $recentReviews = \App\Models\BoardingHouseReview::with(['user', 'boardingHouse'])
+        $recentReviews = BoardingHouseReview::with(['user', 'boardingHouse'])
             ->whereHas('boardingHouse', function ($q) use ($adminId) {
                 $q->where('admin_id', $adminId);
             })
@@ -109,7 +112,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $activityLogs = \App\Models\ActivityLog::where('user_id', $adminId)
+        $activityLogs = ActivityLog::where('user_id', $adminId)
             ->latest()
             ->take(5)
             ->get();
@@ -132,7 +135,7 @@ class DashboardController extends Controller
                 'revenueLabels' => $revenueChartLabels,
                 'revenueData' => $revenueChartData,
                 'propertiesCapacity' => $propertiesCapacity,
-            ]
+            ],
         ]);
     }
 }

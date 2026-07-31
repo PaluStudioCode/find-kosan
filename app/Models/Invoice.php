@@ -16,6 +16,7 @@ class Invoice extends Model
             $invoice->payments()->delete();
         });
     }
+
     protected $fillable = [
         'tenancy_id', 'user_id', 'admin_id', 'period_start', 'period_end',
         'amount', 'due_date', 'status', 'payment_reference', 'payment_method', 'payment_url',

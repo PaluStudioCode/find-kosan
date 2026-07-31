@@ -12,14 +12,16 @@ class LegalDocumentController extends Controller
 {
     public function store(Request $request, BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
 
         $request->validate([
             'document_type' => 'required|string|max:50',
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB limit
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB limit
         ]);
 
         $path = $request->file('file')->store('legal_documents', 'local');
@@ -36,11 +38,13 @@ class LegalDocumentController extends Controller
 
     public function destroy(BoardingHouse $kos, BoardingHouseLegalDocument $legalDocument)
     {
-        if ($kos->admin_id !== auth()->id() || $legalDocument->boarding_house_id !== $kos->id) abort(403);
+        if ($kos->admin_id !== auth()->id() || $legalDocument->boarding_house_id !== $kos->id) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
-        
+
         if (Storage::disk('local')->exists($legalDocument->file_path)) {
             Storage::disk('local')->delete($legalDocument->file_path);
         }

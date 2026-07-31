@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Invoice;
 use App\Models\Tenancy;
 use Illuminate\Database\Seeder;
-use Carbon\Carbon;
 
 class TestWhatsappReminderSeeder extends Seeder
 {
@@ -17,8 +16,9 @@ class TestWhatsappReminderSeeder extends Seeder
         // Cari satu tenancy yang sudah aktif atau memiliki invoice lunas
         $tenancy = Tenancy::where('status', 'aktif')->with('room')->first();
 
-        if (!$tenancy) {
+        if (! $tenancy) {
             $this->command->warn('Tidak ada data sewa (Tenancy) yang aktif. Silakan buat data sewa terlebih dahulu.');
+
             return;
         }
 
@@ -28,7 +28,7 @@ class TestWhatsappReminderSeeder extends Seeder
             ->delete();
 
         $uniqueAdd = rand(1, 100);
-        
+
         $invoice = Invoice::create([
             'tenancy_id' => $tenancy->id,
             'user_id' => $tenancy->user_id,
@@ -40,8 +40,8 @@ class TestWhatsappReminderSeeder extends Seeder
             'status' => 'belum_dibayar',
         ]);
 
-        $this->command->info('Berhasil membuat tagihan testing dengan ID: ' . $invoice->id);
-        $this->command->info('Jatuh tempo diatur pada: HARI INI (' . today()->format('d M Y') . ')');
+        $this->command->info('Berhasil membuat tagihan testing dengan ID: '.$invoice->id);
+        $this->command->info('Jatuh tempo diatur pada: HARI INI ('.today()->format('d M Y').')');
         $this->command->info('Silakan jalankan: php artisan whatsapp:reminders');
     }
 }

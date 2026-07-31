@@ -16,6 +16,7 @@ class Room extends Model
             $room->tenancies()->delete();
         });
     }
+
     protected $fillable = [
         'boarding_house_id', 'name', 'room_number', 'description', 'price',
         'price_period', 'capacity', 'status',
@@ -30,7 +31,6 @@ class Room extends Model
     {
         return $this->belongsTo(BoardingHouse::class);
     }
-
 
     public function facilities()
     {

@@ -6,8 +6,8 @@ use App\Models\BoardingHouse;
 use App\Models\BoardingHousePhoto;
 use App\Models\LegalDocument;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PruneSoftDeletedData extends Command
 {
@@ -41,12 +41,12 @@ class PruneSoftDeletedData extends Command
 
         if ($deletedKos->isEmpty()) {
             $this->info("Tidak ada data sampah (soft delete) yang melewati {$days} hari.");
+
             return;
         }
 
         $count = 0;
         foreach ($deletedKos as $kos) {
-
 
             // 2. Delete Boarding House Photos
             $photos = BoardingHousePhoto::withTrashed()->where('boarding_house_id', $kos->id)->get();
@@ -68,7 +68,7 @@ class PruneSoftDeletedData extends Command
             }
 
             // The rooms and tenancies associated will be cascadingly force-deleted if DB has cascade,
-            // but since Laravel doesn't cascade forceDelete for softdeletes automatically, 
+            // but since Laravel doesn't cascade forceDelete for softdeletes automatically,
             // we should manually force delete them if needed, or rely on Eloquent.
             $kos->rooms()->withTrashed()->forceDelete();
             $kos->tenancies()->withTrashed()->forceDelete();

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\BoardingHouse;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class BoardingHouseFactory extends Factory
     public function definition(): array
     {
         return [
-            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
+            'admin_id' => User::factory()->create(['role' => 'admin'])->id,
             'name' => fake()->company(),
             'description' => fake()->paragraph(),
             'address' => fake()->address(),

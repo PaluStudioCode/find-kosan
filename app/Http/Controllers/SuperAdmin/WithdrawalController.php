@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\AdminWallet;
 use App\Models\AdminWalletTransaction;
+use App\Models\User;
+use App\Models\WhatsappNotification;
 use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +38,7 @@ class WithdrawalController extends Controller
             'transfer_proof' => 'required|image|max:2048',
         ]);
 
-        $proofPath = '/storage/' . $request->file('transfer_proof')->store('withdrawal-proofs', 'public');
+        $proofPath = '/storage/'.$request->file('transfer_proof')->store('withdrawal-proofs', 'public');
 
         DB::transaction(function () use ($request, $withdrawal, $validated, $proofPath) {
             $withdrawal = WithdrawalRequest::lockForUpdate()->findOrFail($withdrawal->id);
@@ -68,15 +70,15 @@ class WithdrawalController extends Controller
             $this->log($request, 'withdrawal.completed', $withdrawal);
 
             // WhatsApp notification to owner
-            $admin = $withdrawal->admin ?? \App\Models\User::find($withdrawal->admin_id);
+            $admin = $withdrawal->admin ?? User::find($withdrawal->admin_id);
             if ($admin && $admin->whatsapp_number) {
-                \App\Models\WhatsappNotification::create([
+                WhatsappNotification::create([
                     'user_id' => $admin->id,
                     'admin_id' => $withdrawal->admin_id,
                     'send_via' => 'admin',
                     'phone_number' => $admin->whatsapp_number,
                     'message_type' => 'penarikan_disetujui',
-                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp" . number_format($withdrawal->amount, 0, ',', '.') . " telah disetujui dan ditransfer ke rekening Anda. No. Ref: {$validated['transfer_reference']}",
+                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp".number_format($withdrawal->amount, 0, ',', '.')." telah disetujui dan ditransfer ke rekening Anda. No. Ref: {$validated['transfer_reference']}",
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);
@@ -118,15 +120,15 @@ class WithdrawalController extends Controller
             $this->log($request, 'withdrawal.rejected', $withdrawal);
 
             // WhatsApp notification to owner
-            $admin = $withdrawal->admin ?? \App\Models\User::find($withdrawal->admin_id);
+            $admin = $withdrawal->admin ?? User::find($withdrawal->admin_id);
             if ($admin && $admin->whatsapp_number) {
-                \App\Models\WhatsappNotification::create([
+                WhatsappNotification::create([
                     'user_id' => $admin->id,
                     'admin_id' => $withdrawal->admin_id,
                     'send_via' => 'admin',
                     'phone_number' => $admin->whatsapp_number,
                     'message_type' => 'penarikan_ditolak',
-                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp" . number_format($withdrawal->amount, 0, ',', '.') . " ditolak. Alasan: {$validated['review_note']}. Saldo Anda telah dikembalikan.",
+                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp".number_format($withdrawal->amount, 0, ',', '.')." ditolak. Alasan: {$validated['review_note']}. Saldo Anda telah dikembalikan.",
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);

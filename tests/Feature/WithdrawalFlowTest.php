@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Invoice;
 use App\Models\AdminWallet;
+use App\Models\Invoice;
 use App\Models\Tenancy;
 use App\Models\User;
 use App\Models\WithdrawalRequest;

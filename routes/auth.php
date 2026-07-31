@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\TenantActivationController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,10 +35,10 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::get('activation/{token}', [\App\Http\Controllers\Auth\TenantActivationController::class, 'show'])
+    Route::get('activation/{token}', [TenantActivationController::class, 'show'])
         ->name('tenant.activation');
 
-    Route::post('activation', [\App\Http\Controllers\Auth\TenantActivationController::class, 'store'])
+    Route::post('activation', [TenantActivationController::class, 'store'])
         ->name('tenant.activation.store');
 });
 

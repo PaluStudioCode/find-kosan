@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\BoardingHouse;
 use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,8 +19,8 @@ class RoomFactory extends Factory
     public function definition(): array
     {
         return [
-            'boarding_house_id' => \App\Models\BoardingHouse::factory(),
-            'name' => 'Kamar ' . fake()->word(),
+            'boarding_house_id' => BoardingHouse::factory(),
+            'name' => 'Kamar '.fake()->word(),
             'room_number' => fake()->randomNumber(2),
             'price' => 1000000,
             'price_period' => 'bulanan',

@@ -16,7 +16,7 @@ class MasterDataController extends Controller
 
         $facilitiesQuery = Facility::query();
         if ($request->has('search_facility')) {
-            $facilitiesQuery->where('name', 'like', '%' . $request->search_facility . '%');
+            $facilitiesQuery->where('name', 'like', '%'.$request->search_facility.'%');
         }
         if ($request->has('type') && $request->type !== 'all') {
             $facilitiesQuery->where('type', $request->type);
@@ -28,7 +28,7 @@ class MasterDataController extends Controller
 
         $rulesQuery = Rule::query();
         if ($request->has('search_rule')) {
-            $rulesQuery->where('name', 'like', '%' . $request->search_rule . '%');
+            $rulesQuery->where('name', 'like', '%'.$request->search_rule.'%');
         }
         $rules = $rulesQuery->orderBy('name')
             ->paginate(5, ['*'], 'rule_page')

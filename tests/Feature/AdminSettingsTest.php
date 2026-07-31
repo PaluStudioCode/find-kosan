@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +15,7 @@ class AdminSettingsTest extends TestCase
     {
         $admin = User::factory()->create([
             'role' => 'super_admin',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
 
         $response = $this->actingAs($admin)->post(route('superadmin.settings.update'), [
@@ -36,7 +36,7 @@ class AdminSettingsTest extends TestCase
     {
         $admin = User::factory()->create([
             'role' => 'admin',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
 
         $response = $this->actingAs($admin)->post(route('superadmin.settings.update'), [

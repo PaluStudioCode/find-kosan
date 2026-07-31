@@ -16,7 +16,7 @@ class ReportController extends Controller
             ->get();
 
         return Inertia::render('Reports/Index', [
-            'reports' => $reports
+            'reports' => $reports,
         ]);
     }
 
@@ -29,7 +29,7 @@ class ReportController extends Controller
         ]);
 
         // Cek apakah user sudah punya laporan yang masih 'menunggu' untuk kos ini
-        if (!empty($validated['boarding_house_id'])) {
+        if (! empty($validated['boarding_house_id'])) {
             $pendingReport = Report::where('reporter_id', auth()->id())
                 ->where('boarding_house_id', $validated['boarding_house_id'])
                 ->where('status', 'menunggu')

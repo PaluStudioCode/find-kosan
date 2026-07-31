@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Invoice;
 use App\Models\AdminWallet;
 use App\Models\AdminWalletTransaction;
+use App\Models\Invoice;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 class AdminWalletService
@@ -25,10 +26,10 @@ class AdminWalletService
             );
 
             // Calculate Platform Fee
-            $feePercent = (float) (\App\Models\Setting::getSetting('fee_percent') ?: 0);
+            $feePercent = (float) (Setting::getSetting('fee_percent') ?: 0);
             $feeAmount = $invoice->amount * ($feePercent / 100);
             $creditAmount = $invoice->amount - $feeAmount;
-            
+
             $description = "Dana sewa dari tagihan #{$invoice->id}";
             if ($feePercent > 0) {
                 $description .= " (Dipotong biaya admin {$feePercent}%)";

@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\BoardingHouse;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\BoardingHouse;
-use App\Models\Facility;
 
 class DatabaseAndModelTest extends TestCase
 {
@@ -31,17 +30,17 @@ class DatabaseAndModelTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'email' => 'admin@kosonline.test',
-            'role' => 'super_admin'
+            'role' => 'super_admin',
         ]);
 
         $this->assertDatabaseHas('facilities', [
             'name' => 'WiFi / Internet',
-            'type' => 'kos'
+            'type' => 'kos',
         ]);
 
         $this->assertDatabaseHas('facilities', [
             'name' => 'Kasur & Bantal',
-            'type' => 'kamar'
+            'type' => 'kamar',
         ]);
     }
 
@@ -53,7 +52,7 @@ class DatabaseAndModelTest extends TestCase
             'name' => 'Kos Test',
             'description' => 'Desc',
             'address' => 'Addr',
-            'status' => 'draft'
+            'status' => 'draft',
         ]);
 
         $this->assertEquals(1, $user->boardingHouses()->count());

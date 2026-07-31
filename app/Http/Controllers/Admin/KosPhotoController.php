@@ -12,7 +12,9 @@ class KosPhotoController extends Controller
 {
     public function store(Request $request, BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
@@ -31,7 +33,7 @@ class KosPhotoController extends Controller
             $isMain = ($currentCount === 0 && $index === 0);
 
             $kos->photos()->create([
-                'file_path' => '/storage/' . $path,
+                'file_path' => '/storage/'.$path,
                 'is_primary' => $isMain,
                 'sort_order' => $maxSort + $index + 1,
                 'category' => $request->category,
@@ -39,16 +41,19 @@ class KosPhotoController extends Controller
         }
 
         $count = count($request->file('photos'));
-        return back()->with('success', $count . ' foto kos berhasil diunggah.');
+
+        return back()->with('success', $count.' foto kos berhasil diunggah.');
     }
 
     public function update(Request $request, BoardingHouse $kos, BoardingHousePhoto $photo)
     {
-        if ($kos->admin_id !== auth()->id() || $photo->boarding_house_id !== $kos->id) abort(403);
+        if ($kos->admin_id !== auth()->id() || $photo->boarding_house_id !== $kos->id) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
-        
+
         $kos->photos()->update(['is_primary' => false]);
         $photo->update(['is_primary' => true]);
 
@@ -57,17 +62,19 @@ class KosPhotoController extends Controller
 
     public function destroy(BoardingHouse $kos, BoardingHousePhoto $photo)
     {
-        if ($kos->admin_id !== auth()->id() || $photo->boarding_house_id !== $kos->id) abort(403);
+        if ($kos->admin_id !== auth()->id() || $photo->boarding_house_id !== $kos->id) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
-        
+
         $path = str_replace('/storage/', '', $photo->file_path);
         // Hapus fisik file di storage
         if (Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
-        
+
         // Hapus permanen dari database
         $photo->forceDelete();
 

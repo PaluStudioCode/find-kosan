@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\BoardingHouse;
+use App\Models\Room;
 use App\Models\Tenancy;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,10 +21,10 @@ class TenancyFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory()->create(['role' => 'user'])->id,
-            'admin_id' => \App\Models\User::factory()->create(['role' => 'admin'])->id,
-            'boarding_house_id' => \App\Models\BoardingHouse::factory(),
-            'room_id' => \App\Models\Room::factory(),
+            'user_id' => User::factory()->create(['role' => 'user'])->id,
+            'admin_id' => User::factory()->create(['role' => 'admin'])->id,
+            'boarding_house_id' => BoardingHouse::factory(),
+            'room_id' => Room::factory(),
             'start_date' => now(),
             'status' => 'aktif',
         ];

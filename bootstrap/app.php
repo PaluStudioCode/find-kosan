@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Middleware\ActiveAccountMiddleware;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\MustChangePasswordMiddleware;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,16 +20,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        
+
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            HandleInertiaRequests::class,
+            AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-            'active' => \App\Http\Middleware\ActiveAccountMiddleware::class,
-            'must_change_password' => \App\Http\Middleware\MustChangePasswordMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'active' => ActiveAccountMiddleware::class,
+            'must_change_password' => MustChangePasswordMiddleware::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
@@ -38,6 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->toResponse($request)
                     ->setStatusCode($response->getStatusCode());
             }
+
             return $response;
         });
     })->create();

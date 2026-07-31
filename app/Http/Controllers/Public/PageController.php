@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PageController extends Controller
@@ -17,7 +16,7 @@ class PageController extends Controller
             'kebijakan-privasi' => 'privacy_policy',
         ];
 
-        if (!array_key_exists($slug, $validSlugs)) {
+        if (! array_key_exists($slug, $validSlugs)) {
             abort(404);
         }
 

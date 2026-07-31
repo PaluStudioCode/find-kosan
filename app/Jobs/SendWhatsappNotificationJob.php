@@ -46,6 +46,7 @@ class SendWhatsappNotificationJob implements ShouldQueue
                 'status' => 'gagal',
                 'failed_reason' => 'Session WA tidak ditemukan untuk notifikasi ini',
             ]);
+
             return;
         }
 

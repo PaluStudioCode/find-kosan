@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Laravolt\Indonesia\Models\Province;
 use Laravolt\Indonesia\Models\City;
 use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Province;
 use Laravolt\Indonesia\Models\Village;
 
 class RegionController extends Controller
@@ -21,6 +21,7 @@ class RegionController extends Controller
         if ($request->has('province_code')) {
             $query->where('province_code', $request->province_code);
         }
+
         return response()->json($query->get());
     }
 
@@ -30,6 +31,7 @@ class RegionController extends Controller
         if ($request->has('city_code')) {
             $query->where('city_code', $request->city_code);
         }
+
         return response()->json($query->get());
     }
 
@@ -39,18 +41,19 @@ class RegionController extends Controller
         if ($request->has('district_code')) {
             $query->where('district_code', $request->district_code);
         }
+
         return response()->json($query->get());
     }
-    
+
     public function reverseGeocodeMatch(Request $request)
     {
         $displayName = $request->display_name;
-        
+
         $matchedCity = null;
         $matchedDistrict = null;
         $matchedVillage = null;
-        
-        if (!$displayName) {
+
+        if (! $displayName) {
             return response()->json(['city' => null, 'district' => null, 'village' => null]);
         }
 
@@ -63,7 +66,7 @@ class RegionController extends Controller
                 break;
             }
         }
-        
+
         // Cari District
         if ($matchedCity) {
             $districts = District::where('city_code', $matchedCity->code)->get();
@@ -75,7 +78,7 @@ class RegionController extends Controller
                 }
             }
         }
-        
+
         // Cari Village
         if ($matchedDistrict) {
             $villages = Village::where('district_code', $matchedDistrict->code)->get();
@@ -87,11 +90,11 @@ class RegionController extends Controller
                 }
             }
         }
-        
+
         return response()->json([
             'city' => $matchedCity,
             'district' => $matchedDistrict,
-            'village' => $matchedVillage
+            'village' => $matchedVillage,
         ]);
     }
 }

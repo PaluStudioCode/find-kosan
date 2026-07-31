@@ -54,7 +54,7 @@ class SystemSettingsController extends Controller
             'fee_percent', 'min_withdrawal',
             'link_instagram', 'link_facebook', 'link_tiktok',
             'meta_description',
-            'about_us', 'terms_conditions', 'privacy_policy'
+            'about_us', 'terms_conditions', 'privacy_policy',
         ];
 
         foreach ($textSettings as $key) {

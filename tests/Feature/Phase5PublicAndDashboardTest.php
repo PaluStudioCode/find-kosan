@@ -3,10 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\BoardingHouse;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\Room;
-use App\Models\Tenancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -41,8 +37,8 @@ class Phase5PublicAndDashboardTest extends TestCase
     {
         $draftKos = BoardingHouse::factory()->create(['status' => 'draft']);
 
-        $response = $this->get('/kos/' . $draftKos->id);
-        
+        $response = $this->get('/kos/'.$draftKos->id);
+
         $response->assertStatus(404);
     }
 
@@ -55,13 +51,14 @@ class Phase5PublicAndDashboardTest extends TestCase
         BoardingHouse::factory()->count(1)->create(['admin_id' => $admin2->id]);
 
         $response = $this->actingAs($admin1)->get('/admin/dashboard');
-        
+
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Admin/Dashboard')
             ->has('metrics.totalRooms')
         );
     }
+
     public function test_admin_dashboard_shows_data()
     {
         $superAdmin = User::factory()->create(['role' => 'super_admin', 'status' => 'aktif']);
@@ -70,7 +67,7 @@ class Phase5PublicAndDashboardTest extends TestCase
         BoardingHouse::factory()->create(['status' => 'menunggu_verifikasi', 'admin_id' => $admin->id]);
 
         $response = $this->actingAs($superAdmin)->get('/superadmin/dashboard');
-        
+
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $page) => $page
             ->component('SuperAdmin/Dashboard')

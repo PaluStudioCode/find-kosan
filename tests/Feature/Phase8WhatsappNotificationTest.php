@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\BoardingHouse;
 use App\Models\Invoice;
+use App\Models\Room;
 use App\Models\Tenancy;
 use App\Models\User;
-use App\Models\BoardingHouse;
-use App\Models\Room;
 use App\Models\WhatsappNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -20,7 +20,7 @@ class Phase8WhatsappNotificationTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin', 'whatsapp_number' => '08123456789']);
         $user = User::factory()->create(['role' => 'user']);
-        
+
         $kos = BoardingHouse::factory()->create(['admin_id' => $admin->id]);
         $room = Room::factory()->create(['boarding_house_id' => $kos->id, 'capacity' => 2, 'price_period' => 'bulanan']);
 
@@ -31,7 +31,7 @@ class Phase8WhatsappNotificationTest extends TestCase
 
         $this->assertDatabaseHas('whatsapp_notifications', [
             'user_id' => $admin->id,
-            'message_type' => 'pembayaran_baru'
+            'message_type' => 'pembayaran_baru',
         ]);
     }
 
@@ -43,7 +43,7 @@ class Phase8WhatsappNotificationTest extends TestCase
             'tenancy_id' => $tenancy->id,
             'user_id' => $user->id,
             'status' => 'belum_dibayar',
-            'due_date' => today()
+            'due_date' => today(),
         ]);
 
         Artisan::call('whatsapp:reminders');
@@ -51,7 +51,7 @@ class Phase8WhatsappNotificationTest extends TestCase
         $this->assertDatabaseHas('whatsapp_notifications', [
             'invoice_id' => $invoice->id,
             'user_id' => $user->id,
-            'message_type' => 'pengingat_jatuh_tempo'
+            'message_type' => 'pengingat_jatuh_tempo',
         ]);
     }
 

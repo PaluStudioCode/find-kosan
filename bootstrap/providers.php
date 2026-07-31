@@ -1,8 +1,9 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Laravolt\Indonesia\ServiceProvider;
 
 return [
     AppServiceProvider::class,
-    Laravolt\Indonesia\ServiceProvider::class,
+    ServiceProvider::class,
 ];

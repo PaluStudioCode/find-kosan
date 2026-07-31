@@ -16,6 +16,7 @@ class Tenancy extends Model
             $tenancy->invoices()->delete();
         });
     }
+
     protected $fillable = [
         'user_id', 'admin_id', 'boarding_house_id', 'room_id',
         'occupant_count', 'start_date', 'end_date', 'status',

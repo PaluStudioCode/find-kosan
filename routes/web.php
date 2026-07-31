@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Public\LandingPageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Public\LandingPageController;
 use App\Http\Controllers\Public\PublicKosController;
 use App\Http\Middleware\GuestOrTenant;
 use Illuminate\Support\Facades\Route;
@@ -11,32 +11,36 @@ Route::middleware([GuestOrTenant::class])->group(function () {
 
     Route::get('/kos', [PublicKosController::class, 'index'])->name('public.kos.index');
     Route::get('/kos/{kos}', [PublicKosController::class, 'show'])->name('public.kos.show');
-    Route::get('/{slug}', [\App\Http\Controllers\Public\PageController::class, 'show'])
+    Route::get('/{slug}', [PageController::class, 'show'])
         ->whereIn('slug', ['tentang-kami', 'syarat-ketentuan', 'kebijakan-privasi'])
         ->name('page.show');
 });
-use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
-use App\Http\Controllers\SuperAdmin\MasterDataController;
-use App\Http\Controllers\SuperAdmin\FacilityController;
-use App\Http\Controllers\SuperAdmin\RuleController;
-use App\Http\Controllers\SuperAdmin\UserController;
-use App\Http\Controllers\SuperAdmin\VerificationController as SuperAdminVerificationController;
-use App\Http\Controllers\SuperAdmin\WithdrawalController;
-use App\Http\Controllers\SuperAdmin\WhatsappSettingsController as SuperAdminWhatsappSettingsController;
-use App\Http\Controllers\SuperAdmin\SystemSettingsController;
-use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\KosController as AdminKosController;
 use App\Http\Controllers\Admin\KosPhotoController as AdminKosPhotoController;
 use App\Http\Controllers\Admin\LegalDocumentController as AdminLegalDocumentController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoomController as AdminRoomController;
 use App\Http\Controllers\Admin\TenancyController as AdminTenancyController;
 use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Admin\WhatsappSettingsController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PaymentGatewayController;
+use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
+use App\Http\Controllers\SuperAdmin\FacilityController;
+use App\Http\Controllers\SuperAdmin\MasterDataController;
+use App\Http\Controllers\SuperAdmin\RuleController;
+use App\Http\Controllers\SuperAdmin\SystemSettingsController;
+use App\Http\Controllers\SuperAdmin\UserController;
+use App\Http\Controllers\SuperAdmin\VerificationController as SuperAdminVerificationController;
+use App\Http\Controllers\SuperAdmin\WhatsappSettingsController as SuperAdminWhatsappSettingsController;
+use App\Http\Controllers\SuperAdmin\WithdrawalController;
 use App\Http\Controllers\User\KosReviewController;
+use App\Http\Controllers\User\TenancyController;
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -68,11 +72,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
             Route::resource('reports', App\Http\Controllers\SuperAdmin\ReportController::class)->only(['index', 'show', 'update', 'destroy']);
-            
+
             Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
             Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show', 'index']);
             Route::resource('rules', RuleController::class)->except(['create', 'edit', 'show', 'index']);
-            
+
             Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
             Route::get('/withdrawals/{withdrawal}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
             Route::post('/withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
@@ -85,7 +89,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/whatsapp-settings/stop', [SuperAdminWhatsappSettingsController::class, 'stopSession'])->name('whatsapp.stop');
             Route::get('/whatsapp-settings/status', [SuperAdminWhatsappSettingsController::class, 'getStatus'])->name('whatsapp.status');
             Route::get('/whatsapp-settings/qr', [SuperAdminWhatsappSettingsController::class, 'getQrCode'])->name('whatsapp.qr');
-            
+
             // System Settings
             Route::get('/settings', [SystemSettingsController::class, 'index'])->name('settings.index');
             Route::post('/settings', [SystemSettingsController::class, 'update'])->name('settings.update');
@@ -115,8 +119,8 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
-            
-            Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+
+            Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
             // WhatsApp Settings
             Route::get('/whatsapp-settings', [WhatsappSettingsController::class, 'index'])->name('whatsapp.index');
@@ -130,10 +134,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         // Role User (Dulunya Penyewa)
         Route::middleware(['role:user'])->prefix('user')->name('user.')->group(function () {
             // Tenancies Management
-            Route::post('/rooms/{room}/book', [App\Http\Controllers\User\TenancyController::class, 'store'])->name('tenancies.store');
-            Route::get('/tenancies', [App\Http\Controllers\User\TenancyController::class, 'index'])->name('tenancies.index');
-            Route::get('/tenancies/{tenancy}', [App\Http\Controllers\User\TenancyController::class, 'show'])->name('tenancies.show');
-            Route::post('/invoices/{invoice}/payment', [App\Http\Controllers\User\TenancyController::class, 'uploadPayment'])->name('invoices.payment');
+            Route::post('/rooms/{room}/book', [TenancyController::class, 'store'])->name('tenancies.store');
+            Route::get('/tenancies', [TenancyController::class, 'index'])->name('tenancies.index');
+            Route::get('/tenancies/{tenancy}', [TenancyController::class, 'show'])->name('tenancies.show');
+            Route::post('/invoices/{invoice}/payment', [TenancyController::class, 'uploadPayment'])->name('invoices.payment');
             Route::post('/kos/{kos}/review', [KosReviewController::class, 'store'])->name('kos.reviews.store');
         });
     });
@@ -166,8 +170,8 @@ Route::post('/duitku/callback', [PaymentGatewayController::class, 'callback'])->
 
 // Google Login
 Route::middleware('guest')->group(function () {
-    Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('google.login');
-    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback']);
+    Route::get('auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback']);
 });
 
 require __DIR__.'/auth.php';

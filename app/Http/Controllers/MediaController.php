@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\Payment;
 use App\Models\BoardingHouse;
 use App\Models\LegalDocument;
+use App\Models\Payment;
+use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
     public function show($type, $filename)
     {
-        $path = $type . '/' . $filename;
+        $path = $type.'/'.$filename;
         $user = auth()->user();
 
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             abort(404);
         }
 
@@ -39,10 +38,12 @@ class MediaController extends Controller
                             $authorized = true;
                         } elseif ($user->role === 'user') {
                             // Can see if they have tenancy for this kos
-                            $hasTenancy = $user->tenanciesAsTenant()->whereHas('room', function($q) use ($kos) {
+                            $hasTenancy = $user->tenanciesAsTenant()->whereHas('room', function ($q) use ($kos) {
                                 $q->where('boarding_house_id', $kos->id);
                             })->exists();
-                            if ($hasTenancy) $authorized = true;
+                            if ($hasTenancy) {
+                                $authorized = true;
+                            }
                         }
                     }
                     break;
@@ -55,7 +56,7 @@ class MediaController extends Controller
             }
         }
 
-        if (!$authorized) {
+        if (! $authorized) {
             abort(403, 'Unauthorized access to this media.');
         }
 

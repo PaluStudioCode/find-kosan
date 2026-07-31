@@ -48,7 +48,7 @@ class RegisteredUserController extends Controller
         if (str_starts_with($whatsappNumber, '+62')) {
             $whatsappNumber = substr($whatsappNumber, 1);
         } elseif (str_starts_with($whatsappNumber, '08')) {
-            $whatsappNumber = '62' . substr($whatsappNumber, 1);
+            $whatsappNumber = '62'.substr($whatsappNumber, 1);
         }
 
         $user = User::create([

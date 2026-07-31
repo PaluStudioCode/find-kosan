@@ -5,22 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BoardingHouse;
 use App\Models\Facility;
+use App\Models\Rule;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class KosController extends Controller
 {
     public function index()
     {
         $boardingHouses = BoardingHouse::where('admin_id', auth()->id())
-            ->with(['photos' => function($q) { $q->where('is_primary', true); }])
+            ->with(['photos' => function ($q) {
+                $q->where('is_primary', true);
+            }])
             ->withCount('rooms')
             ->latest()
             ->paginate(10);
 
         return Inertia::render('Admin/Kos/Index', [
-            'boardingHouses' => $boardingHouses
+            'boardingHouses' => $boardingHouses,
         ]);
     }
 
@@ -28,7 +31,7 @@ class KosController extends Controller
     {
         return Inertia::render('Admin/Kos/Form', [
             'facilities' => Facility::where('type', 'kos')->get(),
-            'rules' => \App\Models\Rule::all()
+            'rules' => Rule::all(),
         ]);
     }
 
@@ -50,12 +53,12 @@ class KosController extends Controller
             'facilities' => 'nullable|array',
             'facilities.*' => 'exists:facilities,id',
             'rules' => 'nullable|array',
-            'rules.*' => 'exists:rules,id'
+            'rules.*' => 'exists:rules,id',
         ]);
 
         $facilityIds = $validated['facilities'] ?? [];
         unset($validated['facilities']);
-        
+
         $ruleIds = $validated['rules'] ?? [];
         unset($validated['rules']);
 
@@ -73,32 +76,36 @@ class KosController extends Controller
 
     public function show(BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
-        
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
+
         $kos->load([
-            'facilities', 
+            'facilities',
             'rules',
             'rooms.facilities',
-            'photos' => function($q) {
+            'photos' => function ($q) {
                 $q->orderBy('is_primary', 'desc');
-            }, 
+            },
             'legalDocuments',
-            'reports' => function($q) {
+            'reports' => function ($q) {
                 $q->whereNotNull('resolution_note')->where('status', 'selesai')->latest();
-            }
+            },
         ]);
 
         return Inertia::render('Admin/Kos/Show', [
             'kos' => $kos,
             'kosFacilitiesList' => Facility::where('type', 'kos')->get(),
-            'kosRulesList' => \App\Models\Rule::all(),
-            'roomFacilitiesList' => Facility::where('type', 'kamar')->get()
+            'kosRulesList' => Rule::all(),
+            'roomFacilitiesList' => Facility::where('type', 'kamar')->get(),
         ]);
     }
 
     public function update(Request $request, BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Data tidak dapat diubah karena sedang dalam proses peninjauan.');
         }
@@ -119,12 +126,12 @@ class KosController extends Controller
             'facilities' => 'nullable|array',
             'facilities.*' => 'exists:facilities,id',
             'rules' => 'nullable|array',
-            'rules.*' => 'exists:rules,id'
+            'rules.*' => 'exists:rules,id',
         ]);
 
         $facilityIds = $validated['facilities'] ?? [];
         unset($validated['facilities']);
-        
+
         $ruleIds = $validated['rules'] ?? [];
         unset($validated['rules']);
 
@@ -147,8 +154,10 @@ class KosController extends Controller
 
     public function requestVerification(BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
-        
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
+
         if ($kos->legalDocuments()->count() === 0) {
             return back()->with('error', 'Minimal satu dokumen legalitas diperlukan untuk mengajukan verifikasi.');
         }
@@ -169,14 +178,15 @@ class KosController extends Controller
 
     public function destroy(BoardingHouse $kos)
     {
-        if ($kos->admin_id !== auth()->id()) abort(403);
+        if ($kos->admin_id !== auth()->id()) {
+            abort(403);
+        }
         if ($kos->status === 'menunggu_verifikasi') {
             return back()->with('error', 'Properti tidak dapat dihapus karena sedang dalam proses peninjauan.');
         }
 
         $kos->delete();
+
         return redirect()->route('admin.kos.index')->with('success', 'Kos berhasil dihapus.');
     }
-
-
 }

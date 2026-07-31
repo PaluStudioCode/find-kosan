@@ -4,10 +4,11 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BoardingHouse;
+use App\Models\Facility;
+use App\Models\Rule;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Inertia\Inertia;
 
 class VerificationController extends Controller
 {
@@ -24,7 +25,7 @@ class VerificationController extends Controller
                 $query->where('status', $status);
                 if ($status === 'dipublikasikan') {
                     // Optional: if you don't want them in dipublikasikan while revising
-                    // $query->whereNull('pending_revisions'); 
+                    // $query->whereNull('pending_revisions');
                 }
             }
         }
@@ -33,36 +34,36 @@ class VerificationController extends Controller
 
         return Inertia::render('SuperAdmin/Verifications/Index', [
             'verifications' => $verifications,
-            'filters' => ['status' => $status]
+            'filters' => ['status' => $status],
         ]);
     }
 
     public function show(BoardingHouse $kos)
     {
         $kos->load([
-            'admin', 
-            'facilities', 
+            'admin',
+            'facilities',
             'rules',
-            'rooms.facilities', 
+            'rooms.facilities',
             'photos',
-            'legalDocuments'
+            'legalDocuments',
         ]);
 
         // If there is a shadow revision, overlay it so the Admin sees the proposed changes
         if ($kos->pending_revisions) {
             $kos->fill($kos->pending_revisions);
-            
+
             if (isset($kos->pending_revisions['facility_ids'])) {
-                $kos->setRelation('facilities', \App\Models\Facility::whereIn('id', $kos->pending_revisions['facility_ids'])->get());
+                $kos->setRelation('facilities', Facility::whereIn('id', $kos->pending_revisions['facility_ids'])->get());
             }
-            
+
             if (isset($kos->pending_revisions['rule_ids'])) {
-                $kos->setRelation('rules', \App\Models\Rule::whereIn('id', $kos->pending_revisions['rule_ids'])->get());
+                $kos->setRelation('rules', Rule::whereIn('id', $kos->pending_revisions['rule_ids'])->get());
             }
         }
 
         return Inertia::render('SuperAdmin/Verifications/Show', [
-            'kos' => $kos
+            'kos' => $kos,
         ]);
     }
 
@@ -72,13 +73,13 @@ class VerificationController extends Controller
             // Check for shadow revision
             if ($kos->pending_revisions) {
                 $revisions = $kos->pending_revisions;
-                
+
                 // Sync many-to-many relationships if present in revisions
                 if (isset($revisions['facility_ids'])) {
                     $kos->facilities()->sync($revisions['facility_ids']);
                     unset($revisions['facility_ids']);
                 }
-                
+
                 if (isset($revisions['rule_ids'])) {
                     $kos->rules()->sync($revisions['rule_ids']);
                     unset($revisions['rule_ids']);
@@ -88,7 +89,7 @@ class VerificationController extends Controller
                 $kos->update($revisions);
                 $kos->pending_revisions = null;
             }
-            
+
             $kos->status = 'dipublikasikan';
             $kos->verified_at = now();
             $kos->verified_by = auth()->id();
@@ -104,7 +105,7 @@ class VerificationController extends Controller
     public function reject(Request $request, BoardingHouse $kos)
     {
         $request->validate([
-            'note' => 'required|string|min:5'
+            'note' => 'required|string|min:5',
         ]);
 
         if ($kos->status === 'menunggu_verifikasi' || $kos->pending_revisions) {
@@ -112,12 +113,12 @@ class VerificationController extends Controller
                 // If rejecting a shadow revision, clear the pending revisions and revert status back to dipublikasikan
                 $kos->pending_revisions = null;
                 $kos->status = 'dipublikasikan';
-                $kos->verification_note = 'Revisi ditolak: ' . $request->note;
+                $kos->verification_note = 'Revisi ditolak: '.$request->note;
             } else {
                 $kos->status = 'ditolak';
                 $kos->verification_note = $request->note;
             }
-            
+
             $kos->verified_at = now();
             $kos->verified_by = auth()->id();
             $kos->save();
@@ -131,8 +132,8 @@ class VerificationController extends Controller
     public function downloadLegalDoc(BoardingHouse $kos, $documentId)
     {
         $document = $kos->legalDocuments()->findOrFail($documentId);
-        
-        if (!Storage::disk('local')->exists($document->file_path)) {
+
+        if (! Storage::disk('local')->exists($document->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
 

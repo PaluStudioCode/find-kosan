@@ -5,9 +5,9 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -17,9 +17,9 @@ class UserController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -31,7 +31,7 @@ class UserController extends Controller
 
         return Inertia::render('SuperAdmin/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['search', 'role'])
+            'filters' => $request->only(['search', 'role']),
         ]);
     }
 

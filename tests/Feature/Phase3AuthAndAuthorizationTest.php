@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\BoardingHouse;
+use App\Models\User;
 use App\Models\UserActivationToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ class Phase3AuthAndAuthorizationTest extends TestCase
     {
         $user = User::factory()->create([
             'status' => 'menunggu_aktivasi',
-            'password' => Hash::make('password')
+            'password' => Hash::make('password'),
         ]);
 
         $response = $this->post('/login', [
@@ -33,7 +33,7 @@ class Phase3AuthAndAuthorizationTest extends TestCase
     {
         $user = User::factory()->create([
             'status' => 'aktif',
-            'password' => Hash::make('password')
+            'password' => Hash::make('password'),
         ]);
 
         $response = $this->post('/login', [
@@ -71,7 +71,7 @@ class Phase3AuthAndAuthorizationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'owner@example.com',
             'role' => 'admin',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
     }
 
@@ -91,12 +91,12 @@ class Phase3AuthAndAuthorizationTest extends TestCase
             'name' => 'Kos 1',
             'description' => 'Desc',
             'address' => 'Addr',
-            'status' => 'draft'
+            'status' => 'draft',
         ]);
 
         // owner1 can update
         $this->assertTrue($admin1->can('update', $boardingHouse));
-        
+
         // owner2 cannot
         $this->assertFalse($admin2->can('update', $boardingHouse));
     }
@@ -106,7 +106,7 @@ class Phase3AuthAndAuthorizationTest extends TestCase
         $user = User::factory()->create([
             'status' => 'menunggu_aktivasi',
             'password' => null,
-            'role' => 'user'
+            'role' => 'user',
         ]);
 
         $tokenStr = 'randomtoken123';
@@ -114,17 +114,17 @@ class Phase3AuthAndAuthorizationTest extends TestCase
             'user_id' => $user->id,
             'token_hash' => hash('sha256', $tokenStr),
             'purpose' => 'tenant_activation',
-            'expires_at' => now()->addDays(7)
+            'expires_at' => now()->addDays(7),
         ]);
 
         $response = $this->post('/activation', [
             'token' => $tokenStr,
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertRedirect('/login');
-        
+
         $user->refresh();
         $this->assertEquals('aktif', $user->status);
         $this->assertNotNull($user->password);

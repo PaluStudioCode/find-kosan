@@ -19,13 +19,14 @@ class Setting extends Model
     public static function getSetting(string $key, $default = null)
     {
         $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 
     /**
      * Helper to set a setting value.
      */
-    public static function setSetting(string $key, $value, string $type = 'string', string $description = null)
+    public static function setSetting(string $key, $value, string $type = 'string', ?string $description = null)
     {
         return self::updateOrCreate(
             ['key' => $key],

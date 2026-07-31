@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Rule extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'name',
         'is_positive',

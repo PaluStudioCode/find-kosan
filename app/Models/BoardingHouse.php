@@ -62,7 +62,7 @@ class BoardingHouse extends Model
     {
         return $this->hasMany(BoardingHouseLegalDocument::class);
     }
-    
+
     public function rules()
     {
         return $this->belongsToMany(Rule::class, 'boarding_house_rules');

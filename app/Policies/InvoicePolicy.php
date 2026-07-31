@@ -14,8 +14,13 @@ class InvoicePolicy
 
     public function view(User $user, Invoice $invoice): bool
     {
-        if ($user->role === 'super_admin') return true;
-        if ($user->role === 'admin') return $user->id === $invoice->admin_id;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+        if ($user->role === 'admin') {
+            return $user->id === $invoice->admin_id;
+        }
+
         return $user->id === $invoice->user_id;
     }
 

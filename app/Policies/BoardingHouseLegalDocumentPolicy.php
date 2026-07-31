@@ -14,7 +14,10 @@ class BoardingHouseLegalDocumentPolicy
 
     public function view(User $user, BoardingHouseLegalDocument $boardingHouseLegalDocument): bool
     {
-        if ($user->role === 'super_admin') return true;
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+
         return $user->id === $boardingHouseLegalDocument->boardingHouse->admin_id;
     }
 

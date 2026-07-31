@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
@@ -21,13 +22,14 @@ class GoogleAuthController extends Controller
             // Bypass SSL verification for local development (Laragon/cURL 60 error)
             $googleUser = Socialite::driver('google')
                 ->stateless()
-                ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
+                ->setHttpClient(new Client(['verify' => false]))
                 ->user();
 
             $user = User::where('google_id', $googleUser->id)->first();
 
             if ($user) {
                 Auth::login($user);
+
                 return redirect()->intended(route('dashboard', absolute: false));
             }
 
@@ -41,6 +43,7 @@ class GoogleAuthController extends Controller
                     'avatar' => $googleUser->avatar,
                 ]);
                 Auth::login($userWithEmail);
+
                 return redirect()->intended(route('dashboard', absolute: false));
             }
 
@@ -61,7 +64,8 @@ class GoogleAuthController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Google Login Error: ' . $e->getMessage());
+            Log::error('Google Login Error: '.$e->getMessage());
+
             return redirect('/login')->with('error', 'Terjadi kesalahan saat login menggunakan Google. Silakan coba lagi.');
         }
     }

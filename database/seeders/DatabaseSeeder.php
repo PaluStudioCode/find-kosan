@@ -84,6 +84,28 @@ class DatabaseSeeder extends Seeder
                 'status' => $facility['status'],
             ]);
         }
-        
+
+        // Master Data Rules
+        $rules = [
+            ['name' => 'Bebas jam malam', 'is_positive' => true],
+            ['name' => 'Ada jam malam', 'is_positive' => false],
+            ['name' => 'Boleh pasutri', 'is_positive' => true],
+            ['name' => 'Dilarang bawa anak', 'is_positive' => false],
+            ['name' => 'Tamu boleh menginap', 'is_positive' => true],
+            ['name' => 'Tamu dilarang menginap', 'is_positive' => false],
+            ['name' => 'Boleh bawa hewan peliharaan', 'is_positive' => true],
+            ['name' => 'Dilarang bawa hewan peliharaan', 'is_positive' => false],
+            ['name' => 'Dilarang merokok di kamar', 'is_positive' => false],
+            ['name' => 'Wajib menjaga kebersihan', 'is_positive' => true],
+            ['name' => 'Dilarang berisik setelah jam 10 malam', 'is_positive' => false],
+        ];
+
+        foreach ($rules as $rule) {
+            \App\Models\Rule::firstOrCreate([
+                'name' => $rule['name'],
+            ], [
+                'is_positive' => $rule['is_positive'],
+            ]);
+        }
     }
 }

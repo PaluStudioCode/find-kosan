@@ -18,7 +18,7 @@ watch(() => page.props.flash, (flash) => {
 <template>
     <div class="flex min-h-screen w-full bg-white">
         <!-- Left Side: Form (Mobile + Desktop) -->
-        <div class="flex w-full flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none animate-in fade-in slide-in-from-left-8 duration-700">
+        <div class="flex w-full flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none">
             <div class="mx-auto w-full max-w-md py-12">
                 <!-- Logo -->
                 <div class="mb-10 flex justify-center lg:justify-start">
@@ -38,14 +38,14 @@ watch(() => page.props.flash, (flash) => {
         </div>
         
         <!-- Right Side: Showcase (Desktop Only) -->
-        <div class="relative hidden w-0 flex-1 lg:block bg-slate-900 overflow-hidden animate-in fade-in duration-1000 delay-300 fill-mode-both">
+        <div class="relative hidden w-0 flex-1 lg:block bg-slate-900 overflow-hidden">
             <AuthFeatureShowcase class="absolute inset-0 h-full w-full opacity-100 transition-opacity duration-1000" />
             
             <!-- Soft Gradient Overlay (Dark) -->
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none"></div>
             
             <!-- Branding Text (Light Text) -->
-            <div class="absolute bottom-16 left-16 right-16 text-white max-w-2xl pointer-events-none z-10 animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-700 fill-mode-both">
+            <div class="absolute bottom-16 left-16 right-16 text-white max-w-2xl pointer-events-none z-10">
                 <blockquote class="space-y-6">
                     <p class="text-3xl xl:text-4xl font-extrabold leading-tight text-white drop-shadow-lg">
                         "Mencari kos dan manajemen penyewaan kini menjadi lebih cepat, aman, dan tanpa repot."

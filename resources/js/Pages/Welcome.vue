@@ -242,8 +242,8 @@ onBeforeUnmount(() => {
         <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-center">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
-            <div class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:pb-32 lg:pt-20">
-                <div class="relative z-10 max-w-2xl -mt-12 lg:-mt-24">
+            <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full">
+                <div class="relative z-10 max-w-2xl">
                     <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 text-sm font-medium rounded-full bg-white/10 text-teal-300 border border-white/10 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
                         Cari Kos Gak Pake Ribet 🚀
                     </div>
                     
-                    <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                    <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl xl:text-6xl">
                         Ketemu Kos Idaman,
                         <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-2">Lebih Cepat & Gampang.</span>
                     </h1>

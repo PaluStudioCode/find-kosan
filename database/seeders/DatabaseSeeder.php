@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Bersihkan folder file yang di-upload agar tidak menumpuk (Orphaned files)
-        $directoriesToClean = ['kos_photos', 'legal_docs', 'payment_receipts', 'qris_images'];
+        $directoriesToClean = ['kos_photos', 'legal_docs', 'payment_receipts', 'qris'];
         foreach ($directoriesToClean as $dir) {
             \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory($dir);
             \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($dir);

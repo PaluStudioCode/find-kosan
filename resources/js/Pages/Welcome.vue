@@ -239,7 +239,7 @@ onBeforeUnmount(() => {
 
         <div ref="landingPage">
         <!-- 1. Modern Hero -->
-        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20">
+        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-20 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-center">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
             <div class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-8 lg:pb-32 lg:pt-20">
@@ -302,7 +302,7 @@ onBeforeUnmount(() => {
 
 
         <!-- 4. Animated map discovery -->
-        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-white py-16 sm:py-24 border-y border-slate-100">
+        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] items-start gap-12 lg:gap-16">
                     <!-- Left: Text -->
@@ -330,7 +330,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 6. How it works -->
-        <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 relative overflow-hidden">
+        <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 lg:py-0 lg:min-h-screen flex flex-col justify-center relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Ngekos Tanpa Pusing, Cukup 4 Langkah.</h2>
@@ -395,7 +395,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 7. Security & transparency -->
-        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-20 sm:py-24 relative overflow-hidden">
+        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-20 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
             <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
@@ -443,7 +443,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 8. Tenancy and payment -->
-        <section class="overflow-hidden bg-white py-16 sm:py-24 border-y border-slate-100">
+        <section class="overflow-hidden bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="grid items-center gap-10 lg:gap-16 lg:grid-cols-[0.9fr_1.1fr]">
                     <!-- Left: Simplified Mockup -->
@@ -517,7 +517,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 9. WhatsApp notifications -->
-        <section class="relative bg-slate-900 py-16 sm:py-24 text-white overflow-hidden">
+        <section class="relative bg-slate-900 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center text-white overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="grid items-center gap-14 lg:gap-16 lg:grid-cols-[1.1fr_0.9fr]">
                     <div data-reveal="left" class="max-w-xl">
@@ -571,7 +571,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 10. Owner solution -->
-        <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 border-y border-slate-100">
+        <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Punya Kos-Kosan? Atur Semuanya Dari Satu Layar.</h2>
@@ -632,7 +632,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 11. Tenant reviews -->
-        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 relative overflow-hidden">
+        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kata Mereka yang Udah Buktiin Langsung.</h2>
@@ -695,7 +695,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 12. FAQ -->
-        <section class="bg-slate-50 py-16 sm:py-24 border-y border-slate-100 relative">
+        <section class="bg-slate-50 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100 relative">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Masih Punya Pertanyaan? (FAQ)</h2>
@@ -719,7 +719,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 13. Final CTA -->
-        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:py-0 lg:min-h-[70vh] flex flex-col justify-center lg:px-8">
             <div data-reveal="scale" class="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-slate-900 px-6 py-16 text-center shadow-xl sm:px-12 sm:py-20 relative">
                 <div class="absolute inset-0 bg-slate-800/20 mix-blend-overlay" />
                 

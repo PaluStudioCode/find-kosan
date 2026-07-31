@@ -54,7 +54,7 @@ class PaymentGatewayController extends Controller
                 )
             ),
             'callbackUrl' => url('/duitku/callback'),
-            'returnUrl' => url('/tenant/tenancies/' . $invoice->tenancy_id),
+            'returnUrl' => url('/user/tenancies/' . $invoice->tenancy_id),
             'expiryPeriod' => 1440
         );
 

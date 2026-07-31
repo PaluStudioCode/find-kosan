@@ -48,7 +48,7 @@ const submitEndTenancy = () => {
                 <ChevronLeft class="w-4 h-4 mr-1" /> Kembali ke Daftar Sewa
             </Link>
             <div class="flex items-center gap-3">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Detail Sewa: {{ tenancy.tenant?.name }}</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Detail Sewa: {{ tenancy.user?.name }}</h2>
                 <StatusBadge :status="tenancy.status" />
             </div>
         </div>
@@ -61,9 +61,9 @@ const submitEndTenancy = () => {
                         <CardTitle>Informasi Penyewa</CardTitle>
                     </CardHeader>
                     <CardContent class="grid grid-cols-2 gap-4">
-                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Nama</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.name }}</p></div>
-                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Email</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.email }}</p></div>
-                        <div><p class="text-sm text-gray-500 dark:text-slate-400">No. WhatsApp</p><p class="font-medium dark:text-slate-200">{{ tenancy.tenant?.whatsapp_number || '-' }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Nama</p><p class="font-medium dark:text-slate-200">{{ tenancy.user?.name }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">Email</p><p class="font-medium dark:text-slate-200">{{ tenancy.user?.email }}</p></div>
+                        <div><p class="text-sm text-gray-500 dark:text-slate-400">No. WhatsApp</p><p class="font-medium dark:text-slate-200">{{ tenancy.user?.whatsapp_number || '-' }}</p></div>
                     </CardContent>
                 </Card>
 

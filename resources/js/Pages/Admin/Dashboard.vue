@@ -232,7 +232,7 @@ const capacityChartOptions = computed(() => ({
                                 <div class="flex items-center gap-3">
                                     <div class="w-2 h-10 bg-orange-400 dark:bg-orange-500 rounded-full"></div>
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200">{{ invoice.tenant?.name }}</span>
+                                        <span class="font-semibold text-slate-800 dark:text-slate-200">{{ invoice.user?.name }}</span>
                                         <span class="text-xs text-slate-500 dark:text-slate-400">{{ invoice.tenancy?.room?.boardingHouse?.name }} - {{ invoice.tenancy?.room?.name }}</span>
                                     </div>
                                 </div>
@@ -266,10 +266,10 @@ const capacityChartOptions = computed(() => ({
                             <div v-for="transaction in recentTransactions" :key="transaction.id" class="flex items-center justify-between p-3 border border-slate-100 dark:border-slate-700/50 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-700 dark:text-emerald-400 text-xs">
-                                        {{ transaction.tenant?.name?.charAt(0) || 'U' }}
+                                        {{ transaction.user?.name?.charAt(0) || 'U' }}
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-sm text-slate-800 dark:text-slate-200">{{ transaction.tenant?.name }}</span>
+                                        <span class="font-semibold text-sm text-slate-800 dark:text-slate-200">{{ transaction.user?.name }}</span>
                                         <span class="text-xs text-slate-500 dark:text-slate-400">{{ transaction.tenancy?.room?.boardingHouse?.name }}</span>
                                     </div>
                                 </div>

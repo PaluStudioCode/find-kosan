@@ -65,8 +65,8 @@ const handleFilterChange = (val) => {
                     <TableBody>
                         <TableRow v-for="tenancy in tenancies.data" :key="tenancy.id">
                             <TableCell>
-                                <div class="font-medium text-gray-900 dark:text-slate-200">{{ tenancy.tenant?.name }}</div>
-                                <div class="text-xs text-gray-500 dark:text-slate-400">{{ tenancy.tenant?.whatsapp_number || tenancy.tenant?.email }}</div>
+                                <div class="font-medium text-gray-900 dark:text-slate-200">{{ tenancy.user?.name }}</div>
+                                <div class="text-xs text-gray-500 dark:text-slate-400">{{ tenancy.user?.whatsapp_number || tenancy.user?.email }}</div>
                             </TableCell>
                             <TableCell>
                                 <div class="font-bold text-indigo-900 dark:text-indigo-400 text-sm mb-1">{{ tenancy.room?.boarding_house?.name || 'Kos' }}</div>

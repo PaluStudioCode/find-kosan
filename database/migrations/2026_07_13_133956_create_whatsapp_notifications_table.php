@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('phone_number', 30);
-            $table->enum('message_type', ['pengingat_jatuh_tempo', 'pembayaran_baru', 'pembayaran_dikonfirmasi']);
+            $table->string('message_type', 50);
             $table->text('message_body')->nullable();
             $table->date('scheduled_date');
             $table->enum('status', ['belum_dikirim', 'terkirim', 'gagal', 'tidak_dikirim']);

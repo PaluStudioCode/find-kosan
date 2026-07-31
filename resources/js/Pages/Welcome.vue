@@ -245,11 +245,13 @@ onBeforeUnmount(() => {
             <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-8">
                 <div class="relative z-10 max-w-2xl flex flex-col">
                     
-                    <div class="w-fit inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-medium rounded-full bg-white/10 text-teal-300 border border-white/10 backdrop-blur-md">
-                        <span class="relative flex h-2 w-2">
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
-                        </span>
-                        Cari Kos Gak Pake Ribet 🚀
+                    <div class="w-fit inline-flex items-center gap-2.5 px-1.5 py-1.5 pr-4 mb-6 text-[11px] font-bold rounded-full bg-slate-800/40 border border-slate-700/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+                        <div class="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 shadow-[0_0_10px_rgba(45,212,191,0.5)]">
+                            <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <span class="bg-gradient-to-r from-teal-50 to-slate-300 bg-clip-text text-transparent tracking-wider uppercase">Cari Kos Gak Pake Ribet</span>
                     </div>
 
                     <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">

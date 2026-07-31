@@ -6,7 +6,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h, Fragment } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import PageTransition from './Components/PageTransition.vue';
+import PageTransition from './components/PageTransition.vue';
 import Vue3Lottie from 'vue3-lottie';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

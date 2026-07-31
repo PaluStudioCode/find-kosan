@@ -284,7 +284,7 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
 
-                <div class="relative min-h-[460px] lg:min-h-[650px] w-full">
+                <div class="relative min-h-[460px] lg:min-h-[650px] w-full mt-[-2rem] lg:-mt-24">
                     <LandingHeroScene class="relative z-10" />
                 </div>
             </div>

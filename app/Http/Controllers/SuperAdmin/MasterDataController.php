@@ -23,7 +23,7 @@ class MasterDataController extends Controller
         }
         $facilities = $facilitiesQuery->orderBy('type')
             ->orderBy('name')
-            ->paginate(10, ['*'], 'facility_page')
+            ->paginate(5, ['*'], 'facility_page')
             ->withQueryString();
 
         $rulesQuery = Rule::query();
@@ -31,7 +31,7 @@ class MasterDataController extends Controller
             $rulesQuery->where('name', 'like', '%' . $request->search_rule . '%');
         }
         $rules = $rulesQuery->orderBy('name')
-            ->paginate(10, ['*'], 'rule_page')
+            ->paginate(5, ['*'], 'rule_page')
             ->withQueryString();
 
         return Inertia::render('SuperAdmin/MasterData/Index', [

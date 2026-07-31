@@ -1,0 +1,1 @@
+import{_ as o,o as s,j as t,B as a}from"./app-BcjhJRhq.js";const n={},r={class:"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"};function c(e,l){return s(),t("label",r,[a(e.$slots,"default")])}const _=o(n,[["render",c]]);export{_ as L};

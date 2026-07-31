@@ -1,10 +1,10 @@
-<script setup>
+﻿<script setup>
 import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Clock, XCircle, AlertTriangle, ShieldCheck } from 'lucide-vue-next';
-import StatusBadge from '@/Components/StatusBadge.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const props = defineProps({

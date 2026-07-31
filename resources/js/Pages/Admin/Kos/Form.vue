@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { toast } from 'vue-sonner';
 import { ref, onMounted, nextTick } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -13,7 +13,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ChevronLeft, MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
-import MapPicker from '@/Components/MapPicker.vue';
+import MapPicker from '@/components/MapPicker.vue';
 import axios from 'axios';
 
 const props = defineProps({

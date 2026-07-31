@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';

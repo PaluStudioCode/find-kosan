@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
-import MapPicker from '@/Components/MapPicker.vue';
+import MapPicker from '@/components/MapPicker.vue';
 import axios from 'axios';
 
 const props = defineProps({

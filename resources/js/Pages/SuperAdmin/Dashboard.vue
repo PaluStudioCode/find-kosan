@@ -1,11 +1,11 @@
-<script setup>
+﻿<script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useDark } from '@vueuse/core';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, FileCheck, Flag, Wallet, ChevronRight, TrendingUp, AlertCircle, Building2, Banknote } from 'lucide-vue-next';
-import StatusBadge from '@/Components/StatusBadge.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Line, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, ArcElement, CategoryScale, LinearScale } from 'chart.js';

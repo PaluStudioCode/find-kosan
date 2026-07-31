@@ -1,7 +1,7 @@
-<script setup>
+﻿<script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { Building2 } from 'lucide-vue-next';
-import AuthFeatureShowcase from '@/Components/AuthFeatureShowcase.vue';
+import AuthFeatureShowcase from '@/components/AuthFeatureShowcase.vue';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'vue-sonner';
 import { watch } from 'vue';

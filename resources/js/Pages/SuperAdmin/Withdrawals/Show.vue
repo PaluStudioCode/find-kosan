@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import StatusBadge from '@/Components/StatusBadge.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { ChevronLeft, CheckCircle, XCircle, Landmark } from 'lucide-vue-next';
 
 import { ref } from 'vue';
@@ -28,7 +28,7 @@ const reject = () => reviewForm.post(route('superadmin.withdrawals.reject', prop
         <Link :href="route('superadmin.withdrawals.index')" class="inline-flex items-center text-sm text-gray-500 hover:text-primary dark:text-slate-400 dark:hover:text-blue-400 mb-5 transition-colors"><ChevronLeft class="w-4 h-4 mr-1" /> Kembali ke penarikan</Link>
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-            <div><h2 class="text-2xl font-bold dark:text-white">Penarikan #{{ withdrawal.id }}</h2><p class="text-gray-500 dark:text-slate-400">{{ withdrawal.admin?.name }} · {{ withdrawal.admin?.email }}</p></div>
+            <div><h2 class="text-2xl font-bold dark:text-white">Penarikan #{{ withdrawal.id }}</h2><p class="text-gray-500 dark:text-slate-400">{{ withdrawal.admin?.name }} Â· {{ withdrawal.admin?.email }}</p></div>
             <StatusBadge :status="withdrawal.status" />
         </div>
 
@@ -37,7 +37,7 @@ const reject = () => reviewForm.post(route('superadmin.withdrawals.reject', prop
                 <CardHeader class="border-b dark:border-slate-800"><CardTitle class="dark:text-white">Detail Transfer</CardTitle></CardHeader>
                 <CardContent class="space-y-4 pt-6">
                     <div><p class="text-sm text-gray-500 dark:text-slate-400">Nominal</p><p class="text-2xl font-bold dark:text-slate-200">{{ formatRupiah(withdrawal.amount) }}</p></div>
-                    <div><p class="text-sm text-gray-500 dark:text-slate-400">Tujuan</p><p class="font-semibold dark:text-slate-200">{{ withdrawal.bank_name }} — {{ withdrawal.account_number }}</p><p class="dark:text-slate-300">{{ withdrawal.account_holder_name }}</p></div>
+                    <div><p class="text-sm text-gray-500 dark:text-slate-400">Tujuan</p><p class="font-semibold dark:text-slate-200">{{ withdrawal.bank_name }} â€” {{ withdrawal.account_number }}</p><p class="dark:text-slate-300">{{ withdrawal.account_holder_name }}</p></div>
                     <div v-if="withdrawal.owner_note"><p class="text-sm text-gray-500 dark:text-slate-400">Catatan pemilik</p><p class="dark:text-slate-300">{{ withdrawal.owner_note }}</p></div>
                     <div v-if="withdrawal.review_note"><p class="text-sm text-gray-500 dark:text-slate-400">Catatan admin</p><p class="dark:text-slate-300">{{ withdrawal.review_note }}</p></div>
                     <div v-if="withdrawal.transfer_reference"><p class="text-sm text-gray-500 dark:text-slate-400">Referensi transfer</p><p class="font-medium dark:text-slate-200">{{ withdrawal.transfer_reference }}</p></div>

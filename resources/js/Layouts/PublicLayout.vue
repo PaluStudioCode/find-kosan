@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';

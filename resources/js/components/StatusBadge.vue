@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { Badge } from '@/components/ui/badge';
 import { computed } from 'vue';
 

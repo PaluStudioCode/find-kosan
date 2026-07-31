@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Upload, X, FileIcon, ImageIcon } from 'lucide-vue-next';

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import {
     computed,
     defineAsyncComponent,
@@ -46,10 +46,10 @@ import {
 } from 'lucide-vue-next';
 
 const LandingHeroScene = defineAsyncComponent(
-    () => import('@/Components/LandingHeroScene.vue'),
+    () => import('@/components/LandingHeroScene.vue'),
 );
 const LandingMapDiscovery = defineAsyncComponent(
-    () => import('@/Components/LandingMapDiscovery.vue'),
+    () => import('@/components/LandingMapDiscovery.vue'),
 );
 
 const props = defineProps({
@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                         </span>
-                        Cari Kos Gak Pake Ribet 🚀
+                        Cari Kos Gak Pake Ribet ðŸš€
                     </div>
                     
                     <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -661,7 +661,7 @@ onBeforeUnmount(() => {
                             />
                         </div>
 
-                        <p class="line-clamp-4 text-sm leading-relaxed text-slate-600 italic">“{{ review.comment }}”</p>
+                        <p class="line-clamp-4 text-sm leading-relaxed text-slate-600 italic">â€œ{{ review.comment }}â€</p>
 
                         <div class="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
                             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-50 text-sm font-bold text-teal-700">

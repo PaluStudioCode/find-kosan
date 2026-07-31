@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { useForwardPropsEmits } from "reka-ui";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import Command from "./Command.vue";

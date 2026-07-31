@@ -2,12 +2,12 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Smartphone, Wifi, WifiOff, QrCode, KeyRound, Loader2, LogOut, RefreshCw } from 'lucide-vue-next';
+
+import {  Wifi, QrCode, KeyRound, Loader2, LogOut, RefreshCw } from 'lucide-vue-next';
 import axios from 'axios';
 
 const props = defineProps({

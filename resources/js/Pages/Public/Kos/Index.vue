@@ -1,11 +1,11 @@
 ﻿<script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { useDraggable } from '@vueuse/core';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { MapPin, Navigation, Map, Settings2, X } from 'lucide-vue-next';
+
+import {  Navigation, Map, Settings2, X } from 'lucide-vue-next';
 import EmptyState from '@/components/EmptyState.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';

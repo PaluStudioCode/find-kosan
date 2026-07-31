@@ -1,11 +1,11 @@
 <script setup>
 import { toast } from 'vue-sonner';
 import { ref } from 'vue';
-import { useForm, router } from '@inertiajs/vue3';
+import {  router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Trash2, Star, UploadCloud, ImagePlus, X, AlertTriangle } from 'lucide-vue-next';
+import {  Star, UploadCloud, X, AlertTriangle } from 'lucide-vue-next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const props = defineProps({

@@ -6,7 +6,7 @@ import { useDark } from '@vueuse/core';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Building2, BedDouble, Key, Clock, Wallet, TrendingUp, AlertCircle, Coins, CheckCircle2, CalendarClock, MessageSquare, Star, ArrowRight, MapPin } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
-import { Button } from '@/components/ui/button';
+
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 

@@ -3,8 +3,8 @@ import { ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Star, MessageSquare, CheckCircle2, ExternalLink, Filter, X } from 'lucide-vue-next';
+
+import { Star, MessageSquare, ExternalLink, Filter, X } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import { id as localeID } from 'date-fns/locale';
 

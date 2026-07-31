@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ShieldAlert, ExternalLink } from 'lucide-vue-next';
+import { ChevronLeft, ExternalLink } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 // Partials

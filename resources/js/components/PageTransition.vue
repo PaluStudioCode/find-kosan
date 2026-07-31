@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Home, MapPin, Search } from 'lucide-vue-next';
+import {   Search } from 'lucide-vue-next';
 
 const isTransitioning = ref(false);
 const transitionType = ref('default');

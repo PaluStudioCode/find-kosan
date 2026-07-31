@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, FileText, LayoutDashboard, Home } from 'lucide-vue-next';
+import { User, LogOut, LayoutDashboard, Home } from 'lucide-vue-next';
 
 const props = defineProps({
     landing: {

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit2, Trash2, AlertTriangle, Check, X } from 'lucide-vue-next';
+import { Plus, Edit2, Trash2, AlertTriangle, X } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 const props = defineProps({

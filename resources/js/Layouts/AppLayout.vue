@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, LayoutList, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings, Database } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings, Database } from 'lucide-vue-next';
 import { useDark, useToggle } from '@vueuse/core';
 
 const isDark = useDark();

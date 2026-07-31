@@ -1,13 +1,13 @@
 ﻿<script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
-import { Card, CardContent } from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
 import StatusBadge from '@/components/StatusBadge.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Home, ChevronRight, Calendar, MapPin, Receipt, ArrowRight } from 'lucide-vue-next';
+import { Home, Calendar, MapPin, Receipt, ArrowRight } from 'lucide-vue-next';
 
 defineProps({
     tenancies: Object,

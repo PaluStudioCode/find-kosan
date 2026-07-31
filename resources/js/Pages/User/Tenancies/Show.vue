@@ -3,12 +3,12 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 import StatusBadge from '@/components/StatusBadge.vue';
-import { ChevronLeft, UploadCloud, Clock, CheckCircle, Home, User, Users, Calendar, Hash, Maximize2, Download, CreditCard } from 'lucide-vue-next';
+import { ChevronLeft, Clock, CheckCircle, Home, User, Users, Calendar, Hash, CreditCard } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import axios from 'axios';

@@ -5,9 +5,9 @@ import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Download, CheckCircle, XCircle, FileText, Eye, MapPin, Home, User, Map, Check, X, AlertTriangle, Image as ImageIcon } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Download, CheckCircle, FileText, Eye, MapPin, Map, Check, X, AlertTriangle, Image as ImageIcon } from 'lucide-vue-next';
 import MapPicker from '@/components/MapPicker.vue';
 
 const props = defineProps({

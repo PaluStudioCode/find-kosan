@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import StatusBadge from '@/components/StatusBadge.vue';
-import { ChevronLeft, CheckCircle, XCircle, Landmark } from 'lucide-vue-next';
+import { ChevronLeft, CheckCircle, XCircle } from 'lucide-vue-next';
 
 import { ref } from 'vue';
 

@@ -11,7 +11,6 @@ import {
     ChevronLeft,
     ChevronRight,
     X,
-    DoorOpen,
     ArrowLeft,
     ImageOff,
     Star,

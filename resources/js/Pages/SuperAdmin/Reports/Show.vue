@@ -3,11 +3,11 @@ import { toast } from 'vue-sonner';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, Info, CheckCircle2, MessageCircle, ShieldAlert } from 'lucide-vue-next';
+import { ChevronLeft, CheckCircle2, MessageCircle, ShieldAlert } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';

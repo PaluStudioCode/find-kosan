@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $walletBalance = $wallet ? $wallet->available_balance : 0;
 
         // Fetch Recent Transactions (lunas invoices)
-        $recentTransactions = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'tenant'])
+        $recentTransactions = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'user'])
             ->where('admin_id', $adminId)
             ->where('status', 'lunas')
             ->latest('updated_at')
@@ -82,7 +82,7 @@ class DashboardController extends Controller
             });
 
         // Upcoming Due Invoices (H-3 to Overdue)
-        $upcomingDueInvoices = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'tenant'])
+        $upcomingDueInvoices = \App\Models\Invoice::with(['tenancy.room.boardingHouse', 'user'])
             ->where('admin_id', $adminId)
             ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
             ->where('due_date', '<=', now()->addDays(3))

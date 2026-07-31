@@ -27,7 +27,7 @@ class TenancyController extends Controller
             $query->where('boarding_house_id', $kosId);
         }
 
-        $tenancies = $query->with(['room.boardingHouse', 'tenant', 'invoices' => function($q) {
+        $tenancies = $query->with(['room.boardingHouse', 'user', 'invoices' => function($q) {
                 $q->latest();
             }])->latest()->paginate(10)->withQueryString();
         
@@ -46,7 +46,7 @@ class TenancyController extends Controller
     public function show(Tenancy $tenancy)
     {
         if ($tenancy->admin_id !== auth()->id()) abort(403);
-        $tenancy->load(['room.boardingHouse', 'tenant', 'invoices.payments']);
+        $tenancy->load(['room.boardingHouse', 'user', 'invoices.payments']);
         
         return Inertia::render('Admin/Tenancies/Show', compact('tenancy'));
     }

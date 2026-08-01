@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { usePage, useForm } from '@inertiajs/vue3';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { CheckCircle2, AlertCircle } from 'lucide-vue-next';
-import OtpVerificationModal from '@/Components/OtpVerificationModal.vue';
+import OtpVerificationModal from '@/components/OtpVerificationModal.vue';
 import { toast } from 'vue-sonner';
 
 const page = usePage();

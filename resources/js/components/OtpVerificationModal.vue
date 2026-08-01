@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const props = defineProps({
   isOpen: {

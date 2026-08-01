@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
@@ -132,7 +132,7 @@ const groupedRooms = computed(() => {
     <AppLayout>
         <Head :title="`Verifikasi: ${kos.name}`" />
 
-        <div class="max-w-4xl mx-auto space-y-4">
+        <div class="max-w-5xl space-y-4">
             <!-- Header Ringkas -->
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">

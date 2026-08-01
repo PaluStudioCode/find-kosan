@@ -32,11 +32,11 @@ class KosPaluDummySeeder extends Seeder
         $this->command->info('Memastikan ketersediaan file fisik dokumen legal dummy...');
         $dummyPdfContent = "%PDF-1.4\n%Dummy PDF File\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n5 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (Dummy Document) Tj ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000044 00000 n\n0000000093 00000 n\n0000000150 00000 n\n0000000258 00000 n\n0000000346 00000 n\ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n441\n%%EOF";
         
-        if (!Storage::disk('local')->exists('dummy/legal/ktp.pdf')) {
-            Storage::disk('local')->put('dummy/legal/ktp.pdf', str_replace('(Dummy Document)', '(Dummy KTP File)', $dummyPdfContent));
+        if (!Storage::disk('local')->exists('legal_documents/dummy_ktp.pdf')) {
+            Storage::disk('local')->put('legal_documents/dummy_ktp.pdf', str_replace('(Dummy Document)', '(Dummy KTP File)', $dummyPdfContent));
         }
-        if (!Storage::disk('local')->exists('dummy/legal/shm.pdf')) {
-            Storage::disk('local')->put('dummy/legal/shm.pdf', str_replace('(Dummy Document)', '(Dummy Sertifikat SHM)', $dummyPdfContent));
+        if (!Storage::disk('local')->exists('legal_documents/dummy_shm.pdf')) {
+            Storage::disk('local')->put('legal_documents/dummy_shm.pdf', str_replace('(Dummy Document)', '(Dummy Sertifikat SHM)', $dummyPdfContent));
         }
 
         $kosFacilities = Facility::where('type', 'kos')->pluck('id');
@@ -175,7 +175,7 @@ class KosPaluDummySeeder extends Seeder
                 'document_type' => 'identitas_pemilik_pengelola',
                 'document_name' => 'KTP Pemilik',
                 'document_number' => '72710' . mt_rand(10000000000, 99999999999),
-                'file_path' => 'dummy/legal/ktp.pdf',
+                'file_path' => 'legal_documents/dummy_ktp.pdf',
                 'status' => 'valid',
                 'review_note' => 'KTP Valid',
                 'reviewed_by' => $superAdmin->id,
@@ -186,7 +186,7 @@ class KosPaluDummySeeder extends Seeder
                 'document_type' => 'bukti_kepemilikan_pengelolaan',
                 'document_name' => 'Sertifikat Hak Milik (SHM)',
                 'document_number' => 'SHM-' . mt_rand(1000, 9999),
-                'file_path' => 'dummy/legal/shm.pdf',
+                'file_path' => 'legal_documents/dummy_shm.pdf',
                 'status' => 'valid',
                 'review_note' => 'Dokumen asli dan sesuai lokasi',
                 'reviewed_by' => $superAdmin->id,

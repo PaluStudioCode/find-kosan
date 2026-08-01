@@ -11,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class KosPaluDummySeeder extends Seeder
 {
@@ -25,6 +26,17 @@ class KosPaluDummySeeder extends Seeder
         if (!$superAdmin || !$admin) {
             $this->command->error('Super Admin atau Admin tidak ditemukan. Harap jalankan DatabaseSeeder terlebih dahulu.');
             return;
+        }
+
+        // AUTO-GENERATE FILE FISIK PDF (Mencegah error 404 jika di-deploy ke server / tidak masuk Github)
+        $this->command->info('Memastikan ketersediaan file fisik dokumen legal dummy...');
+        $dummyPdfContent = "%PDF-1.4\n%Dummy PDF File\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n5 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (Dummy Document) Tj ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000044 00000 n\n0000000093 00000 n\n0000000150 00000 n\n0000000258 00000 n\n0000000346 00000 n\ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n441\n%%EOF";
+        
+        if (!Storage::disk('local')->exists('dummy/legal/ktp.pdf')) {
+            Storage::disk('local')->put('dummy/legal/ktp.pdf', str_replace('(Dummy Document)', '(Dummy KTP File)', $dummyPdfContent));
+        }
+        if (!Storage::disk('local')->exists('dummy/legal/shm.pdf')) {
+            Storage::disk('local')->put('dummy/legal/shm.pdf', str_replace('(Dummy Document)', '(Dummy Sertifikat SHM)', $dummyPdfContent));
         }
 
         $kosFacilities = Facility::where('type', 'kos')->pluck('id');

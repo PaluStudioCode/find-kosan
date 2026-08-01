@@ -9,10 +9,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
+use Illuminate\Http\Request;
+
 class GoogleAuthController extends Controller
 {
-    public function redirect()
+    public function redirect(Request $request)
     {
+        if ($request->has('role') && in_array($request->role, ['admin', 'user'])) {
+            session(['google_register_role' => $request->role]);
+        }
+        
         return Socialite::driver('google')->redirect();
     }
 
@@ -47,13 +53,17 @@ class GoogleAuthController extends Controller
                 return redirect()->intended(route('dashboard', absolute: false));
             }
 
+            // Retrieve role from session or default to 'user'
+            $role = session('google_register_role', 'user');
+            session()->forget('google_register_role');
+
             // Create new user
             $newUser = User::create([
                 'name' => $googleUser->name,
                 'email' => $googleUser->email,
                 'google_id' => $googleUser->id,
                 'avatar' => $googleUser->avatar,
-                'role' => 'user', // default role
+                'role' => $role,
                 'status' => 'aktif',
                 'password' => null, // no password for google login
                 'email_verified_at' => now(), // Assume email is verified if logging in with google

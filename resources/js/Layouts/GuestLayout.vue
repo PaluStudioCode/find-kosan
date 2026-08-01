@@ -16,12 +16,12 @@ watch(() => page.props.flash, (flash) => {
 </script>
 
 <template>
-    <div class="flex min-h-screen w-full bg-white">
+    <div class="flex h-screen w-full bg-white overflow-hidden">
         <!-- Left Side: Form (Mobile + Desktop) -->
-        <div class="flex w-full flex-col justify-start pt-16 lg:pt-32 px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none">
-            <div class="mx-auto w-full max-w-md py-12">
-                <!-- Logo -->
-                <div class="mb-10 flex justify-center lg:justify-start">
+        <div class="flex h-full w-full flex-col px-4 sm:px-6 lg:flex-none lg:w-1/2 xl:w-5/12 bg-slate-50 lg:bg-white relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.05)] lg:shadow-none">
+            <!-- Sticky Logo Header -->
+            <div class="shrink-0 w-full max-w-md mx-auto pt-8 pb-4">
+                <div class="flex justify-center lg:justify-start">
                     <Link href="/" class="flex items-center gap-2.5 text-2xl font-extrabold text-slate-900 group">
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-white shadow-md transition-transform group-hover:scale-105">
                             <Building2 class="h-6 w-6" />
@@ -29,10 +29,14 @@ watch(() => page.props.flash, (flash) => {
                         <span class="bg-gradient-to-r from-teal-600 to-slate-800 bg-clip-text text-transparent">CariKosan</span>
                     </Link>
                 </div>
-                
-                <!-- Content Slot (Cards will fit here perfectly) -->
-                <div class="w-full">
-                    <slot />
+            </div>
+
+            <!-- Scrollable Form Slot -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="flex min-h-full flex-col justify-center pb-8">
+                    <div class="mx-auto w-full max-w-md">
+                        <slot />
+                    </div>
                 </div>
             </div>
         </div>

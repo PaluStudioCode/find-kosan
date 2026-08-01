@@ -158,6 +158,11 @@ class KosController extends Controller
             abort(403);
         }
 
+        $user = auth()->user();
+        if (!$user->hasVerifiedEmail() || empty($user->whatsapp_number)) {
+            return redirect()->route('profile.edit', ['tab' => 'password'])->with('error', 'Anda harus memverifikasi Email dan Nomor WhatsApp di halaman Profil sebelum mengajukan publikasi kos.');
+        }
+
         if ($kos->legalDocuments()->count() === 0) {
             return back()->with('error', 'Minimal satu dokumen legalitas diperlukan untuk mengajukan verifikasi.');
         }

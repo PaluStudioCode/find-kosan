@@ -32,25 +32,25 @@ class DatabaseSeeder extends Seeder
 
         // Super Admin
         $superAdmin = User::firstOrCreate([
-            'email' => 'superadmin@example.com',
+            'email' => 'palustudiocode@gmail.com',
         ], [
             'name' => 'Super Admin',
             'password' => Hash::make('password'),
             'role' => 'super_admin',
             'status' => 'aktif',
-            'whatsapp_number' => '628111111111',
+            'whatsapp_number' => null,
             'email_verified_at' => Carbon::now(),
         ]);
 
         // Pemilik Kos Dummy
         User::firstOrCreate([
-            'email' => 'admin@example.com',
+            'email' => 'danizulkifli2004@gmail.com',
         ], [
             'name' => 'Pemilik Kos',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'status' => 'aktif',
-            'whatsapp_number' => '628222222222',
+            'whatsapp_number' => null,
             'email_verified_at' => Carbon::now(),
         ]);
 
@@ -61,8 +61,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'user',
             'status' => 'aktif',
-            'whatsapp_number' => '085151246624',
-            'email_verified_at' => Carbon::now(),
+            'whatsapp_number' => null,
+            'email_verified_at' => null,
         ]);
 
         // Master Data Facilities

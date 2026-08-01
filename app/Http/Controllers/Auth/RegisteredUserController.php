@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Services\WhatsappService;
+use Illuminate\Support\Facades\Cache;
 
 class RegisteredUserController extends Controller
 {
@@ -51,14 +53,77 @@ class RegisteredUserController extends Controller
             $whatsappNumber = '62'.substr($whatsappNumber, 1);
         }
 
-        $user = User::create([
+        $otp = (string) rand(100000, 999999);
+
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'whatsapp_number' => $whatsappNumber,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'status' => 'aktif',
+            'otp' => $otp,
+        ];
+
+        Cache::put('register_otp_' . $whatsappNumber, $userData, now()->addMinutes(5));
+
+        $waService = new WhatsappService();
+        $message = "Kode OTP pendaftaran CariKosan Anda adalah: *{$otp}*\nBerlaku selama 5 menit.";
+        
+        // Asumsi adminId = 0 (Superadmin Session ID)
+        $response = $waService->sendMessage(0, $whatsappNumber, $message);
+
+        if (empty($response['status']) || !$response['status']) {
+            Cache::forget('register_otp_' . $whatsappNumber);
+            throw ValidationException::withMessages([
+                'whatsapp_number' => 'Gagal mengirim OTP ke nomor WA ini. Pastikan nomor valid atau layanan WA sedang aktif.',
+            ]);
+        }
+
+        return back()->with([
+            'otp_sent' => true,
+            'whatsapp_number' => $whatsappNumber,
+            'status' => 'OTP berhasil dikirim ke nomor WhatsApp Anda.'
         ]);
+    }
+
+    /**
+     * Verify the OTP and finalize registration.
+     *
+     * @throws ValidationException
+     */
+    public function verifyOtp(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'whatsapp_number' => 'required|string',
+            'otp' => 'required|string|size:6',
+        ]);
+
+        $userData = Cache::get('register_otp_' . $request->whatsapp_number);
+
+        if (!$userData) {
+            throw ValidationException::withMessages([
+                'otp' => 'Kode OTP sudah kedaluwarsa atau tidak valid.',
+            ]);
+        }
+
+        if ($userData['otp'] !== $request->otp) {
+            throw ValidationException::withMessages([
+                'otp' => 'Kode OTP yang Anda masukkan salah.',
+            ]);
+        }
+
+        // OTP Valid, create user
+        $user = User::create([
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'whatsapp_number' => $userData['whatsapp_number'],
+            'password' => $userData['password'],
+            'role' => $userData['role'],
+            'status' => $userData['status'],
+        ]);
+
+        Cache::forget('register_otp_' . $request->whatsapp_number);
 
         event(new Registered($user));
 

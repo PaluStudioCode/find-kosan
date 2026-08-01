@@ -47,6 +47,14 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Email OTP
+    Route::post('/profile/email/send-otp', [ProfileController::class, 'sendEmailOtp'])->name('profile.email.send-otp');
+    Route::post('/profile/email/verify-otp', [ProfileController::class, 'verifyEmailOtp'])->name('profile.email.verify-otp');
+
+    // WA OTP
+    Route::post('/profile/wa/send-otp', [ProfileController::class, 'sendWaOtp'])->name('profile.wa.send-otp');
+    Route::post('/profile/wa/verify-otp', [ProfileController::class, 'verifyWaOtp'])->name('profile.wa.verify-otp');
+
     Route::middleware(['must_change_password'])->group(function () {
         Route::get('/dashboard', function () {
             $role = auth()->user()->role;

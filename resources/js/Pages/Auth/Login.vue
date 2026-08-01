@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
@@ -49,7 +49,7 @@ const submit = () => {
                     {{ status }}
                 </div>
 
-                <form @submit.prevent="submit" class="space-y-4">
+                <form @submit.prevent="submit" class="space-y-3">
                     <div class="space-y-2">
                         <Label for="email">Email</Label>
                         <Input
@@ -111,7 +111,7 @@ const submit = () => {
                         Log in
                     </Button>
 
-                    <div class="relative my-4">
+                    <div class="relative my-3">
                         <div class="absolute inset-0 flex items-center">
                             <span class="w-full border-t" />
                         </div>
@@ -130,7 +130,7 @@ const submit = () => {
                     </a>
                 </form>
             </CardContent>
-            <CardFooter class="flex justify-center pt-6">
+            <CardFooter class="flex justify-center pt-4">
                 <p class="text-sm text-muted-foreground">
                     Belum punya akun?
                     <Link :href="route('register')" class="font-semibold text-primary hover:underline">
@@ -140,7 +140,7 @@ const submit = () => {
             </CardFooter>
         </Card>
         
-        <div class="mt-4 text-center">
+        <div class="mt-2 text-center">
             <Link href="/" class="text-sm text-muted-foreground hover:text-primary transition-colors">
                 &larr; Kembali ke pencarian kos
             </Link>

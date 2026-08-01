@@ -82,6 +82,11 @@ class TenancyController extends Controller
 
     public function store(Request $request, Room $room)
     {
+        $user = auth()->user();
+        if (!$user->hasVerifiedEmail() || empty($user->whatsapp_number)) {
+            return redirect()->route('profile.edit', ['tab' => 'password'])->with('error', 'Anda harus memverifikasi Email dan Nomor WhatsApp di halaman Profil sebelum memesan kamar kos.');
+        }
+
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'occupant_count' => 'required|integer|min:1|max:'.$room->capacity,

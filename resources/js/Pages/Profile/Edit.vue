@@ -1,10 +1,11 @@
-﻿<script setup>
-import { computed } from 'vue';
+<script setup>
+import { computed, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
+import VerificationStatus from './Partials/VerificationStatus.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +23,8 @@ const page = usePage();
 const layout = computed(() => {
     return page.props.auth.user.role === 'user' ? PublicLayout : AppLayout;
 });
+
+const defaultTab = ref(new URLSearchParams(window.location.search).get('tab') || 'profile');
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const layout = computed(() => {
         <div :class="layout === PublicLayout ? 'max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8' : 'max-w-3xl mx-auto'">
             <h2 v-if="layout === PublicLayout" class="text-2xl font-bold text-gray-900 mb-6">Pengaturan Akun</h2>
             
-            <Tabs default-value="profile" class="w-full">
+            <Tabs :default-value="defaultTab" class="w-full">
                 <TabsList class="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="profile">Profil</TabsTrigger>
                     <TabsTrigger value="password">Keamanan</TabsTrigger>
@@ -51,7 +54,8 @@ const layout = computed(() => {
                     />
                 </TabsContent>
                 
-                <TabsContent value="password" class="mt-0">
+                <TabsContent value="password" class="mt-0 space-y-6">
+                    <VerificationStatus />
                     <UpdatePasswordForm />
                 </TabsContent>
                 

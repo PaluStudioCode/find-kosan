@@ -3,7 +3,7 @@ import { Home, ShieldCheck, CreditCard, Star, MapPin } from 'lucide-vue-next';
 </script>
 
 <template>
-    <div class="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-900">
+    <div class="relative flex h-full w-full items-center justify-center pb-40 overflow-hidden bg-slate-900">
         <!-- Animated Background Glows -->
         <div class="absolute -top-[20%] -left-[10%] h-[70%] w-[70%] rounded-full bg-teal-600/40 mix-blend-screen blur-[120px] animate-[pulse_8s_ease-in-out_infinite]"></div>
         <div class="absolute top-[40%] -right-[20%] h-[60%] w-[60%] rounded-full bg-indigo-600/40 mix-blend-screen blur-[120px] animate-[pulse_10s_ease-in-out_infinite_reverse]"></div>

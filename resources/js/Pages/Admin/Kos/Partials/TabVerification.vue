@@ -1,7 +1,7 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { router, Link, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Clock, XCircle, AlertTriangle, ShieldCheck } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
@@ -29,8 +29,8 @@ const requestVerification = () => {
             // Notifikasi sukses ditangani oleh layout global (flash.success)
             closeVerificationModal();
         },
-        onError: (err) => {
-            toast.error(err.error || 'Terjadi kesalahan.');
+        onError: () => {
+            // Error validation fields or general flash handled by global
             closeVerificationModal();
         }
     });
@@ -38,7 +38,13 @@ const requestVerification = () => {
 
 const hasLegalDocs = props.kos.legal_documents && props.kos.legal_documents.length > 0;
 const hasPhotos = props.kos.photos && props.kos.photos.length > 0;
-const canSubmit = hasLegalDocs && hasPhotos && ['draft', 'ditolak', 'nonaktif'].includes(props.kos.status);
+
+const page = usePage();
+const isEmailVerified = computed(() => page.props.auth.user.email_verified_at !== null);
+const isWaVerified = computed(() => page.props.auth.user.whatsapp_number !== null && page.props.auth.user.whatsapp_number !== '');
+const isAccountVerified = computed(() => isEmailVerified.value && isWaVerified.value);
+
+const canSubmit = computed(() => hasLegalDocs && hasPhotos && isAccountVerified.value && ['draft', 'ditolak', 'nonaktif'].includes(props.kos.status));
 </script>
 
 <template>
@@ -107,6 +113,18 @@ const canSubmit = hasLegalDocs && hasPhotos && ['draft', 'ditolak', 'nonaktif'].
                         <p class="text-sm text-gray-500 dark:text-slate-400">Minimal 1 dokumen seperti KTP / SHM (bersifat rahasia).</p>
                     </div>
                 </li>
+                <li class="flex items-start gap-3">
+                    <component :is="isAccountVerified ? CheckCircle : Clock" class="w-5 h-5 shrink-0" :class="isAccountVerified ? 'text-green-500 dark:text-green-400' : 'text-red-400 dark:text-red-500'" />
+                    <div>
+                        <p class="font-medium" :class="isAccountVerified ? 'text-gray-900 dark:text-slate-200' : 'text-red-600 dark:text-red-400'">
+                            Verifikasi {{ !isEmailVerified && !isWaVerified ? 'Email & WhatsApp' : (!isEmailVerified ? 'Email' : (!isWaVerified ? 'WhatsApp' : 'Akun')) }}
+                        </p>
+                        <p class="text-sm text-gray-500 dark:text-slate-400">
+                            Status: <span :class="isAccountVerified ? 'text-green-600' : 'text-red-500 font-medium'">{{ isAccountVerified ? 'Terverifikasi' : 'Belum Lengkap' }}</span>. 
+                            <Link v-if="!isAccountVerified" :href="route('profile.edit', { tab: 'password' })" class="text-blue-600 hover:underline ml-1">Lengkapi di sini &rarr;</Link>
+                        </p>
+                    </div>
+                </li>
             </ul>
         </div>
 
@@ -115,7 +133,7 @@ const canSubmit = hasLegalDocs && hasPhotos && ['draft', 'ditolak', 'nonaktif'].
                 <ShieldCheck class="w-5 h-5 mr-2" />
                 Ajukan Verifikasi Sekarang
             </Button>
-            <p v-if="!canSubmit" class="text-xs text-red-500 dark:text-red-400 mt-2">Anda harus mengunggah minimal 1 foto kos dan 1 dokumen legalitas untuk dapat mengajukan verifikasi.</p>
+            <p v-if="!canSubmit" class="text-xs text-red-500 dark:text-red-400 mt-2">Anda harus melengkapi semua syarat di atas sebelum dapat mengajukan verifikasi.</p>
         </div>
         
         <div v-else-if="kos.status === 'menunggu_verifikasi'" class="text-center p-6 bg-gray-50 dark:bg-slate-800/50 border dark:border-slate-800 rounded-lg">

@@ -43,6 +43,10 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
                 'status' => fn () => $request->session()->get('status'),
+                'otp_sent' => fn () => $request->session()->get('otp_sent'),
+                'email_otp_sent' => fn () => $request->session()->get('email_otp_sent'),
+                'wa_otp_sent' => fn () => $request->session()->get('wa_otp_sent'),
+                'whatsapp_number' => fn () => $request->session()->get('whatsapp_number'),
             ],
         ];
     }

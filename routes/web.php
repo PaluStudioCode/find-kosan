@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\LandingPageController;
 use App\Http\Controllers\Public\PublicKosController;
+use App\Http\Controllers\Public\PageController;
 use App\Http\Middleware\GuestOrTenant;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,6 @@ use App\Http\Controllers\Admin\WhatsappSettingsController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PaymentGatewayController;
-use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { useDraggable } from '@vueuse/core';
 import { Head } from '@inertiajs/vue3';
@@ -57,7 +57,7 @@ const filteredKos = computed(() => {
     props.allKos.forEach(kos => {
         if (kos.latitude && kos.longitude) {
             const dist = getDistance(latitude.value, longitude.value, kos.latitude, kos.longitude);
-            if (dist <= radius.value) {
+            if (dist <= radius.value || radius.value === 51) {
                 filtered.push({ ...kos, distance: dist });
             }
         }
@@ -121,12 +121,14 @@ const updateMapMarkers = () => {
             updateMapMarkers();
         });
 
-        radiusCircle = L.circle([latitude.value, longitude.value], {
-            color: '#3b82f6',
-            fillColor: '#3b82f6',
-            fillOpacity: 0.1,
-            radius: radius.value * 1000 // in meters
-        }).addTo(map);
+        if (radius.value < 51) {
+            radiusCircle = L.circle([latitude.value, longitude.value], {
+                color: '#3b82f6',
+                fillColor: '#3b82f6',
+                fillOpacity: 0.1,
+                radius: radius.value * 1000 // in meters
+            }).addTo(map);
+        }
     }
 
     // Add markers for filtered kos
@@ -176,16 +178,37 @@ const updateMapMarkers = () => {
 
 // Re-center map to fit bounds of the radius circle if location exists
 const fitMapToRadius = () => {
-    if (map && radiusCircle) {
-        map.fitBounds(radiusCircle.getBounds(), { padding: [20, 20], maxZoom: 15 });
+    if (map) {
+        if (radius.value < 51 && radiusCircle) {
+            map.fitBounds(radiusCircle.getBounds(), { padding: [20, 20], maxZoom: 15 });
+        } else if (radius.value === 51 && markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds(), { padding: [50, 50], maxZoom: 13 });
+        }
     }
 };
 
 const getLocation = (silent = false) => {
+    if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if (!silent) alert('Fitur lokasi membutuhkan koneksi HTTPS atau localhost.');
+        detectingLocation.value = false;
+        return;
+    }
+
     if (navigator.geolocation) {
         detectingLocation.value = true;
+        
+        // Manual fallback timeout (jaga-jaga jika browser diam saja/silent fail)
+        const fallback = setTimeout(() => {
+            if (detectingLocation.value) {
+                detectingLocation.value = false;
+                if (!silent) alert('Waktu deteksi lokasi habis. Browser mungkin memblokir akses GPS.');
+            }
+        }, 8000);
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
+                clearTimeout(fallback);
                 latitude.value = position.coords.latitude;
                 longitude.value = position.coords.longitude;
                 detectingLocation.value = false;
@@ -193,6 +216,7 @@ const getLocation = (silent = false) => {
                 fitMapToRadius();
             },
             (error) => {
+                clearTimeout(fallback);
                 detectingLocation.value = false;
                 if (!silent) {
                     alert('Tidak dapat mengambil lokasi. Pastikan GPS aktif dan Anda memberikan izin lokasi.');
@@ -200,7 +224,7 @@ const getLocation = (silent = false) => {
             },
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: 7000,
                 maximumAge: 0
             }
         );
@@ -277,20 +301,22 @@ onMounted(() => {
                 <div class="w-full text-left transition-opacity duration-300" :class="{ 'opacity-50 pointer-events-none': !latitude }">
                     <div class="flex justify-between items-center mb-3">
                         <Label class="text-sm font-bold text-slate-700">Radius Jangkauan</Label>
-                        <span class="text-teal-700 font-bold bg-teal-50 px-3 py-1 rounded-full text-xs border border-teal-100">{{ radius }} KM</span>
+                        <span class="text-teal-700 font-bold bg-teal-50 px-3 py-1 rounded-full text-xs border border-teal-100">
+                            {{ radius === 51 ? 'Tak Terbatas' : radius + ' KM' }}
+                        </span>
                     </div>
                     <input 
                         type="range" 
                         v-model.number="radius" 
                         min="1" 
-                        max="50" 
+                        max="51" 
                         step="1"
                         class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30" 
                         :disabled="!latitude"
                     />
                     <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-bold tracking-wider">
                         <span>1 KM</span>
-                        <span>50 KM</span>
+                        <span>∞</span>
                     </div>
                 </div>
 

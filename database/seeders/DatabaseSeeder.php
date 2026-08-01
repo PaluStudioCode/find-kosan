@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
 
         // Super Admin
         $superAdmin = User::firstOrCreate([
-            'email' => 'palustudiocode@gmail.com',
+            'email' => 'superadmin@example.com',
         ], [
             'name' => 'Super Admin',
             'password' => Hash::make('password'),
@@ -44,13 +44,13 @@ class DatabaseSeeder extends Seeder
 
         // Pemilik Kos Dummy
         User::firstOrCreate([
-            'email' => 'danizulkifli2004@gmail.com',
+            'email' => 'admin@example.com',
         ], [
             'name' => 'Pemilik Kos',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'status' => 'aktif',
-            'whatsapp_number' => null,
+            'whatsapp_number' => "082195466654",
             'email_verified_at' => Carbon::now(),
         ]);
 
@@ -119,5 +119,17 @@ class DatabaseSeeder extends Seeder
                 'is_positive' => $rule['is_positive'],
             ]);
         }
+
+        // Pastikan Data Wilayah Laravolt sudah di-seed
+        if (\Illuminate\Support\Facades\DB::table('cities')->count() == 0) {
+            $this->command->info('Melakukan seeding data wilayah Laravolt Indonesia...');
+            \Illuminate\Support\Facades\Artisan::call('laravolt:indonesia:seed');
+            $this->command->info('Seeding data wilayah selesai!');
+        }
+
+        // Panggil seeder 50 Kos Dummy Palu
+        $this->call([
+            KosPaluDummySeeder::class,
+        ]);
     }
 }

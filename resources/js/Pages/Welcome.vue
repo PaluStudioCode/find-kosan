@@ -233,10 +233,10 @@ onBeforeUnmount(() => {
 
         <div ref="landingPage">
         <!-- 1. Modern Hero -->
-        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-32 pt-32 lg:pt-40 lg:pb-0 lg:min-h-[90vh] flex flex-col justify-start">
+        <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-16 pt-12 lg:pt-32 lg:pb-0 min-h-[calc(100vh-64px)] flex flex-col justify-start lg:justify-center">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
-            <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-8">
+            <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-8 pt-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-12">
                 <div class="relative z-10 max-w-2xl flex flex-col">
                     
                     <div class="w-fit inline-flex items-center gap-2.5 px-1.5 py-1.5 pr-4 mb-6 text-[11px] font-bold rounded-full bg-slate-800/40 border border-slate-700/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
@@ -291,8 +291,6 @@ onBeforeUnmount(() => {
                     <LandingHeroScene class="relative z-10" />
                 </div>
             </div>
-
-            <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
         </section>
 
 
@@ -628,7 +626,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 11. Tenant reviews -->
-        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
+        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-24 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kata Mereka yang Udah Buktiin Langsung.</h2>
@@ -691,7 +689,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 12. FAQ -->
-        <section class="bg-slate-50 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100 relative">
+        <section class="bg-slate-50 py-16 sm:py-24 lg:py-24 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100 relative">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Masih Punya Pertanyaan? (FAQ)</h2>
@@ -715,7 +713,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 13. Final CTA -->
-        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:py-0 lg:min-h-[70vh] flex flex-col justify-center lg:px-8">
+        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:py-24 lg:min-h-[70vh] flex flex-col justify-center lg:px-8">
             <div data-reveal="scale" class="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-slate-900 px-6 py-16 text-center shadow-xl sm:px-12 sm:py-20 relative">
                 <div class="absolute inset-0 bg-slate-800/20 mix-blend-overlay" />
                 

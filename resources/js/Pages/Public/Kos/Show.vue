@@ -1,7 +1,8 @@
 <script setup>
 import { toast } from 'vue-sonner';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, Deferred } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import ShowSkeleton from './ShowSkeleton.vue';
 import { Button } from '@/components/ui/button';
 import {
     MapPin,
@@ -30,7 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const props = defineProps({
     kos: {
         type: Object,
-        required: true,
+        default: null,
     },
     reviews: {
         type: Object,
@@ -109,7 +110,7 @@ const reviewForm = useForm({
 });
 
 const submitReview = () => {
-    reviewForm.post(route('user.kos.reviews.store', props.kos.id), {
+    reviewForm.post(route('user.kos.reviews.store', props.kos?.id), {
         preserveScroll: true,
         onSuccess: () => reviewForm.clearErrors(),
     });
@@ -118,12 +119,13 @@ const submitReview = () => {
 // --- Report ---
 const reportDialogOpen = ref(false);
 const reportForm = useForm({
-    boarding_house_id: props.kos.id,
+    boarding_house_id: props.kos?.id ?? '',
     category: 'data_kos_tidak_valid',
     description: '',
 });
 
 const openReportDialog = () => {
+    reportForm.boarding_house_id = props.kos?.id;
     reportForm.clearErrors();
     reportDialogOpen.value = true;
 };
@@ -158,16 +160,16 @@ const photoCategories = {
 };
 
 // --- Computed ---
-const kosPhotos = computed(() => props.kos.photos.map(p => ({ id: p.id, url: p.file_path, caption: p.caption, category: p.category })));
-const availableRooms = computed(() => props.kos.rooms.filter(r => r.status === 'tersedia'));
-const unavailableRooms = computed(() => props.kos.rooms.filter(r => r.status !== 'tersedia'));
+const kosPhotos = computed(() => props.kos?.photos?.map(p => ({ id: p.id, url: p.file_path, caption: p.caption, category: p.category })) || []);
+const availableRooms = computed(() => props.kos?.rooms?.filter(r => r.status === 'tersedia') || []);
+const unavailableRooms = computed(() => props.kos?.rooms?.filter(r => r.status !== 'tersedia') || []);
 const cheapestPrice = computed(() => {
-    if (props.kos.rooms.length === 0) return null;
+    if (!props.kos?.rooms || props.kos.rooms.length === 0) return null;
     return Math.min(...props.kos.rooms.map(r => r.price));
 });
 
 const groupedRooms = computed(() => {
-    if (!props.kos.rooms) return [];
+    if (!props.kos?.rooms) return [];
     
     const groups = {};
     props.kos.rooms.forEach(room => {
@@ -199,9 +201,14 @@ const groupedRooms = computed(() => {
 
 <template>
     <PublicLayout>
-        <Head :title="kos.name" />
+        <Deferred :data="['kos', 'reviews', 'reviewSummary', 'currentReview', 'hasRented']">
+            <template #fallback>
+                <ShowSkeleton />
+            </template>
+            
+            <Head :title="kos?.name || 'Memuat...'" />
 
-        <!-- Hero Photo Gallery -->
+            <!-- Hero Photo Gallery -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             <div class="mb-4">
                 <Link :href="route('public.kos.index')" class="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 transition-colors">
@@ -700,6 +707,6 @@ const groupedRooms = computed(() => {
                 </form>
             </DialogContent>
         </Dialog>
+        </Deferred>
     </PublicLayout>
 </template>
-

@@ -60,51 +60,55 @@ class PublicKosController extends Controller
             }
         }
 
-        $kos->load([
-            'facilities',
-            'rules',
-            'rooms' => function ($q) {
-                $q->where('status', 'tersedia')->with('facilities');
-            },
-            'photos' => function ($q) {
-                $q->orderBy('is_primary', 'desc');
-            },
-            'admin:id,name,whatsapp_number,email',
-        ]);
-
-        $reviews = $kos->reviews()
-            ->with('user:id,name')
-            ->latest()
-            ->paginate(10, ['*'], 'reviews_page')
-            ->withQueryString();
-
-        $reviewSummary = $kos->reviews()
-            ->selectRaw('COUNT(*) as total, AVG(rating) as average')
-            ->first();
-
-        $currentReview = null;
-        $hasRented = false;
-        if ($request->user()?->role === 'user') {
-            $currentReview = $kos->reviews()
-                ->where('user_id', $request->user()->id)
-                ->first();
-            
-            $hasRented = \App\Models\Tenancy::where('user_id', $request->user()->id)
-                ->where('boarding_house_id', $kos->id)
-                ->exists();
-        }
-
         return Inertia::render('Public/Kos/Show', [
-            'kos' => $kos,
-            'reviews' => $reviews,
-            'reviewSummary' => [
-                'average' => $reviewSummary->average
-                    ? round((float) $reviewSummary->average, 1)
-                    : null,
-                'total' => (int) $reviewSummary->total,
-            ],
-            'currentReview' => $currentReview,
-            'hasRented' => $hasRented,
+            'kos' => Inertia::defer(function () use ($kos) {
+                $kos->load([
+                    'facilities',
+                    'rules',
+                    'rooms' => function ($q) {
+                        $q->where('status', 'tersedia')->with('facilities');
+                    },
+                    'photos' => function ($q) {
+                        $q->orderBy('is_primary', 'desc');
+                    },
+                    'admin:id,name,whatsapp_number,email',
+                ]);
+                return $kos;
+            }),
+            'reviews' => Inertia::defer(function () use ($kos) {
+                return $kos->reviews()
+                    ->with('user:id,name')
+                    ->latest()
+                    ->paginate(10, ['*'], 'reviews_page')
+                    ->withQueryString();
+            }),
+            'reviewSummary' => Inertia::defer(function () use ($kos) {
+                $reviewSummary = $kos->reviews()
+                    ->selectRaw('COUNT(*) as total, AVG(rating) as average')
+                    ->first();
+                return [
+                    'average' => $reviewSummary->average
+                        ? round((float) $reviewSummary->average, 1)
+                        : null,
+                    'total' => (int) $reviewSummary->total,
+                ];
+            }),
+            'currentReview' => Inertia::defer(function () use ($request, $kos) {
+                if ($request->user()?->role === 'user') {
+                    return $kos->reviews()
+                        ->where('user_id', $request->user()->id)
+                        ->first();
+                }
+                return null;
+            }),
+            'hasRented' => Inertia::defer(function () use ($request, $kos) {
+                if ($request->user()?->role === 'user') {
+                    return \App\Models\Tenancy::where('user_id', $request->user()->id)
+                        ->where('boarding_house_id', $kos->id)
+                        ->exists();
+                }
+                return false;
+            }),
         ]);
     }
 }

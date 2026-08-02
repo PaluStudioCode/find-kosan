@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -138,10 +138,9 @@ const formatDate = (dateString) => {
                 </div>
 
                 <div v-if="reviews.links && reviews.links.length > 3" class="mt-8 flex justify-center">
-                    <!-- Basic inertia pagination UI if required -->
                     <template v-for="(link, k) in reviews.links" :key="k">
                         <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-2 text-sm border dark:border-slate-800 rounded text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-900" v-html="link.label" />
-                        <Link v-else :href="link.url" class="mr-1 mb-1 px-4 py-2 text-sm border dark:border-slate-800 rounded hover:bg-gray-100 dark:hover:bg-slate-800 bg-white dark:bg-slate-900 dark:text-slate-300" :class="{ 'bg-slate-900 text-white hover:bg-slate-800 border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:border-slate-100': link.active }" v-html="link.label" />
+                        <Link v-else :href="link.url" preserve-scroll class="mr-1 mb-1 px-4 py-2 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-50 border-teal-500 text-teal-700 font-medium dark:bg-teal-900/50 dark:border-teal-500 dark:text-teal-300' : 'border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-900 dark:text-slate-300'" v-html="link.label" />
                     </template>
                 </div>
 

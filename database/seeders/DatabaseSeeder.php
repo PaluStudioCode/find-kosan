@@ -156,6 +156,8 @@ class DatabaseSeeder extends Seeder
         // Panggil seeder 50 Kos Dummy Palu
         $this->call([
             KosPaluDummySeeder::class,
+            TenancyDummySeeder::class,
+            ReviewDummySeeder::class,
         ]);
     }
 }

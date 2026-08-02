@@ -80,8 +80,9 @@ class ProfileController extends Controller
         Cache::put('email_otp_' . $user->id, $otp, now()->addMinutes(5));
 
         try {
-            $user->notify(new EmailVerificationOtp($otp));
+            $user->notify(new \App\Notifications\EmailVerificationOtp($otp));
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('OTP Email Send Failed: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             throw ValidationException::withMessages([
                 'email' => 'Gagal mengirim OTP ke email. Pastikan email valid atau layanan email sedang aktif.',
             ]);

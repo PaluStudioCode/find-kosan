@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+import axios from 'axios';
+import { Head, useForm, router, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,13 +18,25 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import StatusBadge from '@/components/StatusBadge.vue';
-import { Landmark, WalletCards, ArrowDownToLine, Clock, X } from 'lucide-vue-next';
+import { Landmark, WalletCards, ArrowDownToLine, Clock, X, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
     wallet: Object,
     transactions: Object,
-    withdrawals: Array,
+    withdrawals: Object,
     min_withdrawal: Number,
+    filters: Object,
+});
+
+const filterType = ref(props.filters?.type || '');
+const filterMonth = ref(props.filters?.month || '');
+
+watch([filterType, filterMonth], ([type, month]) => {
+    router.get(
+        route('admin.wallet.index'),
+        { type, month },
+        { preserveState: true, preserveScroll: true, replace: true }
+    );
 });
 
 const form = useForm({
@@ -40,6 +53,46 @@ const selectedProofImage = ref(null);
 const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR', maximumFractionDigits: 0,
 }).format(amount || 0);
+
+const isExporting = ref(false);
+
+const exportExcel = async () => {
+    isExporting.value = true;
+    try {
+        const response = await axios.get(route('admin.wallet.export'), {
+            params: {
+                type: filterType.value,
+                month: filterMonth.value,
+                year: props.filters?.year
+            },
+            responseType: 'blob'
+        });
+        
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        
+        let filename = 'Laporan_Mutasi.xlsx';
+        const contentDisposition = response.headers['content-disposition'];
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (filenameMatch && filenameMatch.length === 2) {
+                filename = filenameMatch[1];
+            }
+        }
+        
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Failed to export excel:', error);
+        alert('Gagal mengunduh file Excel. Silakan coba lagi.');
+    } finally {
+        isExporting.value = false;
+    }
+};
 
 const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
     preserveScroll: true,
@@ -136,12 +189,12 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
             </Card>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <Card class="shadow-sm">
                 <CardHeader><CardTitle>Riwayat Penarikan</CardTitle></CardHeader>
                 <CardContent class="p-0">
-                    <div v-if="withdrawals.length" class="divide-y dark:divide-slate-800">
-                        <div v-for="withdrawal in withdrawals" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                    <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
+                        <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                                 <div class="flex-1">
                                     <p class="font-semibold dark:text-white">{{ formatRupiah(withdrawal.amount) }}</p>
                                     <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} - {{ withdrawal.account_number }} - {{ withdrawal.account_holder_name }}</p>
@@ -161,11 +214,49 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                         </div>
                     </div>
                     <p v-else class="p-8 text-center text-gray-500 dark:text-slate-400">Belum ada permintaan penarikan.</p>
+
+                    <!-- Pagination for Withdrawals -->
+                    <div v-if="withdrawals.links && withdrawals.data.length > 0" class="p-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-center gap-1 flex-wrap">
+                        <template v-for="(link, k) in withdrawals.links" :key="k">
+                            <div v-if="link.url === null" class="px-3 py-1 text-sm text-gray-400 border border-transparent" v-html="link.label"></div>
+                            <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
+                        </template>
+                    </div>
                 </CardContent>
             </Card>
 
             <Card class="shadow-sm">
-                <CardHeader><CardTitle>Mutasi Saldo</CardTitle></CardHeader>
+                <CardHeader class="flex flex-col gap-4">
+                    <CardTitle>Mutasi Saldo</CardTitle>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <select v-model="filterType" class="text-sm border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-md shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <option value="">Semua Transaksi</option>
+                            <option value="pemasukan">Pemasukan (+)</option>
+                            <option value="pengeluaran">Pengeluaran (-)</option>
+                        </select>
+                        <select v-model="filterMonth" class="text-sm border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-md shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <option value="">Semua Bulan</option>
+                            <option value="1">Januari</option>
+                            <option value="2">Februari</option>
+                            <option value="3">Maret</option>
+                            <option value="4">April</option>
+                            <option value="5">Mei</option>
+                            <option value="6">Juni</option>
+                            <option value="7">Juli</option>
+                            <option value="8">Agustus</option>
+                            <option value="9">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                        <button type="button" @click="exportExcel" :disabled="isExporting"
+                           class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 hover:text-emerald-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <Loader2 v-if="isExporting" class="w-4 h-4 animate-spin" />
+                            <ArrowDownToLine v-else class="w-4 h-4" />
+                            Unduh Excel
+                        </button>
+                    </div>
+                </CardHeader>
                 <CardContent class="p-0">
                     <div v-if="transactions.data.length" class="divide-y dark:divide-slate-800">
                         <div v-for="transaction in transactions.data" :key="transaction.id" class="p-4 flex items-center justify-between gap-4">
@@ -179,6 +270,14 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                         </div>
                     </div>
                     <p v-else class="p-8 text-center text-gray-500 dark:text-slate-400">Belum ada mutasi saldo.</p>
+
+                    <!-- Pagination -->
+                    <div v-if="transactions.links && transactions.data.length > 0" class="p-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-center gap-1 flex-wrap">
+                        <template v-for="(link, k) in transactions.links" :key="k">
+                            <div v-if="link.url === null" class="px-3 py-1 text-sm text-gray-400 border border-transparent" v-html="link.label"></div>
+                            <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
+                        </template>
+                    </div>
                 </CardContent>
             </Card>
         </div>

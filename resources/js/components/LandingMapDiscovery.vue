@@ -67,8 +67,8 @@ const createKosIcon = (index) => L.divIcon({
             </svg>
         </div>
     `,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
 });
 
 const updateRadiusState = () => {
@@ -172,7 +172,7 @@ const initializeMap = () => {
 
     const furthestDistance = Math.max(...markerRecords.map((record) => record.distance), 2);
     maximumRadius = Math.max(3, Math.ceil(furthestDistance + 0.8));
-    minimumRadius = Math.max(0.8, Math.min(2, maximumRadius * 0.35));
+    minimumRadius = 0.1; // 100 meter
     radiusKm.value = minimumRadius;
 
     const bounds = L.latLngBounds(coordinates);
@@ -196,7 +196,7 @@ onMounted(() => {
         if (!isVisible || !autoAnimation.value) return;
 
         const cycle = (Math.sin((timestamp - startedAt) / 1500) + 1) / 2;
-        radiusKm.value = Number((minimumRadius + cycle * (maximumRadius - minimumRadius)).toFixed(1));
+        radiusKm.value = minimumRadius + cycle * (maximumRadius - minimumRadius);
         updateRadiusState();
     };
 
@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
                         @input="handleManualRadius"
                     />
                     <span class="min-w-[48px] rounded-md bg-teal-50 px-1.5 py-0.5 text-center text-[10px] font-bold text-teal-800">
-                        {{ radiusKm }} km
+                        {{ Number(radiusKm).toFixed(1) }} km
                     </span>
                 </div>
             </div>
@@ -310,8 +310,8 @@ onBeforeUnmount(() => {
 .landing-kos-marker {
     position: relative;
     display: flex;
-    width: 38px;
-    height: 38px;
+    width: 28px;
+    height: 28px;
     align-items: center;
     justify-content: center;
     border: 3px solid white;
@@ -323,8 +323,8 @@ onBeforeUnmount(() => {
 }
 
 .landing-kos-marker svg {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;

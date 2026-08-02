@@ -28,16 +28,30 @@ class WalletController extends Controller
         return Inertia::render('Admin/Wallet/Index', [
             'wallet' => $wallet,
             'min_withdrawal' => $minWithdrawal,
+            'filters' => $request->only(['type', 'month', 'year']),
             'transactions' => AdminWalletTransaction::with('invoice')
                 ->where('admin_wallet_id', $wallet->id)
                 ->whereNotIn('type', ['withdrawal_hold', 'withdrawal_release'])
+                ->when($request->type, function ($query, $type) {
+                    if ($type === 'pemasukan') {
+                        $query->whereIn('type', ['payment_credit']);
+                    } elseif ($type === 'pengeluaran') {
+                        $query->whereNotIn('type', ['payment_credit']);
+                    }
+                })
+                ->when($request->month, function ($query, $month) {
+                    $query->whereMonth('created_at', $month);
+                })
+                ->when($request->year, function ($query, $year) {
+                    $query->whereYear('created_at', $year);
+                })
                 ->latest()
-                ->paginate(10)
+                ->paginate(5)
                 ->withQueryString(),
             'withdrawals' => WithdrawalRequest::where('admin_id', $adminId)
                 ->latest()
-                ->take(10)
-                ->get(),
+                ->paginate(5, ['*'], 'withdrawals_page')
+                ->withQueryString(),
         ]);
     }
 
@@ -96,5 +110,41 @@ class WalletController extends Controller
         });
 
         return back()->with('success', 'Permintaan penarikan berhasil dikirim dan menunggu persetujuan admin.');
+    }
+
+    public function export(Request $request)
+    {
+        $adminId = $request->user()->id;
+        $wallet = AdminWallet::where('admin_id', $adminId)->first();
+
+        if (!$wallet) {
+            return back()->with('error', 'Dompet tidak ditemukan.');
+        }
+
+        $transactions = AdminWalletTransaction::with('invoice')
+            ->where('admin_wallet_id', $wallet->id)
+            ->whereNotIn('type', ['withdrawal_hold', 'withdrawal_release'])
+            ->when($request->type, function ($query, $type) {
+                if ($type === 'pemasukan') {
+                    $query->whereIn('type', ['payment_credit']);
+                } elseif ($type === 'pengeluaran') {
+                    $query->whereNotIn('type', ['payment_credit']);
+                }
+            })
+            ->when($request->month, function ($query, $month) {
+                $query->whereMonth('created_at', $month);
+            })
+            ->when($request->year, function ($query, $year) {
+                $query->whereYear('created_at', $year);
+            })
+            ->oldest()
+            ->get();
+
+        $fileName = 'Laporan_Mutasi_Kos_' . date('Ymd_His') . '.xlsx';
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\WalletTransactionsExport($transactions), 
+            $fileName
+        );
     }
 }

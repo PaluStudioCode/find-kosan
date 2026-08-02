@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -186,6 +186,7 @@ const executeDelete = () => {
                                 <Link 
                                     v-if="link.url"
                                     :href="link.url" 
+                                    preserve-scroll
                                     class="px-3 py-1 border rounded-md text-sm transition-colors"
                                     :class="link.active ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
                                     v-html="link.label"

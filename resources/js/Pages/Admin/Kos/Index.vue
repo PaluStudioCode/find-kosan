@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -112,7 +112,7 @@ const deleteKos = () => {
         <div v-if="boardingHouses.links && boardingHouses.links.length > 3" class="mt-8 flex flex-wrap justify-center gap-1">
             <template v-for="(link, k) in boardingHouses.links" :key="k">
                 <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-2 text-sm border rounded text-gray-400 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500" v-html="link.label" />
-                <Link v-else :href="link.url" class="px-3 py-1 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-600 text-white border-teal-600 pointer-events-none' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'" v-html="link.label" />
+                <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-600 text-white border-teal-600 pointer-events-none' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'" v-html="link.label" />
             </template>
         </div>
     </AppLayout>

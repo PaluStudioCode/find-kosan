@@ -125,6 +125,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/tenancies/{tenancy}/end', [AdminTenancyController::class, 'endTenancy'])->name('tenancies.end');
 
             Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+            Route::get('/wallet/export', [WalletController::class, 'export'])->name('wallet.export');
             Route::post('/wallet/withdrawals', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdrawals.store');
 
             Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

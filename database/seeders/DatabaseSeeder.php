@@ -118,6 +118,34 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // Dummy Application Settings
+        $settings = [
+            ['key' => 'app_name', 'value' => 'Find Kosan', 'type' => 'string', 'description' => 'Nama Aplikasi'],
+            ['key' => 'footer_text', 'value' => 'Temukan kos impianmu dengan mudah dan cepat di Palu. Harga jujur, fasilitas terverifikasi.', 'type' => 'string', 'description' => 'Teks Footer'],
+            ['key' => 'contact_email', 'value' => 'support@findkosan.com', 'type' => 'string', 'description' => 'Email Kontak Bantuan'],
+            ['key' => 'contact_phone', 'value' => '081234567890', 'type' => 'string', 'description' => 'Nomor HP/WA Bantuan'],
+            ['key' => 'fee_percent', 'value' => '5', 'type' => 'integer', 'description' => 'Potongan biaya admin (%)'],
+            ['key' => 'min_withdrawal', 'value' => '50000', 'type' => 'integer', 'description' => 'Minimal penarikan dana (Rp)'],
+            ['key' => 'link_instagram', 'value' => 'https://instagram.com/findkosan', 'type' => 'string', 'description' => 'Link Instagram'],
+            ['key' => 'link_facebook', 'value' => 'https://facebook.com/findkosan', 'type' => 'string', 'description' => 'Link Facebook'],
+            ['key' => 'link_tiktok', 'value' => 'https://tiktok.com/@findkosan', 'type' => 'string', 'description' => 'Link TikTok'],
+            ['key' => 'meta_description', 'value' => 'Platform pencarian kos terbaik dan terpercaya di Kota Palu. Cari kos murah, nyaman, dan strategis dekat kampus.', 'type' => 'string', 'description' => 'SEO Meta Description'],
+            ['key' => 'about_us', 'value' => 'Find Kosan adalah platform inovatif yang dirancang khusus untuk mempermudah pencarian tempat tinggal sementara bagi mahasiswa dan pekerja di Kota Palu.', 'type' => 'text', 'description' => 'Tentang Kami (About Us)'],
+            ['key' => 'terms_conditions', 'value' => 'Dengan menggunakan layanan kami, Anda setuju untuk mematuhi semua syarat dan ketentuan yang berlaku, termasuk larangan memberikan informasi palsu.', 'type' => 'text', 'description' => 'Syarat & Ketentuan'],
+            ['key' => 'privacy_policy', 'value' => 'Kami sangat menjaga privasi data Anda. Semua data diri yang dikumpulkan hanya akan digunakan untuk keperluan transaksi di platform Find Kosan.', 'type' => 'text', 'description' => 'Kebijakan Privasi'],
+        ];
+
+        foreach ($settings as $setting) {
+            \App\Models\Setting::updateOrCreate(
+                ['key' => $setting['key']],
+                [
+                    'value' => $setting['value'],
+                    'type' => $setting['type'],
+                    'description' => $setting['description'],
+                ]
+            );
+        }
+
         // Pastikan Data Wilayah Laravolt sudah di-seed
         if (\Illuminate\Support\Facades\DB::table('cities')->count() == 0) {
             $this->command->info('Melakukan seeding data wilayah Laravolt Indonesia...');

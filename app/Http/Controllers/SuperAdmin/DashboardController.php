@@ -16,12 +16,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // 1. Kartu Metrik Utama
-        $totalUsers = User::count();
+        $totalUsers = User::where('role', '!=', 'super_admin')->count();
         $totalOwners = User::where('role', 'admin')->count();
         $totalTenants = User::where('role', 'user')->count();
 
         $pendingKosVerifications = BoardingHouse::where('status', 'menunggu_verifikasi')->count();
-        $pendingReports = Report::where('status', 'menunggu_diproses')->count();
+        $pendingReports = Report::where('status', 'menunggu')->count();
         $pendingWithdrawals = WithdrawalRequest::where('status', 'menunggu_persetujuan')->count();
 
         // 2. Data Visualisasi (Grafik)
@@ -74,8 +74,8 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $recentReports = Report::with(['reporter', 'reportable'])
-            ->where('status', 'menunggu_diproses')
+        $recentReports = Report::with(['reporter', 'boardingHouse'])
+            ->where('status', 'menunggu')
             ->latest()
             ->take(5)
             ->get();

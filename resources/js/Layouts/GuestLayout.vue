@@ -32,9 +32,9 @@ watch(() => page.props.flash, (flash) => {
             </div>
 
             <!-- Scrollable Form Slot -->
-            <div class="flex-1 overflow-y-auto">
-                <div class="flex min-h-full flex-col justify-center pb-8">
-                    <div class="mx-auto w-full max-w-md">
+            <div class="flex-1 overflow-y-auto px-1 sm:px-0">
+                <div class="flex min-h-full flex-col py-6 lg:py-8">
+                    <div class="m-auto w-full max-w-md bg-white rounded-3xl p-5 sm:p-8 shadow-xl border border-slate-100 lg:bg-transparent lg:shadow-none lg:border-0 lg:p-0">
                         <slot />
                     </div>
                 </div>

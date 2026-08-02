@@ -354,16 +354,29 @@ const resize = () => {
     const width = container.value.clientWidth;
     const height = container.value.clientHeight;
     renderer.setSize(width, height, false);
-    camera.aspect = width / Math.max(height, 1);
+    
+    const aspect = width / Math.max(height, 1);
+    camera.aspect = aspect;
+
+    // Responsive camera positioning: 
+    if (aspect < 0.8) {
+        // Mobile
+        camera.position.set(11.5, 7.8, 14.5);
+    } else if (aspect < 1.2) {
+        // Tablet
+        camera.position.set(9.5, 6.5, 12.5);
+    } else {
+        // Desktop: Zoomed out just a little bit more (slightly smaller object)
+        camera.position.set(8.2, 5.5, 11.0);
+    }
+    camera.lookAt(0, 1.45, 0);
+
     camera.updateProjectionMatrix();
 };
 
 const handlePointerMove = (event) => {
-    if (!container.value) return;
-
-    const bounds = container.value.getBoundingClientRect();
-    pointer.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-    pointer.y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+    pointer.x = (event.clientX / window.innerWidth - 0.5) * 2;
+    pointer.y = (event.clientY / window.innerHeight - 0.5) * 2;
 };
 
 onMounted(() => {
@@ -402,7 +415,7 @@ onMounted(() => {
     });
     visibilityObserver.observe(container.value);
 
-    container.value.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointermove', handlePointerMove);
     animate();
 });
 
@@ -410,7 +423,7 @@ onBeforeUnmount(() => {
     window.cancelAnimationFrame(animationFrame);
     resizeObserver?.disconnect();
     visibilityObserver?.disconnect();
-    container.value?.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointermove', handlePointerMove);
 
     scene?.traverse((object) => {
         object.geometry?.dispose();
@@ -431,7 +444,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div ref="container" class="relative h-full min-h-[420px] w-full overflow-hidden" aria-label="Animasi bangunan kos dua lantai">
+    <div ref="container" class="relative w-full cursor-grab active:cursor-grabbing" aria-label="Animasi bangunan kos dua lantai">
         <canvas v-show="!webglFailed" ref="canvas" class="absolute inset-0 h-full w-full" />
 
         <div v-if="webglFailed" class="absolute inset-10 flex items-end justify-center rounded-[2rem] border border-white/10 bg-gradient-to-br from-teal-400/20 to-orange-300/10">

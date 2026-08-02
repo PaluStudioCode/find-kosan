@@ -28,15 +28,64 @@ class KosPaluDummySeeder extends Seeder
             return;
         }
 
-        // AUTO-GENERATE FILE FISIK PDF (Mencegah error 404 jika di-deploy ke server / tidak masuk Github)
-        $this->command->info('Memastikan ketersediaan file fisik dokumen legal dummy...');
+        $this->command->info('Memeriksa ketersediaan file fisik dokumen legal dummy di dummy_data...');
         $dummyPdfContent = "%PDF-1.4\n%Dummy PDF File\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n5 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (Dummy Document) Tj ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000044 00000 n\n0000000093 00000 n\n0000000150 00000 n\n0000000258 00000 n\n0000000346 00000 n\ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n441\n%%EOF";
         
-        if (!Storage::disk('local')->exists('legal_documents/dummy_ktp.pdf')) {
+        $ktpSourceJpg = base_path('dummy_data/documents/Ktp.jpg');
+        $shmSourceJpg = base_path('dummy_data/documents/shm.jpg');
+
+        $ktpPath = 'legal_documents/dummy_ktp.pdf';
+        $shmPath = 'legal_documents/dummy_shm.pdf';
+
+        if (file_exists($ktpSourceJpg)) {
+            $ktpPath = 'legal_documents/dummy_ktp.jpg';
+            Storage::disk('local')->put($ktpPath, file_get_contents($ktpSourceJpg));
+        } elseif (!Storage::disk('local')->exists('legal_documents/dummy_ktp.pdf')) {
             Storage::disk('local')->put('legal_documents/dummy_ktp.pdf', str_replace('(Dummy Document)', '(Dummy KTP File)', $dummyPdfContent));
         }
-        if (!Storage::disk('local')->exists('legal_documents/dummy_shm.pdf')) {
+
+        if (file_exists($shmSourceJpg)) {
+            $shmPath = 'legal_documents/dummy_shm.jpg';
+            Storage::disk('local')->put($shmPath, file_get_contents($shmSourceJpg));
+        } elseif (!Storage::disk('local')->exists('legal_documents/dummy_shm.pdf')) {
             Storage::disk('local')->put('legal_documents/dummy_shm.pdf', str_replace('(Dummy Document)', '(Dummy Sertifikat SHM)', $dummyPdfContent));
+        }
+
+        $this->command->info('Memeriksa foto-foto dummy di dummy_data...');
+        $photoCategories = ['bangunan_depan', 'dalam_kamar', 'kamar_mandi', 'ruang_tamu', 'dapur', 'area_parkir', 'fasilitas_umum', 'lainnya'];
+        
+        $prefixMap = [
+            'tampak-depan' => 'bangunan_depan',
+            'dalam-kamar' => 'dalam_kamar',
+            'kamar-mandi' => 'kamar_mandi',
+            'ruang-tamu' => 'ruang_tamu',
+            'dapur' => 'dapur',
+            'parkiran' => 'area_parkir',
+            'fasilitas-umum' => 'fasilitas_umum',
+            'lainnya' => 'lainnya'
+        ];
+
+        $availablePhotos = [];
+        foreach ($photoCategories as $cat) {
+            $availablePhotos[$cat] = [];
+        }
+
+        $dummyPhotosPath = base_path('dummy_data/photos');
+        if (is_dir($dummyPhotosPath)) {
+            $files = scandir($dummyPhotosPath);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..') continue;
+                
+                foreach ($prefixMap as $prefix => $cat) {
+                    if (str_starts_with($file, $prefix)) {
+                        $sourcePath = $dummyPhotosPath . '/' . $file;
+                        $filename = 'kos_photos/dummy_' . $file;
+                        Storage::disk('public')->put($filename, file_get_contents($sourcePath));
+                        $availablePhotos[$cat][] = '/storage/' . $filename;
+                        break;
+                    }
+                }
+            }
         }
 
         $kosFacilities = Facility::where('type', 'kos')->pluck('id');
@@ -54,11 +103,14 @@ class KosPaluDummySeeder extends Seeder
 
         // Daftar keyword untuk foto realistis menggunakan LoremFlickr (selalu berhasil dan sesuai keyword)
         $photoKeywords = [
-            'utama' => 'house,exterior',
-            'kamar' => 'bedroom,interior',
+            'bangunan_depan' => 'house,exterior',
+            'dalam_kamar' => 'bedroom,interior',
             'kamar_mandi' => 'bathroom,shower',
-            'fasilitas' => 'kitchen,livingroom',
-            'lingkungan' => 'street,neighborhood'
+            'ruang_tamu' => 'livingroom,sofa',
+            'dapur' => 'kitchen,stove',
+            'area_parkir' => 'parking,garage',
+            'fasilitas_umum' => 'kitchen,livingroom',
+            'lainnya' => 'furniture,house'
         ];
 
         // Zona daratan Kota Palu (Super Aman, Dijamin tidak masuk laut)
@@ -94,9 +146,9 @@ class KosPaluDummySeeder extends Seeder
                 'address' => 'Jl. ' . $faker->streetName() . ' No. ' . rand(1, 100),
                 'public_contact_name' => $admin->name,
                 'public_contact_whatsapp_number' => '08' . mt_rand(1000000000, 9999999999),
-                'city' => ucwords(strtolower($cityPalu->name)),
-                'district' => ucwords(strtolower($district->name)),
-                'subdistrict' => ucwords(strtolower($village->name)),
+                'city' => $cityPalu->name,
+                'district' => $district->name,
+                'subdistrict' => $village->name,
                 'latitude' => $lat,
                 'longitude' => $lng,
                 'status' => 'dipublikasikan',
@@ -152,21 +204,33 @@ class KosPaluDummySeeder extends Seeder
                 }
             }
 
-            // Create 10 Photos
-            $categories = ['utama', 'kamar', 'kamar_mandi', 'fasilitas', 'lingkungan'];
-            for ($p = 1; $p <= 10; $p++) {
-                $cat = $p === 1 ? 'utama' : $categories[array_rand($categories)];
-                // Menggunakan LoremFlickr dengan parameter lock (kombinasi unik dari i dan p) agar gambar tidak error dan selalu unik
-                $lockId = ($i * 10) + $p;
-                $photoUrl = 'https://loremflickr.com/800/600/' . $photoKeywords[$cat] . '?lock=' . $lockId;
+            // Create 8 Photos (1 per category)
+            $categories = ['bangunan_depan', 'dalam_kamar', 'kamar_mandi', 'ruang_tamu', 'dapur', 'area_parkir', 'fasilitas_umum', 'lainnya'];
+            $p = 1;
+            foreach ($categories as $cat) {
+                // Gunakan foto lokal sesuai kategori jika ada
+                if (!empty($availablePhotos[$cat])) {
+                    $photoUrl = $availablePhotos[$cat][array_rand($availablePhotos[$cat])];
+                } else {
+                    // Jika kategori tersebut kosong (misal 'lainnya'), ambil acak dari SEMUA foto dummy lokal yang ada
+                    $allDummyPhotos = array_merge(...array_values($availablePhotos));
+                    if (!empty($allDummyPhotos)) {
+                        $photoUrl = $allDummyPhotos[array_rand($allDummyPhotos)];
+                    } else {
+                        // Fallback terakhir ke internet jika folder dummy_data/photos benar-benar kosong total
+                        $lockId = ($i * 10) + $p;
+                        $photoUrl = 'https://loremflickr.com/800/600/' . $photoKeywords[$cat] . '?lock=' . $lockId;
+                    }
+                }
 
                 BoardingHousePhoto::create([
                     'boarding_house_id' => $kos->id,
                     'file_path' => $photoUrl,
                     'category' => $cat,
-                    'is_primary' => ($p === 1),
+                    'is_primary' => ($cat === 'bangunan_depan'),
                     'sort_order' => $p,
                 ]);
+                $p++;
             }
 
             // Create Legal Documents
@@ -175,7 +239,7 @@ class KosPaluDummySeeder extends Seeder
                 'document_type' => 'identitas_pemilik_pengelola',
                 'document_name' => 'KTP Pemilik',
                 'document_number' => '72710' . mt_rand(10000000000, 99999999999),
-                'file_path' => 'legal_documents/dummy_ktp.pdf',
+                'file_path' => $ktpPath,
                 'status' => 'valid',
                 'review_note' => 'KTP Valid',
                 'reviewed_by' => $superAdmin->id,
@@ -186,7 +250,7 @@ class KosPaluDummySeeder extends Seeder
                 'document_type' => 'bukti_kepemilikan_pengelolaan',
                 'document_name' => 'Sertifikat Hak Milik (SHM)',
                 'document_number' => 'SHM-' . mt_rand(1000, 9999),
-                'file_path' => 'legal_documents/dummy_shm.pdf',
+                'file_path' => $shmPath,
                 'status' => 'valid',
                 'review_note' => 'Dokumen asli dan sesuai lokasi',
                 'reviewed_by' => $superAdmin->id,

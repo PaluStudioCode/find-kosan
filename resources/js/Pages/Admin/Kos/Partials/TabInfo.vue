@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ const onCityChange = async () => {
     subdistricts.value = [];
     if (!form.city) return;
     try {
-        const cityObj = cities.value.find(c => c.name === form.city);
+        const cityObj = cities.value.find(c => c.name.toLowerCase() === form.city.toLowerCase());
         if(cityObj) {
             const { data } = await axios.get('/api/regions/districts?city_code=' + cityObj.code);
             districts.value = data;
@@ -85,7 +85,7 @@ const onDistrictChange = async () => {
     subdistricts.value = [];
     if (!form.district) return;
     try {
-        const distObj = districts.value.find(d => d.name === form.district);
+        const distObj = districts.value.find(d => d.name.toLowerCase() === form.district.toLowerCase());
         if(distObj) {
             const { data } = await axios.get('/api/regions/villages?district_code=' + distObj.code);
             subdistricts.value = data;
@@ -99,7 +99,7 @@ onMounted(async () => {
 
     // Pre-load districts if city already set
     if (form.city) {
-        const cityObj = cities.value.find(c => c.name === form.city);
+        const cityObj = cities.value.find(c => c.name.toLowerCase() === form.city.toLowerCase());
         if (cityObj) {
             try {
                 const { data } = await axios.get('/api/regions/districts?city_code=' + cityObj.code);
@@ -110,7 +110,7 @@ onMounted(async () => {
 
     // Pre-load subdistricts if district already set
     if (form.district) {
-        const distObj = districts.value.find(d => d.name === form.district);
+        const distObj = districts.value.find(d => d.name.toLowerCase() === form.district.toLowerCase());
         if (distObj) {
             try {
                 const { data } = await axios.get('/api/regions/villages?district_code=' + distObj.code);
@@ -264,7 +264,7 @@ const handleLocationSelected = async (location) => {
                                                     }"
                                                 >
                                                     <Check
-                                                        :class="cn('mr-2 h-4 w-4', form.city === c.name ? 'opacity-100' : 'opacity-0')"
+                                                        :class="cn('mr-2 h-4 w-4', (form.city && c.name && form.city.toLowerCase() === c.name.toLowerCase()) ? 'opacity-100' : 'opacity-0')"
                                                     />
                                                     {{ c.name }}
                                                 </CommandItem>
@@ -310,7 +310,7 @@ const handleLocationSelected = async (location) => {
                                                     }"
                                                 >
                                                     <Check
-                                                        :class="cn('mr-2 h-4 w-4', form.district === d.name ? 'opacity-100' : 'opacity-0')"
+                                                        :class="cn('mr-2 h-4 w-4', (form.district && d.name && form.district.toLowerCase() === d.name.toLowerCase()) ? 'opacity-100' : 'opacity-0')"
                                                     />
                                                     {{ d.name }}
                                                 </CommandItem>
@@ -355,7 +355,7 @@ const handleLocationSelected = async (location) => {
                                                     }"
                                                 >
                                                     <Check
-                                                        :class="cn('mr-2 h-4 w-4', form.subdistrict === v.name ? 'opacity-100' : 'opacity-0')"
+                                                        :class="cn('mr-2 h-4 w-4', (form.subdistrict && v.name && form.subdistrict.toLowerCase() === v.name.toLowerCase()) ? 'opacity-100' : 'opacity-0')"
                                                     />
                                                     {{ v.name }}
                                                 </CommandItem>

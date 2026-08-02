@@ -236,10 +236,10 @@ onBeforeUnmount(() => {
         <section class="relative isolate overflow-hidden bg-slate-900 text-white pb-16 pt-12 lg:pt-32 lg:pb-0 min-h-[calc(100vh-64px)] flex flex-col justify-start lg:justify-center">
             <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900 to-[#071a1d]" />
 
-            <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-8 pt-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-12">
-                <div class="relative z-10 max-w-2xl flex flex-col">
+            <div class="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 pb-8 pt-4 sm:px-6 lg:grid-cols-[0.95fr_1.15fr] lg:px-8 lg:py-0 w-full mt-0 lg:-mt-12">
+                <div class="relative z-20 max-w-2xl flex flex-col">
                     
-                    <div class="w-fit inline-flex items-center gap-2.5 px-1.5 py-1.5 pr-4 mb-6 text-[11px] font-bold rounded-full bg-slate-800/40 border border-slate-700/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+                    <div data-reveal style="--reveal-delay: 0ms" class="w-fit inline-flex items-center gap-2.5 px-1.5 py-1.5 pr-4 mb-6 text-[11px] font-bold rounded-full bg-slate-800/40 border border-slate-700/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                         <div class="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 shadow-[0_0_10px_rgba(45,212,191,0.5)]">
                             <svg class="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -248,16 +248,16 @@ onBeforeUnmount(() => {
                         <span class="bg-gradient-to-r from-teal-50 to-slate-300 bg-clip-text text-transparent tracking-wider uppercase">Cari Kos Gak Pake Ribet</span>
                     </div>
 
-                    <h1 class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
+                    <h1 data-reveal style="--reveal-delay: 100ms" class="max-w-2xl text-4xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Ketemu Kos Idaman,
                         <span class="inline-block bg-gradient-to-r from-teal-300 via-emerald-300 to-orange-300 bg-clip-text text-transparent pb-1">Lebih Cepat & Gampang.</span>
                     </h1>
 
-                    <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-300 font-medium">
+                    <p data-reveal style="--reveal-delay: 200ms" class="mt-4 max-w-xl text-base leading-relaxed text-slate-300 font-medium">
                         Tinggal buka peta, cek fasilitas, baca review jujur penyewa lain, langsung booking. Bayar dan kelola tagihan bulanan? Semua beres dari HP-mu!
                     </p>
 
-                    <div class="mt-6 flex flex-col gap-3 sm:flex-row w-full">
+                    <div data-reveal style="--reveal-delay: 300ms" class="mt-6 flex flex-col gap-3 sm:flex-row w-full">
                         <Link :href="route('public.kos.index')">
                             <Button class="group h-11 w-full rounded-full bg-teal-500 px-6 text-sm font-bold text-white shadow-md transition-all hover:bg-teal-400 hover:-translate-y-0.5 sm:w-auto">
                                 Cari Kos
@@ -271,7 +271,7 @@ onBeforeUnmount(() => {
                         </a>
                     </div>
 
-                    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-slate-400">
+                    <div data-reveal style="--reveal-delay: 400ms" class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium text-slate-400">
                         <span class="flex items-center gap-1.5">
                             <Check class="h-4 w-4 text-teal-400" />
                             Pencarian peta
@@ -287,8 +287,8 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
 
-                <div class="relative min-h-[460px] lg:min-h-[650px] w-full mt-[-2rem] lg:-mt-24">
-                    <LandingHeroScene class="relative z-10" />
+                <div data-reveal="scale" style="--reveal-delay: 300ms" class="relative z-30 pointer-events-none lg:pointer-events-auto h-[460px] lg:h-[800px] w-full mt-[-4rem] lg:-mt-48">
+                    <LandingHeroScene class="absolute inset-0 z-10 h-full" />
                 </div>
             </div>
         </section>
@@ -296,11 +296,11 @@ onBeforeUnmount(() => {
 
 
         <!-- 4. Animated map discovery -->
-        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
+        <section id="peta-kos" class="scroll-mt-20 relative overflow-hidden bg-white py-16 sm:py-24 lg:py-32 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] items-start gap-12 lg:gap-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
                     <!-- Left: Text -->
-                    <div data-reveal="left" class="max-w-xl lg:mt-6">
+                    <div data-reveal="left" class="max-w-xl">
                         <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Cari Kos Langsung di Peta. Gampang Banget!</h2>
                         <p class="mt-4 text-base leading-relaxed text-slate-600">
                             Males baca list kosan yang kepanjangan? Buka aja petanya, zoom in ke kampus atau area kantormu, dan pantau langsung kosan mana yang posisinya paling strategis buat kamu.
@@ -315,8 +315,8 @@ onBeforeUnmount(() => {
 
                     <!-- Right: Map -->
                     <div data-reveal="right" class="relative">
-                        <div class="relative rounded-[2rem] border border-slate-200 bg-slate-50 p-2 shadow-lg">
-                            <LandingMapDiscovery :items="mapKos" class="overflow-hidden rounded-3xl w-full h-[350px] sm:h-[450px]" />
+                        <div class="relative rounded-[2rem] border border-slate-200 bg-slate-50 p-2 shadow-lg max-w-lg mx-auto lg:max-w-none">
+                            <LandingMapDiscovery :items="mapKos" class="overflow-hidden rounded-3xl w-full h-[300px] sm:h-[360px] lg:h-[380px]" />
                         </div>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 6. How it works -->
-        <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 lg:py-0 lg:min-h-screen flex flex-col justify-center relative overflow-hidden">
+        <section id="cara-kerja" class="scroll-mt-20 bg-slate-900 py-24 sm:py-32 lg:py-32 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Ngekos Tanpa Pusing, Cukup 4 Langkah.</h2>
@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 7. Security & transparency -->
-        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-20 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
+        <section id="keamanan" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 lg:py-32 relative overflow-hidden">
             <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
@@ -437,7 +437,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 8. Tenancy and payment -->
-        <section class="overflow-hidden bg-white py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
+        <section class="overflow-hidden bg-white py-16 sm:py-24 lg:py-32 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="grid items-center gap-10 lg:gap-16 lg:grid-cols-[0.9fr_1.1fr]">
                     <!-- Left: Simplified Mockup -->
@@ -511,7 +511,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 9. WhatsApp notifications -->
-        <section class="relative bg-slate-900 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center text-white overflow-hidden">
+        <section class="relative bg-slate-900 py-16 sm:py-24 lg:py-32 text-white overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="grid items-center gap-14 lg:gap-16 lg:grid-cols-[1.1fr_0.9fr]">
                     <div data-reveal="left" class="max-w-xl">
@@ -565,7 +565,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 10. Owner solution -->
-        <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 lg:py-0 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100">
+        <section id="pemilik" class="scroll-mt-20 bg-slate-50 py-16 sm:py-24 lg:py-32 border-y border-slate-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Punya Kos-Kosan? Atur Semuanya Dari Satu Layar.</h2>
@@ -626,7 +626,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 11. Tenant reviews -->
-        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-24 lg:min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
+        <section id="ulasan" class="scroll-mt-20 bg-white py-16 sm:py-24 lg:py-32 relative overflow-hidden">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Kata Mereka yang Udah Buktiin Langsung.</h2>
@@ -689,7 +689,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 12. FAQ -->
-        <section class="bg-slate-50 py-16 sm:py-24 lg:py-24 lg:min-h-[85vh] flex flex-col justify-center border-y border-slate-100 relative">
+        <section class="bg-slate-50 py-16 sm:py-24 lg:py-32 border-y border-slate-100 relative">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div data-reveal class="mx-auto max-w-2xl text-center mb-16">
                     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Masih Punya Pertanyaan? (FAQ)</h2>
@@ -713,7 +713,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- 13. Final CTA -->
-        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:py-24 lg:min-h-[70vh] flex flex-col justify-center lg:px-8">
+        <section class="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:py-32 lg:px-8">
             <div data-reveal="scale" class="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-slate-900 px-6 py-16 text-center shadow-xl sm:px-12 sm:py-20 relative">
                 <div class="absolute inset-0 bg-slate-800/20 mix-blend-overlay" />
                 

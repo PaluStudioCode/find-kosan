@@ -20,7 +20,7 @@ class KosPhotoController extends Controller
         }
 
         $request->validate([
-            'category' => 'required|string|in:bangunan_depan,dalam_kamar,kamar_mandi,fasilitas_umum,lingkungan,lainnya',
+            'category' => 'required|string|in:bangunan_depan,dalam_kamar,kamar_mandi,ruang_tamu,dapur,area_parkir,fasilitas_umum,lainnya',
             'photos' => 'required|array|min:1',
             'photos.*' => 'image|max:2048',
         ]);

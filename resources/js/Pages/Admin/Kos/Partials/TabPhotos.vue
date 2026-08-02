@@ -25,8 +25,10 @@ const photoCategories = {
     'bangunan_depan': 'Tampak Depan',
     'dalam_kamar': 'Dalam Kamar',
     'kamar_mandi': 'Kamar Mandi',
+    'ruang_tamu': 'Ruang Tamu',
+    'dapur': 'Dapur',
+    'area_parkir': 'Area Parkir',
     'fasilitas_umum': 'Fasilitas Umum',
-    'lingkungan': 'Lingkungan',
     'lainnya': 'Lainnya'
 };
 

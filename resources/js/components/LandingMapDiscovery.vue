@@ -220,59 +220,49 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="landing-map-shell">
-        <div ref="mapContainer" class="h-[420px] w-full sm:h-[500px]" />
+    <div class="landing-map-shell relative w-full">
+        <div ref="mapContainer" class="absolute inset-0 h-full w-full" />
 
-        <div class="pointer-events-none absolute inset-x-4 top-4 z-[500] sm:inset-x-6 sm:top-6">
-            <div class="flex items-center gap-3 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-xl">
-                <Search class="h-4 w-4 shrink-0 text-teal-700" />
-                <div class="min-w-0">
-                    <p class="truncate text-xs font-bold text-slate-800">Cari kos di sekitar lokasi</p>
-                    <p class="truncate text-[10px] text-slate-400">Geser radius untuk memperluas area</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="absolute bottom-5 left-4 right-4 z-[500] sm:bottom-6 sm:left-6 sm:right-auto sm:w-[290px]">
-            <div class="rounded-2xl border border-white/80 bg-white/95 p-4 shadow-xl backdrop-blur-xl">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                        <SlidersHorizontal class="h-4 w-4 text-teal-700" />
-                        <p class="text-xs font-bold text-slate-800">Radius pencarian</p>
+        <div class="absolute bottom-4 left-4 right-4 z-[500] sm:bottom-5 sm:left-5 sm:right-auto sm:w-[240px]">
+            <div class="rounded-xl border border-white/80 bg-white/95 p-3 shadow-lg backdrop-blur-xl">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <SlidersHorizontal class="h-3.5 w-3.5 text-teal-700" />
+                        <p class="text-[11px] font-bold text-slate-800">Radius pencarian</p>
                     </div>
                     <button
                         type="button"
-                        class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-teal-50 hover:text-teal-700"
+                        class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-teal-50 hover:text-teal-700"
                         :aria-label="autoAnimation ? 'Jeda animasi radius' : 'Putar animasi radius'"
                         @click="toggleAnimation"
                     >
-                        <Pause v-if="autoAnimation" class="h-3.5 w-3.5" />
-                        <Play v-else class="h-3.5 w-3.5" />
+                        <Pause v-if="autoAnimation" class="h-3 w-3" />
+                        <Play v-else class="h-3 w-3" />
                     </button>
                 </div>
 
-                <div class="mt-3 flex items-center gap-3">
+                <div class="mt-2.5 flex items-center gap-2">
                     <input
                         :value="radiusKm"
                         type="range"
                         :min="minimumRadius"
                         :max="maximumRadius"
                         step="0.1"
-                        class="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-slate-200 accent-teal-700"
+                        class="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-slate-200 accent-teal-700"
                         aria-label="Radius pencarian kos"
                         @input="handleManualRadius"
                     />
-                    <span class="min-w-14 rounded-lg bg-teal-50 px-2 py-1 text-center text-xs font-bold text-teal-800">
+                    <span class="min-w-[48px] rounded-md bg-teal-50 px-1.5 py-0.5 text-center text-[10px] font-bold text-teal-800">
                         {{ radiusKm }} km
                     </span>
                 </div>
             </div>
         </div>
 
-        <div class="absolute bottom-32 right-4 z-[500] sm:bottom-6 sm:right-16">
-            <div class="flex items-center gap-2 rounded-full border border-white/80 bg-[#0c292b] px-3.5 py-2 text-xs font-bold text-white shadow-xl">
-                <Navigation class="h-3.5 w-3.5 text-teal-300" />
-                {{ nearbyCount }} kos ditemukan
+        <div class="absolute top-4 right-4 z-[500] sm:top-5 sm:right-5">
+            <div class="flex items-center gap-1.5 rounded-full border border-white/80 bg-[#0c292b]/90 backdrop-blur-md px-3 py-1.5 text-[11px] font-bold text-white shadow-lg">
+                <Navigation class="h-3 w-3 text-teal-300" />
+                {{ nearbyCount }} ditemukan
             </div>
         </div>
     </div>

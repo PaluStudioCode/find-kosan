@@ -17,17 +17,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Bersihkan folder file yang di-upload agar tidak menumpuk (Orphaned files)
-        $directoriesToClean = ['kos_photos', 'legal_docs', 'payment_receipts'];
-        foreach ($directoriesToClean as $dir) {
+        // Bersihkan seluruh folder file yang di-upload beserta isi filenya
+        $publicDirectories = ['kos_photos', 'legal_docs', 'payment_receipts', 'withdrawal-proofs'];
+        foreach ($publicDirectories as $dir) {
             Storage::disk('public')->deleteDirectory($dir);
-            Storage::disk('public')->makeDirectory($dir);
+        }
 
-            // Fix Docker permission issue: pastikan web server bisa tulis & baca walau dibuat oleh Root
-            $path = storage_path('app/public/' . $dir);
-            if (file_exists($path)) {
-                @chmod($path, 0777);
-            }
+        $localDirectories = ['legal_documents', 'payments', 'qris'];
+        foreach ($localDirectories as $dir) {
+            Storage::disk('local')->deleteDirectory($dir);
         }
 
         // Super Admin

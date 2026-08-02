@@ -55,7 +55,9 @@ class BoardingHouse extends Model
 
     public function photos()
     {
-        return $this->hasMany(BoardingHousePhoto::class);
+        return $this->hasMany(BoardingHousePhoto::class)
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order', 'asc');
     }
 
     public function legalDocuments()

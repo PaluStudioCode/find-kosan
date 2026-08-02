@@ -1,9 +1,10 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ExternalLink } from 'lucide-vue-next';
+import { ChevronLeft, ExternalLink, Loader2 } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 // Partials
@@ -20,7 +21,7 @@ const props = defineProps({
     roomFacilitiesList: Array,
 });
 
-const isLocked = computed(() => props.kos.status === 'menunggu_verifikasi');
+const isLocked = computed(() => props.kos?.status === 'menunggu_verifikasi');
 
 const activeTab = ref(new URLSearchParams(window.location.search).get('tab') || 'info');
 const tabs = [
@@ -34,7 +35,31 @@ const tabs = [
 
 <template>
     <AppLayout>
-        <Head :title="`Kelola - ${kos.name}`" />
+        <Head :title="kos ? `Kelola - ${kos.name}` : 'Memuat Properti...'" />
+        
+        <Deferred :data="['kos', 'kosFacilitiesList', 'kosRulesList', 'roomFacilitiesList']">
+            <template #fallback>
+                <div class="animate-pulse">
+                    <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                        <div>
+                            <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                            <div class="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        </div>
+                        <div class="h-10 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-lg shadow-sm">
+                        <div class="flex overflow-x-auto border-b dark:border-slate-800 p-2 gap-4">
+                            <div v-for="n in 5" :key="'tab-'+n" class="h-10 w-32 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-center py-20 flex-col gap-4">
+                                <Loader2 class="w-8 h-8 text-slate-300 dark:text-slate-700 animate-spin" />
+                                <p class="text-slate-400 dark:text-slate-600 font-medium">Memuat data properti...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
         <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
             <div>
@@ -83,5 +108,6 @@ const tabs = [
                 <TabVerification v-if="activeTab === 'verification'" :kos="kos" />
             </div>
         </div>
+        </Deferred>
     </AppLayout>
 </template>

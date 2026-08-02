@@ -35,10 +35,8 @@ class ReportController extends Controller
             $query->where('category', $request->category);
         }
 
-        $reports = $query->latest()->paginate(15)->withQueryString();
-
         return Inertia::render('SuperAdmin/Reports/Index', [
-            'reports' => $reports,
+            'reports' => Inertia::defer(fn () => $query->latest()->paginate(10)->withQueryString()),
             'filters' => request()->all(['search', 'status', 'category']),
         ]);
     }

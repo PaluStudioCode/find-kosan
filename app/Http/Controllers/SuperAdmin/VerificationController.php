@@ -30,40 +30,40 @@ class VerificationController extends Controller
             }
         }
 
-        $verifications = $query->paginate(15)->withQueryString();
-
         return Inertia::render('SuperAdmin/Verifications/Index', [
-            'verifications' => $verifications,
+            'verifications' => Inertia::defer(fn () => $query->paginate(10)->withQueryString()),
             'filters' => ['status' => $status],
         ]);
     }
 
     public function show(BoardingHouse $kos)
     {
-        $kos->load([
-            'admin',
-            'facilities',
-            'rules',
-            'rooms.facilities',
-            'photos',
-            'legalDocuments',
-        ]);
-
-        // If there is a shadow revision, overlay it so the Admin sees the proposed changes
-        if ($kos->pending_revisions) {
-            $kos->fill($kos->pending_revisions);
-
-            if (isset($kos->pending_revisions['facility_ids'])) {
-                $kos->setRelation('facilities', Facility::whereIn('id', $kos->pending_revisions['facility_ids'])->get());
-            }
-
-            if (isset($kos->pending_revisions['rule_ids'])) {
-                $kos->setRelation('rules', Rule::whereIn('id', $kos->pending_revisions['rule_ids'])->get());
-            }
-        }
-
         return Inertia::render('SuperAdmin/Verifications/Show', [
-            'kos' => $kos,
+            'kos' => Inertia::defer(function () use ($kos) {
+                $kos->load([
+                    'admin',
+                    'facilities',
+                    'rules',
+                    'rooms.facilities',
+                    'photos',
+                    'legalDocuments',
+                ]);
+
+                // If there is a shadow revision, overlay it so the Admin sees the proposed changes
+                if ($kos->pending_revisions) {
+                    $kos->fill($kos->pending_revisions);
+
+                    if (isset($kos->pending_revisions['facility_ids'])) {
+                        $kos->setRelation('facilities', Facility::whereIn('id', $kos->pending_revisions['facility_ids'])->get());
+                    }
+
+                    if (isset($kos->pending_revisions['rule_ids'])) {
+                        $kos->setRelation('rules', Rule::whereIn('id', $kos->pending_revisions['rule_ids'])->get());
+                    }
+                }
+
+                return $kos;
+            }),
         ]);
     }
 

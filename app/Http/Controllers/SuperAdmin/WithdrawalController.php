@@ -18,9 +18,10 @@ class WithdrawalController extends Controller
     public function index()
     {
         return Inertia::render('SuperAdmin/Withdrawals/Index', [
-            'withdrawals' => WithdrawalRequest::with(['admin', 'reviewer', 'transferer'])
+            'withdrawals' => Inertia::defer(fn () => WithdrawalRequest::with(['admin', 'reviewer', 'transferer'])
                 ->latest()
-                ->paginate(15),
+                ->paginate(10)
+                ->withQueryString()),
         ]);
     }
 

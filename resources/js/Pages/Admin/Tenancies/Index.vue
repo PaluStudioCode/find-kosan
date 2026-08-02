@@ -1,5 +1,6 @@
-﻿<script setup>
+<script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -49,9 +50,44 @@ const handleFilterChange = (val) => {
             </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border dark:border-slate-800 p-4">
-            <div v-if="tenancies.data.length > 0">
-                <Table>
+        <Deferred data="tenancies">
+            <template #fallback>
+                <div class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border dark:border-slate-800 p-4">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Penyewa</TableHead>
+                                <TableHead>Kamar & Kos</TableHead>
+                                <TableHead>Mulai Sewa</TableHead>
+                                <TableHead>Tagihan Aktif</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead class="text-right">Aksi</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="n in 5" :key="'skel-'+n" class="animate-pulse">
+                                <TableCell>
+                                    <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-2"></div>
+                                    <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                                </TableCell>
+                                <TableCell>
+                                    <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mb-2"></div>
+                                    <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-2"></div>
+                                    <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                                </TableCell>
+                                <TableCell><div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></TableCell>
+                                <TableCell><div class="h-5 bg-slate-200 dark:bg-slate-700 rounded-full w-20"></div></TableCell>
+                                <TableCell><div class="h-5 bg-slate-200 dark:bg-slate-700 rounded-full w-16"></div></TableCell>
+                                <TableCell class="text-right"><div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 ml-auto"></div></TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </template>
+
+            <div class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border dark:border-slate-800 p-4">
+                <div v-if="tenancies.data.length > 0">
+                    <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Penyewa</TableHead>
@@ -105,6 +141,7 @@ const handleFilterChange = (val) => {
                 title="Belum ada penyewaan"
                 description="Belum ada data penyewaan atau transaksi pada properti Anda."
             />
-        </div>
+            </div>
+        </Deferred>
     </AppLayout>
 </template>

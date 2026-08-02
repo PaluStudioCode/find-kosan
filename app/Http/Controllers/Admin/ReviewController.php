@@ -16,25 +16,24 @@ class ReviewController extends Controller
         $kosFilter = $request->input('kos_id');
         $ratingFilter = $request->input('rating');
 
-        $query = BoardingHouseReview::whereHas('boardingHouse', function ($q) use ($adminId) {
-            $q->where('admin_id', $adminId);
-        })
-            ->with(['user:id,name,email', 'boardingHouse:id,name']);
-
-        if ($kosFilter) {
-            $query->where('boarding_house_id', $kosFilter);
-        }
-
-        if ($ratingFilter) {
-            $query->where('rating', $ratingFilter);
-        }
-
-        $reviews = $query->latest()->paginate(10)->withQueryString();
-
         $kosList = BoardingHouse::where('admin_id', $adminId)->select('id', 'name')->get();
 
         return Inertia::render('Admin/Reviews/Index', [
-            'reviews' => $reviews,
+            'reviews' => Inertia::defer(function () use ($adminId, $kosFilter, $ratingFilter) {
+                $query = BoardingHouseReview::whereHas('boardingHouse', function ($q) use ($adminId) {
+                    $q->where('admin_id', $adminId);
+                })->with(['user:id,name,email', 'boardingHouse:id,name']);
+
+                if ($kosFilter) {
+                    $query->where('boarding_house_id', $kosFilter);
+                }
+
+                if ($ratingFilter) {
+                    $query->where('rating', $ratingFilter);
+                }
+
+                return $query->latest()->paginate(6)->withQueryString();
+            }),
             'kosList' => $kosList,
             'filters' => [
                 'kos_id' => $kosFilter,

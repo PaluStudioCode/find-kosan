@@ -1,6 +1,8 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import StatusBadge from '@/components/StatusBadge.vue';
@@ -23,6 +25,22 @@ const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
         <Card class="border-0 dark:bg-slate-900 shadow-sm dark:border-slate-800">
             <CardHeader class="border-b dark:border-slate-800"><CardTitle class="dark:text-white">Daftar Permintaan Penarikan</CardTitle></CardHeader>
             <CardContent class="p-0 border-0">
+                <Deferred :data="['withdrawals']">
+                    <template #fallback>
+                        <div class="animate-pulse divide-y dark:divide-slate-800">
+                            <div v-for="n in 10" :key="n" class="p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div class="space-y-2">
+                                    <div class="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                    <div class="h-5 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                    <div class="h-4 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                                    <div class="h-9 w-20 bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
                 <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
                     <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                         <div>
@@ -37,6 +55,11 @@ const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
                     </div>
                 </div>
                 <p v-else class="p-10 text-center text-gray-500 dark:text-slate-500">Belum ada permintaan penarikan.</p>
+                </Deferred>
+
+                <div class="p-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800">
+                    <Pagination :links="withdrawals ? withdrawals.links : []" />
+                </div>
             </CardContent>
         </Card>
     </AppLayout>

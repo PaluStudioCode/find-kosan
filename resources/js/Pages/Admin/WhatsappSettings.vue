@@ -1,6 +1,7 @@
-﻿<script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+<script setup>
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,14 @@ const connectMethod = ref('qr'); // 'qr' or 'pairing'
 const pairingPhoneInput = ref('');
 const errorMessage = ref('');
 const connectedAt = ref(props.session?.connected_at || null);
+
+watch(() => props.session, (newSession) => {
+    if (newSession) {
+        status.value = newSession.status || 'disconnected';
+        phoneNumber.value = newSession.phone_number || '';
+        connectedAt.value = newSession.connected_at || null;
+    }
+}, { immediate: true });
 
 let pollInterval = null;
 
@@ -207,7 +216,18 @@ onUnmounted(() => {
         </div>
 
         <div class="max-w-3xl mx-auto">
-            <Card class="overflow-hidden border-0 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <Deferred data="session">
+                <template #fallback>
+                    <Card class="overflow-hidden border-0 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                        <CardContent class="p-8 sm:p-12 animate-pulse flex flex-col items-center">
+                            <div class="w-20 h-20 bg-slate-200 dark:bg-slate-800 rounded-full mb-5"></div>
+                            <div class="h-6 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                            <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        </CardContent>
+                    </Card>
+                </template>
+
+                <Card class="overflow-hidden border-0 shadow-sm dark:bg-slate-900 dark:border-slate-800">
                 <CardContent class="p-0 border-0">
                     <!-- Connected State -->
                     <div v-if="isConnected" class="p-8 sm:p-12 text-center flex flex-col items-center bg-white dark:bg-slate-900 rounded-lg">
@@ -312,6 +332,7 @@ onUnmounted(() => {
                     </div>
                 </CardContent>
             </Card>
+            </Deferred>
         </div>
     </AppLayout>
 </template>

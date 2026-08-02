@@ -1,11 +1,13 @@
-﻿<script setup>
+<script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import StatusBadge from '@/components/StatusBadge.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import Pagination from '@/components/Pagination.vue';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -45,6 +47,42 @@ const formatDate = (date) => {
             </div>
 
             <div class="mt-4">
+                <Deferred :data="['verifications']">
+                    <template #fallback>
+                        <Table>
+                            <TableHeader>
+                                <TableRow class="dark:border-slate-800">
+                                    <TableHead class="dark:text-slate-400">Nama Kos</TableHead>
+                                    <TableHead class="dark:text-slate-400">Pemilik</TableHead>
+                                    <TableHead class="dark:text-slate-400">Tgl Pengajuan</TableHead>
+                                    <TableHead class="dark:text-slate-400">Tipe Pengajuan</TableHead>
+                                    <TableHead class="text-right dark:text-slate-400">Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody class="animate-pulse">
+                                <TableRow v-for="n in 10" :key="n" class="dark:border-slate-800">
+                                    <TableCell>
+                                        <div class="space-y-2">
+                                            <div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                            <div class="h-3 w-48 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div class="space-y-2">
+                                            <div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                            <div class="h-3 w-32 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell><div class="w-24 h-5 bg-slate-200 dark:bg-slate-800 rounded"></div></TableCell>
+                                    <TableCell><div class="w-32 h-6 bg-slate-200 dark:bg-slate-800 rounded-full"></div></TableCell>
+                                    <TableCell class="text-right">
+                                        <div class="flex justify-end"><div class="w-20 h-8 bg-slate-200 dark:bg-slate-800 rounded"></div></div>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </template>
+                    
                 <Table v-if="verifications.data.length > 0">
                     <TableHeader>
                         <TableRow class="dark:border-slate-800">
@@ -91,12 +129,8 @@ const formatDate = (date) => {
                     description="Tidak ada data kos dengan status tersebut saat ini."
                 />
 
-                <div v-if="verifications.links && verifications.links.length > 3" class="mt-6 flex justify-center gap-1 border-t dark:border-slate-800 pt-4">
-                    <template v-for="(link, k) in verifications.links" :key="k">
-                        <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-2 text-sm border dark:border-slate-700 rounded text-gray-400 dark:text-slate-500 bg-white dark:bg-slate-800" v-html="link.label" />
-                        <Link v-else :href="link.url" class="mr-1 mb-1 px-4 py-2 text-sm border dark:border-slate-700 rounded hover:bg-gray-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800 dark:text-slate-300" :class="{ 'bg-gray-900 text-white hover:bg-gray-800 border-gray-900 dark:bg-white dark:text-slate-900 dark:border-white dark:hover:bg-gray-200': link.active }" v-html="link.label" />
-                    </template>
-                </div>
+                </Deferred>
+                <Pagination :links="verifications ? verifications.links : []" />
             </div>
         </div>
     </AppLayout>

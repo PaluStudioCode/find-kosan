@@ -29,29 +29,33 @@ class WalletController extends Controller
             'wallet' => $wallet,
             'min_withdrawal' => $minWithdrawal,
             'filters' => $request->only(['type', 'month', 'year']),
-            'transactions' => AdminWalletTransaction::with('invoice')
-                ->where('admin_wallet_id', $wallet->id)
-                ->whereNotIn('type', ['withdrawal_hold', 'withdrawal_release'])
-                ->when($request->type, function ($query, $type) {
-                    if ($type === 'pemasukan') {
-                        $query->whereIn('type', ['payment_credit']);
-                    } elseif ($type === 'pengeluaran') {
-                        $query->whereNotIn('type', ['payment_credit']);
-                    }
-                })
-                ->when($request->month, function ($query, $month) {
-                    $query->whereMonth('created_at', $month);
-                })
-                ->when($request->year, function ($query, $year) {
-                    $query->whereYear('created_at', $year);
-                })
-                ->latest()
-                ->paginate(5)
-                ->withQueryString(),
-            'withdrawals' => WithdrawalRequest::where('admin_id', $adminId)
-                ->latest()
-                ->paginate(5, ['*'], 'withdrawals_page')
-                ->withQueryString(),
+            'transactions' => Inertia::defer(function () use ($wallet, $request) {
+                return AdminWalletTransaction::with('invoice')
+                    ->where('admin_wallet_id', $wallet->id)
+                    ->whereNotIn('type', ['withdrawal_hold', 'withdrawal_release'])
+                    ->when($request->type, function ($query, $type) {
+                        if ($type === 'pemasukan') {
+                            $query->whereIn('type', ['payment_credit']);
+                        } elseif ($type === 'pengeluaran') {
+                            $query->whereNotIn('type', ['payment_credit']);
+                        }
+                    })
+                    ->when($request->month, function ($query, $month) {
+                        $query->whereMonth('created_at', $month);
+                    })
+                    ->when($request->year, function ($query, $year) {
+                        $query->whereYear('created_at', $year);
+                    })
+                    ->latest()
+                    ->paginate(5)
+                    ->withQueryString();
+            }),
+            'withdrawals' => Inertia::defer(function () use ($adminId) {
+                return WithdrawalRequest::where('admin_id', $adminId)
+                    ->latest()
+                    ->paginate(5, ['*'], 'withdrawals_page')
+                    ->withQueryString();
+            }),
         ]);
     }
 

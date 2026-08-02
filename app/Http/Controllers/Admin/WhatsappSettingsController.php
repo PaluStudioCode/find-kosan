@@ -23,15 +23,16 @@ class WhatsappSettingsController extends Controller
     public function index()
     {
         $adminId = auth()->id();
-        $session = WaSession::where('admin_id', $adminId)->first();
-
         return Inertia::render('Admin/WhatsappSettings', [
-            'session' => $session ? [
-                'status' => $session->status,
-                'phone_number' => $session->phone_number,
-                'connected_at' => $session->connected_at?->toISOString(),
-                'disconnected_at' => $session->disconnected_at?->toISOString(),
-            ] : null,
+            'session' => Inertia::defer(function () use ($adminId) {
+                $session = WaSession::where('admin_id', $adminId)->first();
+                return $session ? [
+                    'status' => $session->status,
+                    'phone_number' => $session->phone_number,
+                    'connected_at' => $session->connected_at?->toISOString(),
+                    'disconnected_at' => $session->disconnected_at?->toISOString(),
+                ] : null;
+            }),
         ]);
     }
 

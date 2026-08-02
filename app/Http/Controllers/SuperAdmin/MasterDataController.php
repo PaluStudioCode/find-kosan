@@ -21,22 +21,19 @@ class MasterDataController extends Controller
         if ($request->has('type') && $request->type !== 'all') {
             $facilitiesQuery->where('type', $request->type);
         }
-        $facilities = $facilitiesQuery->orderBy('type')
-            ->orderBy('name')
-            ->paginate(5, ['*'], 'facility_page')
-            ->withQueryString();
-
         $rulesQuery = Rule::query();
         if ($request->has('search_rule')) {
             $rulesQuery->where('name', 'like', '%'.$request->search_rule.'%');
         }
-        $rules = $rulesQuery->orderBy('name')
-            ->paginate(5, ['*'], 'rule_page')
-            ->withQueryString();
 
         return Inertia::render('SuperAdmin/MasterData/Index', [
-            'facilities' => $facilities,
-            'rules' => $rules,
+            'facilities' => Inertia::defer(fn () => $facilitiesQuery->orderBy('type')
+                ->orderBy('name')
+                ->paginate(10, ['*'], 'facility_page')
+                ->withQueryString()),
+            'rules' => Inertia::defer(fn () => $rulesQuery->orderBy('name')
+                ->paginate(10, ['*'], 'rule_page')
+                ->withQueryString()),
             'activeTab' => $activeTab,
             'filters' => $request->only(['search_facility', 'search_rule', 'type']),
         ]);

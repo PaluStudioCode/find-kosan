@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
@@ -87,7 +88,36 @@ const formatDate = (dateString) => {
 
             <div class="mt-2">
                 
-                <!-- If No Reviews -->
+                <Deferred data="reviews">
+                    <template #fallback>
+                        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            <Card v-for="n in 6" :key="'skel-'+n" class="flex flex-col overflow-hidden animate-pulse">
+                                <CardHeader class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 pb-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                                        <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-20"></div>
+                                    </div>
+                                    <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mt-4"></div>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                                        <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent class="flex-1 p-5 flex flex-col justify-between">
+                                    <div class="space-y-2">
+                                        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                                        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6"></div>
+                                    </div>
+                                    <div class="mt-6 flex justify-between gap-3 border-t pt-4 border-slate-100 dark:border-slate-800">
+                                        <div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-28"></div>
+                                        <div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-28"></div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </template>
+
+                    <!-- If No Reviews -->
                 <div v-if="!reviews.data.length" class="flex flex-col items-center justify-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 py-20 px-4 text-center shadow-sm">
                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 dark:bg-teal-950/30 mb-4">
                         <MessageSquare class="h-8 w-8 text-teal-500" />
@@ -143,6 +173,7 @@ const formatDate = (dateString) => {
                         <Link v-else :href="link.url" preserve-scroll class="mr-1 mb-1 px-4 py-2 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-50 border-teal-500 text-teal-700 font-medium dark:bg-teal-900/50 dark:border-teal-500 dark:text-teal-300' : 'border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-900 dark:text-slate-300'" v-html="link.label" />
                     </template>
                 </div>
+                </Deferred>
 
             </div>
         </div>

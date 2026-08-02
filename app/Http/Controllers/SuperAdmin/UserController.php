@@ -27,10 +27,8 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        $users = $query->latest()->paginate(15)->withQueryString();
-
         return Inertia::render('SuperAdmin/Users/Index', [
-            'users' => $users,
+            'users' => Inertia::defer(fn () => $query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'role']),
         ]);
     }

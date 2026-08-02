@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { useDraggable } from '@vueuse/core';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
 
@@ -13,11 +13,12 @@ import { Label } from '@/components/ui/label';
 
 const props = defineProps({
     allKos: Array,
+    filters: Object,
 });
 
-const latitude = ref(null);
-const longitude = ref(null);
-const radius = ref(5);
+const latitude = ref(props.filters?.lat ? parseFloat(props.filters.lat) : null);
+const longitude = ref(props.filters?.lng ? parseFloat(props.filters.lng) : null);
+const radius = ref(props.filters?.radius ? parseFloat(props.filters.radius) : 5);
 const mapContainer = ref(null);
 const cardRef = ref(null);
 const dragHandleRef = ref(null);
@@ -47,10 +48,11 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
     return R * c;
 };
 
-// Filtered Kos list with calculated distance
+// We filter the server's response locally as well. 
+// This ensures that when the user moves the pin, old markers that fall outside the new radius disappear instantly (Zero lag) while waiting for the server's new data.
 const filteredKos = computed(() => {
     if (!latitude.value || !longitude.value) {
-        return props.allKos.map(kos => ({ ...kos, distance: null }));
+        return props.allKos;
     }
 
     const filtered = [];
@@ -63,9 +65,26 @@ const filteredKos = computed(() => {
         }
     });
 
-    // Sort by distance
     return filtered.sort((a, b) => a.distance - b.distance);
 });
+
+const fetchKosFromServer = () => {
+    updateMapMarkers();
+    fitMapToRadius();
+    
+    if (latitude.value && longitude.value) {
+        router.get(route('public.kos'), {
+            lat: latitude.value,
+            lng: longitude.value,
+            radius: radius.value
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+            only: ['allKos', 'filters']
+        });
+    }
+};
 
 const initMap = () => {
     // Default center (Indonesia) if no location
@@ -85,7 +104,7 @@ const initMap = () => {
     map.on('click', (e) => {
         latitude.value = e.latlng.lat;
         longitude.value = e.latlng.lng;
-        updateMapMarkers();
+        fetchKosFromServer();
     });
 
     updateMapMarkers();
@@ -118,7 +137,7 @@ const updateMapMarkers = () => {
             const position = e.target.getLatLng();
             latitude.value = position.lat;
             longitude.value = position.lng;
-            updateMapMarkers();
+            fetchKosFromServer();
         });
 
         if (radius.value < 51) {
@@ -132,7 +151,7 @@ const updateMapMarkers = () => {
     }
 
     // Add markers for filtered kos
-    const kosList = latitude.value && longitude.value ? filteredKos.value : props.allKos;
+    const kosList = filteredKos.value;
     
     kosList.forEach(kos => {
         if (kos.latitude && kos.longitude) {
@@ -212,8 +231,7 @@ const getLocation = (silent = false) => {
                 latitude.value = position.coords.latitude;
                 longitude.value = position.coords.longitude;
                 detectingLocation.value = false;
-                updateMapMarkers();
-                fitMapToRadius();
+                fetchKosFromServer();
             },
             (error) => {
                 clearTimeout(fallback);
@@ -233,11 +251,20 @@ const getLocation = (silent = false) => {
     }
 };
 
-// Watch radius to instantly update the map visualization and the markers
+let resizeTimeout;
+// Watch radius to fetch new data from server, debounce to avoid rapid API calls
 watch(radius, () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        fetchKosFromServer();
+    }, 500);
+});
+
+// Watch props to redraw map when new data arrives from server
+watch(() => props.allKos, () => {
     updateMapMarkers();
     fitMapToRadius();
-});
+}, { deep: true });
 
 onMounted(() => {
     initMap();
@@ -251,10 +278,10 @@ onMounted(() => {
         <Head title="Cari Kos Terdekat" />
 
         <div class="w-full h-[calc(100vh-65px)] relative z-0">
-            <!-- Settings Toggle Button (Mobile Only) -->
+            <!-- Settings Toggle Button (All Screens) -->
             <button 
                 :class="[
-                    'md:hidden fixed bottom-6 right-6 z-[400] items-center justify-center w-14 h-14 bg-teal-600 text-white rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.2)] hover:bg-teal-700 active:scale-95 transition-all',
+                    'fixed bottom-6 right-6 z-[400] items-center justify-center w-14 h-14 bg-teal-600 text-white rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.2)] hover:bg-teal-700 active:scale-95 transition-all',
                     isSettingsOpen ? 'hidden' : 'flex'
                 ]"
                 @click="isSettingsOpen = true"
@@ -266,12 +293,12 @@ onMounted(() => {
             <div 
                 ref="cardRef"
                 :style="cardStyle"
-                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex-col gap-5 md:flex"
+                class="fixed z-[400] w-[320px] bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex-col gap-5"
                 :class="isSettingsOpen ? 'flex' : 'hidden'"
             >
                 <button 
                     @click="isSettingsOpen = false" 
-                    class="md:hidden absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors"
                 >
                     <X class="w-4 h-4" />
                 </button>
@@ -301,21 +328,34 @@ onMounted(() => {
                 <div class="w-full text-left transition-opacity duration-300" :class="{ 'opacity-50 pointer-events-none': !latitude }">
                     <div class="flex justify-between items-center mb-3">
                         <Label class="text-sm font-bold text-slate-700">Radius Jangkauan</Label>
-                        <span class="text-teal-700 font-bold bg-teal-50 px-3 py-1 rounded-full text-xs border border-teal-100">
-                            {{ radius === 51 ? 'Tak Terbatas' : radius + ' KM' }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <template v-if="radius < 51">
+                                <input 
+                                    type="number" 
+                                    v-model.number="radius" 
+                                    min="0.5" 
+                                    max="50" 
+                                    step="0.5"
+                                    class="w-16 px-2 py-1 text-xs text-center border border-teal-200 rounded-md focus:ring-teal-500 focus:border-teal-500 text-teal-700 font-bold bg-teal-50 shadow-sm"
+                                />
+                                <span class="text-xs font-bold text-slate-500">KM</span>
+                            </template>
+                            <span v-else class="text-teal-700 font-bold bg-teal-50 px-3 py-1 rounded-full text-xs border border-teal-100">
+                                Tak Terbatas
+                            </span>
+                        </div>
                     </div>
                     <input 
                         type="range" 
                         v-model.number="radius" 
-                        min="1" 
+                        min="0.5" 
                         max="51" 
-                        step="1"
+                        step="0.5"
                         class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30" 
-                        :disabled="!latitude"
+                        :disabled="!latitude || detectingLocation"
                     />
                     <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-bold tracking-wider">
-                        <span>1 KM</span>
+                        <span>500 M</span>
                         <span>∞</span>
                     </div>
                 </div>

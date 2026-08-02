@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit2, Trash2, AlertTriangle, X } from 'lucide-vue-next';
+import { Deferred } from '@inertiajs/vue3';
 import StatusBadge from '@/components/StatusBadge.vue';
+import Pagination from '@/components/Pagination.vue';
 
 const props = defineProps({
     facilities: Object,
@@ -25,7 +27,9 @@ const currentTab = ref(props.activeTab || 'facilities');
 
 const handleTabChange = (val) => {
     currentTab.value = val;
-    router.get(route('superadmin.master-data.index'), { ...props.filters, tab: val }, { preserveState: true, replace: true });
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', val);
+    window.history.replaceState({}, '', url);
 };
 
 // --- FACILITY LOGIC ---
@@ -213,6 +217,34 @@ const deleteRule = () => {
                         </div>
                     </CardHeader>
                     <CardContent class="p-0 border-0">
+                        <Deferred :data="['facilities']">
+                            <template #fallback>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left">
+                                        <thead class="text-xs text-gray-700 dark:text-slate-400 uppercase bg-gray-50 dark:bg-slate-800/50 border-b dark:border-slate-800">
+                                            <tr>
+                                                <th class="px-4 py-3">Nama Fasilitas</th>
+                                                <th class="px-4 py-3">Tipe</th>
+                                                <th class="px-4 py-3">Status</th>
+                                                <th class="px-4 py-3 text-right">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="animate-pulse">
+                                            <tr v-for="n in 10" :key="n" class="border-b dark:border-slate-800">
+                                                <td class="px-4 py-3"><div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                                                <td class="px-4 py-3"><div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                                                <td class="px-4 py-3"><div class="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
+                                                <td class="px-4 py-3 text-right">
+                                                    <div class="flex justify-end gap-2">
+                                                        <div class="h-8 w-9 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                        <div class="h-8 w-9 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-700 dark:text-slate-400 uppercase bg-gray-50 dark:bg-slate-800/50 border-b dark:border-slate-800">
@@ -245,13 +277,11 @@ const deleteRule = () => {
                                 </tbody>
                             </table>
                         </div>
+                        </Deferred>
         
                         <!-- Pagination -->
-                        <div v-if="facilities.links && facilities.links.length > 3" class="p-4 flex gap-1 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-900 rounded-b-lg">
-                            <template v-for="(link, k) in facilities.links" :key="k">
-                                <div v-if="link.url === null" class="px-3 py-1 text-sm border dark:border-slate-700 rounded text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800" v-html="link.label" />
-                                <button v-else @click="router.get(link.url, { ...filters, tab: 'facilities' }, {preserveState: true})" class="px-3 py-1 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-600 text-white border-teal-600 cursor-default' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'" :disabled="link.active" v-html="link.label" />
-                            </template>
+                        <div class="p-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800">
+                            <Pagination :links="facilities ? facilities.links : []" />
                         </div>
                     </CardContent>
                 </Card>
@@ -264,6 +294,32 @@ const deleteRule = () => {
                         <CardTitle class="dark:text-white">Daftar Peraturan</CardTitle>
                     </CardHeader>
                     <CardContent class="p-0 border-0">
+                        <Deferred :data="['rules']">
+                            <template #fallback>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left">
+                                        <thead class="text-xs text-gray-700 dark:text-slate-400 uppercase bg-gray-50 dark:bg-slate-800/50 border-b dark:border-slate-800">
+                                            <tr>
+                                                <th class="px-4 py-3">Peraturan</th>
+                                                <th class="px-4 py-3">Sifat</th>
+                                                <th class="px-4 py-3 text-right">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="animate-pulse">
+                                            <tr v-for="n in 10" :key="n" class="border-b dark:border-slate-800">
+                                                <td class="px-4 py-3"><div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
+                                                <td class="px-4 py-3"><div class="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
+                                                <td class="px-4 py-3 text-right">
+                                                    <div class="flex justify-end gap-2">
+                                                        <div class="h-8 w-9 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                        <div class="h-8 w-9 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-gray-700 dark:text-slate-400 uppercase bg-gray-50 dark:bg-slate-800/50 border-b dark:border-slate-800">
@@ -301,13 +357,11 @@ const deleteRule = () => {
                                 </tbody>
                             </table>
                         </div>
+                        </Deferred>
         
                         <!-- Pagination -->
-                        <div v-if="rules.links && rules.links.length > 3" class="p-4 flex gap-1 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-900 rounded-b-lg">
-                            <template v-for="(link, k) in rules.links" :key="k">
-                                <div v-if="link.url === null" class="px-3 py-1 text-sm border dark:border-slate-700 rounded text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800" v-html="link.label" />
-                                <button v-else @click="router.get(link.url, { ...filters, tab: 'rules' }, {preserveState: true})" class="px-3 py-1 text-sm border rounded transition-colors" :class="link.active ? 'bg-teal-600 text-white border-teal-600 cursor-default' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'" :disabled="link.active" v-html="link.label" />
-                            </template>
+                        <div class="p-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800">
+                            <Pagination :links="rules ? rules.links : []" />
                         </div>
                     </CardContent>
                 </Card>

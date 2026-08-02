@@ -1,5 +1,6 @@
-﻿<script setup>
+<script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,7 @@ const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price);
 };
 
-const activeInvoice = computed(() => props.tenancy.invoices[0]);
+const activeInvoice = computed(() => props.tenancy?.invoices?.[0]);
 
 const showEndTenancyDialog = ref(false);
 
@@ -41,7 +42,26 @@ const submitEndTenancy = () => {
 
 <template>
     <AppLayout>
-        <Head title="Detail Sewa Penyewa" />
+        <Head :title="tenancy ? `Detail Sewa - ${tenancy.user?.name}` : 'Memuat Detail Sewa...'" />
+
+        <Deferred :data="['tenancy']">
+            <template #fallback>
+                <div class="animate-pulse">
+                    <div class="mb-6">
+                        <div class="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                        <div class="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                            <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="h-64 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
         <div class="mb-6">
             <Link :href="route('admin.tenancies.index')" class="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white flex items-center mb-2 inline-flex transition-colors">
@@ -153,6 +173,6 @@ const submitEndTenancy = () => {
         </Dialog>
 
 
-
+        </Deferred>
     </AppLayout>
 </template>

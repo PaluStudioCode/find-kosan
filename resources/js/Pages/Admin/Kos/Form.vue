@@ -1,7 +1,8 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { ref, onMounted, nextTick } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -139,6 +140,26 @@ const handleLocationSelected = async (location) => {
 <template>
     <AppLayout>
         <Head title="Tambah Kos" />
+
+        <Deferred :data="['facilities', 'rules']">
+            <template #fallback>
+                <div class="animate-pulse">
+                    <div class="mb-6">
+                        <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                        <div class="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                        <div class="h-4 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="h-[400px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                            <div class="h-[200px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="h-[300px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
         <div class="mb-6">
             <Link :href="route('admin.kos.index')" class="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white flex items-center mb-4 inline-flex transition-colors">
@@ -412,5 +433,6 @@ const handleLocationSelected = async (location) => {
                 </Button>
             </div>
         </form>
+        </Deferred>
     </AppLayout>
 </template>

@@ -1,5 +1,6 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useDark } from '@vueuse/core';
@@ -37,20 +38,20 @@ watch(isDark, async () => {
 });
 
 const growthChartData = computed(() => ({
-    labels: props.charts.growthLabels,
+    labels: props.charts?.growthLabels || [],
     datasets: [
         {
             label: 'Penyewa',
             borderColor: isDark.value ? '#60a5fa' : '#3b82f6',
             backgroundColor: isDark.value ? '#60a5fa' : '#3b82f6',
-            data: props.charts.growthTenantsData,
+            data: props.charts?.growthTenantsData || [],
             tension: 0.4
         },
         {
             label: 'Pemilik Kos',
             borderColor: isDark.value ? '#34d399' : '#10b981',
             backgroundColor: isDark.value ? '#34d399' : '#10b981',
-            data: props.charts.growthOwnersData,
+            data: props.charts?.growthOwnersData || [],
             tension: 0.4
         }
     ]
@@ -73,7 +74,7 @@ const growthChartOptions = computed(() => ({
 }));
 
 const propertyChartData = computed(() => ({
-    labels: props.charts.propertyStatusLabels,
+    labels: props.charts?.propertyStatusLabels || [],
     datasets: [
         {
             backgroundColor: isDark.value 
@@ -81,7 +82,7 @@ const propertyChartData = computed(() => ({
                 : ['#10b981', '#f59e0b', '#cbd5e1', '#ef4444'],
             borderColor: isDark.value ? '#1e293b' : '#ffffff',
             borderWidth: 2,
-            data: props.charts.propertyStatusData
+            data: props.charts?.propertyStatusData || []
         }
     ]
 }));
@@ -102,6 +103,73 @@ const propertyChartOptions = computed(() => ({
 <template>
     <AppLayout>
         <Head title="Dashboard Super Admin" />
+
+        <Deferred :data="['metrics', 'charts', 'recentVerifications', 'recentReports', 'recentWithdrawals']">
+            <template #fallback>
+                <div class="animate-pulse">
+                    <!-- Header Ringkas -->
+                    <div class="mb-6">
+                        <div class="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                        <div class="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
+                    
+                    <!-- Metrics Cards Skeleton -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <Card v-for="n in 4" :key="'metric-'+n" class="border-0 shadow-sm bg-white dark:bg-slate-900">
+                            <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                                <div class="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800"></div>
+                            </CardHeader>
+                            <CardContent class="border-0">
+                                <div class="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                <div class="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mt-2"></div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    
+                    <!-- Charts Skeleton -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <Card class="lg:col-span-2 border-0 shadow-sm dark:bg-slate-900">
+                            <CardHeader class="border-0">
+                                <div class="h-5 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                <div class="h-4 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            </CardHeader>
+                            <CardContent class="border-0 pt-6">
+                                <div class="h-[250px] w-full bg-slate-100 dark:bg-slate-800/50 rounded-lg"></div>
+                            </CardContent>
+                        </Card>
+                        <Card class="border-0 shadow-sm dark:bg-slate-900">
+                            <CardHeader class="border-0">
+                                <div class="h-5 w-40 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                <div class="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            </CardHeader>
+                            <CardContent class="border-0 flex items-center justify-center h-[280px]">
+                                <div class="h-[200px] w-[200px] rounded-full bg-slate-100 dark:bg-slate-800/50"></div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    
+                    <!-- Action Panels Skeleton -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <Card v-for="n in 3" :key="'panel-'+n" class="border-0 shadow-sm dark:bg-slate-900">
+                            <CardHeader class="border-b border-slate-100 dark:border-slate-800 pb-3 flex flex-row items-center justify-between">
+                                <div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            </CardHeader>
+                            <CardContent class="pt-4 border-0 space-y-3">
+                                <div v-for="j in 3" :key="'item-'+n+'-'+j" class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl space-y-2">
+                                    <div class="flex justify-between">
+                                        <div class="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                                        <div class="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                                    </div>
+                                    <div class="h-3 w-40 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                                    <div class="h-8 w-full bg-slate-200 dark:bg-slate-700 rounded-md mt-2"></div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </template>
 
         <div class="mb-6">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Super Admin</h2>
@@ -296,5 +364,6 @@ const propertyChartOptions = computed(() => ({
             </Card>
 
         </div>
+        </Deferred>
     </AppLayout>
 </template>

@@ -14,24 +14,23 @@ class KosController extends Controller
 {
     public function index()
     {
-        $boardingHouses = BoardingHouse::where('admin_id', auth()->id())
-            ->with(['photos' => function ($q) {
-                $q->where('is_primary', true);
-            }])
-            ->withCount('rooms')
-            ->latest()
-            ->paginate(10);
-
         return Inertia::render('Admin/Kos/Index', [
-            'boardingHouses' => $boardingHouses,
+            'boardingHouses' => Inertia::defer(fn () => BoardingHouse::where('admin_id', auth()->id())
+                ->with(['photos' => function ($q) {
+                    $q->where('is_primary', true);
+                }])
+                ->withCount('rooms')
+                ->latest()
+                ->paginate(6)
+            ),
         ]);
     }
 
     public function create()
     {
         return Inertia::render('Admin/Kos/Form', [
-            'facilities' => Facility::where('type', 'kos')->get(),
-            'rules' => Rule::all(),
+            'facilities' => Inertia::defer(fn () => Facility::where('type', 'kos')->get()),
+            'rules' => Inertia::defer(fn () => Rule::all()),
         ]);
     }
 
@@ -80,24 +79,25 @@ class KosController extends Controller
             abort(403);
         }
 
-        $kos->load([
-            'facilities',
-            'rules',
-            'rooms.facilities',
-            'photos' => function ($q) {
-                $q->orderBy('is_primary', 'desc');
-            },
-            'legalDocuments',
-            'reports' => function ($q) {
-                $q->whereNotNull('resolution_note')->where('status', 'selesai')->latest();
-            },
-        ]);
-
         return Inertia::render('Admin/Kos/Show', [
-            'kos' => $kos,
-            'kosFacilitiesList' => Facility::where('type', 'kos')->get(),
-            'kosRulesList' => Rule::all(),
-            'roomFacilitiesList' => Facility::where('type', 'kamar')->get(),
+            'kos' => Inertia::defer(function () use ($kos) {
+                $kos->load([
+                    'facilities',
+                    'rules',
+                    'rooms.facilities',
+                    'photos' => function ($q) {
+                        $q->orderBy('is_primary', 'desc');
+                    },
+                    'legalDocuments',
+                    'reports' => function ($q) {
+                        $q->whereNotNull('resolution_note')->where('status', 'selesai')->latest();
+                    },
+                ]);
+                return $kos;
+            }),
+            'kosFacilitiesList' => Inertia::defer(fn () => Facility::where('type', 'kos')->get()),
+            'kosRulesList' => Inertia::defer(fn () => Rule::all()),
+            'roomFacilitiesList' => Inertia::defer(fn () => Facility::where('type', 'kamar')->get()),
         ]);
     }
 

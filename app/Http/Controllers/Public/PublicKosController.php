@@ -11,15 +11,43 @@ class PublicKosController extends Controller
 {
     public function index(Request $request)
     {
-        $allKos = BoardingHouse::with([
+        $lat = (float) $request->query('lat');
+        $lng = (float) $request->query('lng');
+        $radius = (float) $request->query('radius', 5);
+
+        $query = BoardingHouse::with([
             'facilities',
             'photos' => function ($q) {
                 $q->where('is_primary', true);
             },
-        ])->where('status', 'dipublikasikan')->latest()->get();
+        ])->where('status', 'dipublikasikan')
+          ->whereNotNull('latitude')
+          ->whereNotNull('longitude');
+
+        if ($lat && $lng) {
+            // SQL Haversine Formula
+            $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
+            
+            $query->selectRaw("boarding_houses.*, {$haversine} AS distance", [$lat, $lng, $lat]);
+
+            if ($radius < 51) {
+                $query->having('distance', '<=', $radius);
+            }
+            $query->orderBy('distance');
+        } else {
+            $query->latest();
+        }
+
+        // Limit the result to avoid overloading the browser map
+        $allKos = $query->limit(100)->get();
 
         return Inertia::render('Public/Kos/Index', [
             'allKos' => $allKos,
+            'filters' => [
+                'lat' => $lat,
+                'lng' => $lng,
+                'radius' => $radius,
+            ]
         ]);
     }
 

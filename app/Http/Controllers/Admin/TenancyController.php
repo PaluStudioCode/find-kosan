@@ -18,27 +18,27 @@ class TenancyController extends Controller
         $admin = auth()->user();
         $kosId = $request->get('kos_id');
 
-        $query = $admin->tenanciesAsOwner()
-            ->where(function ($q) {
-                $q->where('status', '!=', 'nonaktif')
-                    ->orWhereHas('invoices.payments');
-            });
-
-        if ($kosId && $kosId !== 'all') {
-            $query->where('boarding_house_id', $kosId);
-        }
-
-        $tenancies = $query->with(['room.boardingHouse', 'user', 'invoices' => function ($q) {
-            $q->latest();
-        }])->latest()->paginate(10)->withQueryString();
-
         $properties = BoardingHouse::where('admin_id', $admin->id)
             ->select('id', 'name')
             ->orderBy('name')
             ->get();
 
         return Inertia::render('Admin/Tenancies/Index', [
-            'tenancies' => $tenancies,
+            'tenancies' => Inertia::defer(function () use ($admin, $kosId) {
+                $query = $admin->tenanciesAsOwner()
+                    ->where(function ($q) {
+                        $q->where('status', '!=', 'nonaktif')
+                            ->orWhereHas('invoices.payments');
+                    });
+
+                if ($kosId && $kosId !== 'all') {
+                    $query->where('boarding_house_id', $kosId);
+                }
+
+                return $query->with(['room.boardingHouse', 'user', 'invoices' => function ($q) {
+                    $q->latest();
+                }])->latest()->paginate(5)->withQueryString();
+            }),
             'properties' => $properties,
             'filters' => ['kos_id' => $kosId],
         ]);
@@ -49,9 +49,12 @@ class TenancyController extends Controller
         if ($tenancy->admin_id !== auth()->id()) {
             abort(403);
         }
-        $tenancy->load(['room.boardingHouse', 'user', 'invoices.payments']);
-
-        return Inertia::render('Admin/Tenancies/Show', compact('tenancy'));
+        return Inertia::render('Admin/Tenancies/Show', [
+            'tenancy' => Inertia::defer(function () use ($tenancy) {
+                $tenancy->load(['room.boardingHouse', 'user', 'invoices.payments']);
+                return $tenancy;
+            })
+        ]);
     }
 
     public function endTenancy(Tenancy $tenancy)

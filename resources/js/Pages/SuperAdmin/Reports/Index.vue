@@ -1,7 +1,9 @@
-﻿<script setup>
+<script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Eye, CheckCircle, AlertCircle, Clock, XCircle, Search } from 'lucide-vue-next';
@@ -104,6 +106,45 @@ const categoryLabel = (cat) => {
                     </div>
                 </CardHeader>
                 <CardContent class="p-0 border-0">
+                    <Deferred :data="['reports']">
+                        <template #fallback>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow class="dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+                                        <TableHead class="dark:text-slate-400">Tgl Lapor</TableHead>
+                                        <TableHead class="dark:text-slate-400">Pelapor</TableHead>
+                                        <TableHead class="dark:text-slate-400">Terlapor (Kos & Owner)</TableHead>
+                                        <TableHead class="dark:text-slate-400">Kategori</TableHead>
+                                        <TableHead class="dark:text-slate-400">Status</TableHead>
+                                        <TableHead class="text-right dark:text-slate-400">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody class="animate-pulse">
+                                    <TableRow v-for="n in 10" :key="n" class="dark:border-slate-800">
+                                        <TableCell><div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></TableCell>
+                                        <TableCell>
+                                            <div class="space-y-2">
+                                                <div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                <div class="h-3 w-24 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div class="space-y-2">
+                                                <div class="h-5 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                <div class="h-3 w-32 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell><div class="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-md border dark:border-slate-700"></div></TableCell>
+                                        <TableCell>
+                                            <div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded flex items-center gap-1.5"><div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700"></div></div>
+                                        </TableCell>
+                                        <TableCell class="text-right">
+                                            <div class="flex justify-end"><div class="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </template>
                     <Table v-if="reports.data.length > 0">
                         <TableHeader>
                             <TableRow class="dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
@@ -151,21 +192,11 @@ const categoryLabel = (cat) => {
                     <div v-else class="text-center py-12 text-gray-500 dark:text-slate-500 border-b dark:border-slate-800 rounded-b-lg">
                         Belum ada laporan masuk.
                     </div>
+                    </Deferred>
 
                     <!-- Pagination -->
-                    <div class="p-4 flex justify-center bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800" v-if="reports.links && reports.links.length > 3">
-                        <div class="flex gap-1">
-                            <template v-for="(link, i) in reports.links" :key="i">
-                                <Link 
-                                    v-if="link.url"
-                                    :href="link.url" 
-                                    class="px-3 py-1 border rounded-md text-sm transition-colors"
-                                    :class="link.active ? 'bg-primary text-white border-primary dark:bg-blue-600 dark:text-white dark:border-blue-600' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
-                                    v-html="link.label"
-                                />
-                                <span v-else class="px-3 py-1 border rounded-md text-sm text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800 dark:border-slate-700" v-html="link.label"></span>
-                            </template>
-                        </div>
+                    <div class="p-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800">
+                        <Pagination :links="reports ? reports.links : []" />
                     </div>
                 </CardContent>
             </Card>

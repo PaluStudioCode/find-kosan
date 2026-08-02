@@ -1,6 +1,7 @@
 <script setup>
 import { toast } from 'vue-sonner';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,8 @@ const openPhotoSlider = (index) => {
 };
 
 const nextPhoto = () => {
-    if (currentPhotoIndex.value < props.kos.photos.length - 1) {
+    const photos = props.kos?.photos || [];
+    if (currentPhotoIndex.value < photos.length - 1) {
         currentPhotoIndex.value++;
     } else {
         currentPhotoIndex.value = 0;
@@ -56,10 +58,11 @@ const nextPhoto = () => {
 };
 
 const prevPhoto = () => {
+    const photos = props.kos?.photos || [];
     if (currentPhotoIndex.value > 0) {
         currentPhotoIndex.value--;
     } else {
-        currentPhotoIndex.value = props.kos.photos.length - 1;
+        currentPhotoIndex.value = photos.length - 1;
     }
 };
 
@@ -97,7 +100,7 @@ const showLegalDocsModal = ref(false);
 
 // Grouped Rooms Computation
 const groupedRooms = computed(() => {
-    if (!props.kos.rooms) return [];
+    if (!props.kos?.rooms) return [];
     
     const groups = {};
     props.kos.rooms.forEach(room => {
@@ -132,7 +135,83 @@ const groupedRooms = computed(() => {
 
 <template>
     <AppLayout>
-        <Head :title="`Verifikasi: ${kos.name}`" />
+        <Head :title="kos ? `Verifikasi: ${kos.name}` : 'Memuat Verifikasi...'" />
+
+        <Deferred :data="['kos']">
+            <template #fallback>
+                <div class="animate-pulse max-w-5xl space-y-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                        <div class="h-6 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        <div class="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm">
+                        <!-- Pihak Terkait & Wilayah -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x border-b border-gray-100 dark:border-slate-800 dark:divide-slate-800">
+                            <div class="p-6">
+                                <div class="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+                                    <div class="space-y-2">
+                                        <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                        <div class="h-3 w-40 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-800 mt-1"></div>
+                                    <div class="space-y-2">
+                                        <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                        <div class="h-3 w-48 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Informasi Dasar -->
+                        <div class="p-6 border-b border-gray-100 dark:border-slate-800">
+                            <div class="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-3"></div>
+                            <div class="h-40 w-full bg-slate-100 dark:bg-slate-800/50 rounded-lg mb-4"></div>
+                            <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                                <div class="h-9 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="h-9 w-36 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="h-9 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fasilitas & Kamar -->
+                        <div class="p-6 border-b border-gray-100 dark:border-slate-800">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-3"></div>
+                                    <div class="flex flex-wrap gap-2 mb-6">
+                                        <div v-for="n in 6" :key="'fas-'+n" class="h-7 w-20 bg-slate-100 dark:bg-slate-800/50 rounded border border-gray-200 dark:border-slate-700"></div>
+                                    </div>
+                                    <div class="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-3"></div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <div v-for="n in 4" :key="'rule-'+n" class="h-7 w-28 bg-slate-100 dark:bg-slate-800/50 rounded border border-gray-200 dark:border-slate-700"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="h-3 w-40 bg-slate-200 dark:bg-slate-800 rounded mb-3"></div>
+                                    <div class="space-y-2">
+                                        <div v-for="n in 2" :key="'room-'+n" class="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="p-4 bg-gray-50/80 dark:bg-slate-800/80 flex justify-between gap-3 items-center">
+                            <div class="h-9 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-9 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
         <div class="max-w-5xl space-y-4">
             <!-- Header Ringkas -->
@@ -419,5 +498,6 @@ const groupedRooms = computed(() => {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+        </Deferred>
     </AppLayout>
 </template>

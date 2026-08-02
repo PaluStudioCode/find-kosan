@@ -1,5 +1,6 @@
-﻿<script setup>
+<script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useDark } from '@vueuse/core';
@@ -45,6 +46,7 @@ watch(isDark, async () => {
         showCharts.value = true;
     }, 50);
 });
+
 
 const revenueChartData = computed(() => ({
     labels: props.charts.revenueLabels,
@@ -114,7 +116,63 @@ const capacityChartOptions = computed(() => ({
             <p class="text-gray-500 dark:text-slate-400 mt-1">Ringkasan properti dan transaksi Anda.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- SKELETON LOADER (Tampil secara otomatis oleh Inertia Deferred saat pindah halaman) -->
+        <Deferred :data="['metrics', 'recentTransactions', 'upcomingDueInvoices', 'vacantRooms', 'recentReviews', 'charts']">
+            <template #fallback>
+            <!-- Skeleton: Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <Card v-for="i in 4" :key="'metric-'+i" class="border-0 shadow-sm bg-slate-100 dark:bg-slate-800/50 animate-pulse h-32">
+                    <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                        <div class="h-4 bg-slate-200 dark:bg-slate-700/50 rounded w-1/2"></div>
+                        <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700/50"></div>
+                    </CardHeader>
+                    <CardContent class="border-0 mt-2">
+                        <div class="h-8 bg-slate-200 dark:bg-slate-700/50 rounded w-3/4 mb-3"></div>
+                        <div class="h-3 bg-slate-200 dark:bg-slate-700/50 rounded w-1/3"></div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- Skeleton: Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <Card v-for="i in 2" :key="'chart-'+i" class="shadow-sm border-0 dark:bg-slate-800/50 bg-slate-100 animate-pulse h-[380px]">
+                    <CardHeader class="border-0 pb-2">
+                        <div class="h-6 bg-slate-200 dark:bg-slate-700/50 rounded w-1/2 mb-2"></div>
+                    </CardHeader>
+                    <CardContent class="border-0 flex items-end gap-3 h-[300px] pb-4 px-6 mt-4">
+                        <div v-for="bar in 7" :key="'bar-'+bar" class="bg-slate-200 dark:bg-slate-700/50 rounded-t-sm flex-1" :style="{ height: Math.floor(Math.random() * 60 + 20) + '%' }"></div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- Skeleton: Bottom Lists -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-6" v-for="col in 2" :key="'col-'+col">
+                    <Card v-for="row in 2" :key="'row-'+row" class="shadow-sm border-0 dark:bg-slate-800/50 bg-slate-100 animate-pulse min-h-[300px]">
+                        <CardHeader class="pb-3 border-b border-slate-200 dark:border-slate-700/50">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700/50"></div>
+                                <div class="h-6 bg-slate-200 dark:bg-slate-700/50 rounded w-1/2"></div>
+                            </div>
+                        </CardHeader>
+                        <CardContent class="pt-6 border-0 space-y-5">
+                            <div v-for="item in 3" :key="'item-'+item" class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 w-full">
+                                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700/50"></div>
+                                    <div class="space-y-2 flex-1">
+                                        <div class="h-4 bg-slate-200 dark:bg-slate-700/50 rounded w-1/3"></div>
+                                        <div class="h-3 bg-slate-200 dark:bg-slate-700/50 rounded w-1/4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+            </template>
+
+            <!-- ACTUAL CONTENT -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Pendapatan Bulan Ini (Premium Green Gradient) -->
             <Card class="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white transform hover:-translate-y-1 transition-all duration-300">
                 <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10 blur-2xl"></div>
@@ -341,7 +399,7 @@ const capacityChartOptions = computed(() => ({
                         </Link>
                     </CardHeader>
                     <CardContent class="pt-4 border-0">
-                        <div v-if="recentReviews.length > 0" class="space-y-4">
+                        <div v-if="recentReviews.length > 0" class="space-y-4 max-h-[320px] overflow-y-auto pr-2">
                             <div v-for="review in recentReviews" :key="review.id" class="border-b border-slate-100 dark:border-slate-800 last:border-0 pb-4 last:pb-0">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="font-semibold text-sm text-slate-800 dark:text-slate-200">{{ review.user?.name }}</span>
@@ -360,5 +418,6 @@ const capacityChartOptions = computed(() => ({
                 </Card>
             </div>
         </div>
+        </Deferred>
     </AppLayout>
 </template>

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import { Head, useForm, router, Link } from '@inertiajs/vue3';
+import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -193,7 +194,20 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
             <Card class="shadow-sm">
                 <CardHeader><CardTitle>Riwayat Penarikan</CardTitle></CardHeader>
                 <CardContent class="p-0">
-                    <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
+                    <Deferred data="withdrawals">
+                        <template #fallback>
+                            <div class="divide-y dark:divide-slate-800">
+                                <div v-for="n in 4" :key="'w-skel-'+n" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between animate-pulse">
+                                    <div class="flex-1 space-y-2">
+                                        <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                                        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 max-w-sm"></div>
+                                    </div>
+                                    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24"></div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
                         <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                                 <div class="flex-1">
                                     <p class="font-semibold dark:text-white">{{ formatRupiah(withdrawal.amount) }}</p>
@@ -222,6 +236,7 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                             <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
                         </template>
                     </div>
+                    </Deferred>
                 </CardContent>
             </Card>
 
@@ -258,7 +273,20 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                     </div>
                 </CardHeader>
                 <CardContent class="p-0">
-                    <div v-if="transactions.data.length" class="divide-y dark:divide-slate-800">
+                    <Deferred data="transactions">
+                        <template #fallback>
+                            <div class="divide-y dark:divide-slate-800">
+                                <div v-for="n in 5" :key="'t-skel-'+n" class="p-4 flex items-center justify-between gap-4 animate-pulse">
+                                    <div class="space-y-2 flex-1">
+                                        <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
+                                        <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                                    </div>
+                                    <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div v-if="transactions.data.length" class="divide-y dark:divide-slate-800">
                         <div v-for="transaction in transactions.data" :key="transaction.id" class="p-4 flex items-center justify-between gap-4">
                             <div>
                                 <p class="font-medium dark:text-slate-200">{{ transaction.description }}</p>
@@ -278,6 +306,7 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                             <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
                         </template>
                     </div>
+                    </Deferred>
                 </CardContent>
             </Card>
         </div>

@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue';
+import { Deferred } from '@inertiajs/vue3';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -137,6 +139,39 @@ const executeDelete = () => {
                     </div>
                 </CardHeader>
                 <CardContent class="p-0 border-0">
+                    <Deferred :data="['users']">
+                        <template #fallback>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow class="dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+                                        <TableHead class="dark:text-slate-400">Nama</TableHead>
+                                        <TableHead class="dark:text-slate-400">Email & WA</TableHead>
+                                        <TableHead class="dark:text-slate-400">Peran</TableHead>
+                                        <TableHead class="dark:text-slate-400">Status</TableHead>
+                                        <TableHead class="text-right dark:text-slate-400">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody class="animate-pulse">
+                                    <TableRow v-for="n in 10" :key="n" class="dark:border-slate-800">
+                                        <TableCell><div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></TableCell>
+                                        <TableCell>
+                                            <div class="space-y-2">
+                                                <div class="h-5 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                                <div class="h-3 w-32 bg-slate-100 dark:bg-slate-800/50 rounded"></div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell><div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></TableCell>
+                                        <TableCell><div class="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-full"></div></TableCell>
+                                        <TableCell class="text-right">
+                                            <div class="flex justify-end gap-2">
+                                                <div class="h-9 w-9 bg-slate-200 dark:bg-slate-800 rounded-md border dark:border-slate-700"></div>
+                                                <div class="h-9 w-9 bg-slate-200 dark:bg-slate-800 rounded-md border dark:border-slate-700"></div>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </template>
                     <Table>
                         <TableHeader>
                             <TableRow class="dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
@@ -178,22 +213,12 @@ const executeDelete = () => {
                             </TableRow>
                         </TableBody>
                     </Table>
+                    </Deferred>
 
                     <!-- Pagination -->
-                    <div class="p-4 flex justify-center bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800" v-if="users.links && users.links.length > 3">
-                        <div class="flex gap-1">
-                            <template v-for="(link, i) in users.links" :key="i">
-                                <Link 
-                                    v-if="link.url"
-                                    :href="link.url" 
-                                    preserve-scroll
-                                    class="px-3 py-1 border rounded-md text-sm transition-colors"
-                                    :class="link.active ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700'"
-                                    v-html="link.label"
-                                />
-                                <span v-else class="px-3 py-1 border rounded-md text-sm text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800 dark:border-slate-700" v-html="link.label"></span>
-                            </template>
-                        </div>
+                    <!-- Pagination -->
+                    <div class="p-4 bg-gray-50 dark:bg-slate-900 rounded-b-lg border-t dark:border-slate-800">
+                        <Pagination :links="users ? users.links : []" />
                     </div>
                 </CardContent>
             </Card>

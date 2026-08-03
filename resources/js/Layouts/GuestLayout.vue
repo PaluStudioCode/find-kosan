@@ -50,13 +50,13 @@ watch(() => page.props.flash, (flash) => {
             
             <!-- Branding Text (Light Text) -->
             <div class="absolute bottom-8 lg:bottom-12 xl:bottom-16 left-8 lg:left-12 xl:left-16 right-8 lg:right-12 xl:right-16 text-white max-w-2xl pointer-events-none z-10">
-                <blockquote class="space-y-4 lg:space-y-6">
-                    <p class="text-2xl lg:text-3xl xl:text-4xl font-extrabold leading-tight text-white drop-shadow-lg">
-                        "Mencari kos dan manajemen penyewaan kini menjadi lebih cepat, aman, dan tanpa repot."
+                <blockquote class="space-y-4 lg:space-y-5">
+                    <p class="text-xl lg:text-2xl xl:text-3xl font-extrabold leading-tight text-white drop-shadow-lg">
+                        "Cari kos & kelola properti dengan cepat, aman, dan praktis."
                     </p>
                     <footer class="flex items-center gap-3">
-                        <div class="h-px w-8 bg-teal-400"></div>
-                        <span class="text-teal-300 font-bold tracking-wide uppercase text-sm drop-shadow-md">Temukan Kenyamanan Anda</span>
+                        <div class="h-px w-6 lg:w-8 bg-teal-400"></div>
+                        <span class="text-teal-300 font-bold tracking-wide uppercase text-xs lg:text-sm drop-shadow-md">Temukan Kenyamanan Anda</span>
                     </footer>
                 </blockquote>
             </div>

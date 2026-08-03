@@ -32,11 +32,21 @@ const props = defineProps({
 const filterType = ref(props.filters?.type || '');
 const filterMonth = ref(props.filters?.month || '');
 
+const isLoadingTransactions = ref(false);
+const isLoadingWithdrawals = ref(false);
+
 watch([filterType, filterMonth], ([type, month]) => {
+    isLoadingTransactions.value = true;
     router.get(
         route('admin.wallet.index'),
         { type, month },
-        { preserveState: true, preserveScroll: true, replace: true }
+        { 
+            preserveState: true, 
+            preserveScroll: true, 
+            replace: true, 
+            only: ['transactions'],
+            onFinish: () => isLoadingTransactions.value = false
+        }
     );
 });
 
@@ -56,6 +66,19 @@ const formatRupiah = (amount) => new Intl.NumberFormat('id-ID', {
 }).format(amount || 0);
 
 const isExporting = ref(false);
+
+const formattedAmount = ref('');
+
+const handleAmountInput = (e) => {
+    let rawValue = e.target.value.replace(/\D/g, '');
+    if (rawValue) {
+        form.amount = rawValue;
+        formattedAmount.value = new Intl.NumberFormat('id-ID').format(rawValue);
+    } else {
+        form.amount = '';
+        formattedAmount.value = '';
+    }
+};
 
 const exportExcel = async () => {
     isExporting.value = true;
@@ -99,6 +122,7 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
     preserveScroll: true,
     onSuccess: () => {
         form.reset();
+        formattedAmount.value = '';
         isDialogOpen.value = false;
     },
 });
@@ -132,7 +156,7 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                     <form class="space-y-4 mt-2" @submit.prevent="submit">
                         <div>
                             <Label for="amount" class="text-gray-700 dark:text-slate-300 font-medium">Nominal (Min: {{ formatRupiah(props.min_withdrawal) }})</Label>
-                            <Input id="amount" v-model="form.amount" class="mt-1.5" type="number" :min="props.min_withdrawal" placeholder="Contoh: 500000" />
+                            <Input id="amount" v-model="formattedAmount" @input="handleAmountInput" class="mt-1.5" type="text" placeholder="Contoh: 500.000" />
                             <p v-if="form.errors.amount" class="text-sm text-red-600 dark:text-red-400 mt-1">{{ form.errors.amount }}</p>
                         </div>
                         <div>
@@ -207,10 +231,23 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                             </div>
                         </template>
 
+                        <div v-if="isLoadingWithdrawals" class="divide-y dark:divide-slate-800">
+                            <div v-for="n in 4" :key="'w-skel-load-'+n" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between animate-pulse">
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                                    <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 max-w-sm"></div>
+                                </div>
+                                <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24"></div>
+                            </div>
+                        </div>
+
+                        <template v-else>
                         <div v-if="withdrawals.data.length" class="divide-y dark:divide-slate-800">
                         <div v-for="withdrawal in withdrawals.data" :key="withdrawal.id" class="p-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                                 <div class="flex-1">
                                     <p class="font-semibold dark:text-white">{{ formatRupiah(withdrawal.amount) }}</p>
+                                    <p v-if="withdrawal.pph_amount > 0" class="text-xs text-orange-600 dark:text-orange-400 font-medium mt-0.5">Potongan PPh ({{ Number(withdrawal.pph_percent) }}%): -{{ formatRupiah(withdrawal.pph_amount) }}</p>
+                                    <p v-if="withdrawal.pph_amount > 0" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mb-1">Diterima Bersih: {{ formatRupiah(withdrawal.net_amount) }}</p>
                                     <p class="text-sm text-gray-500 dark:text-slate-400">{{ withdrawal.bank_name }} - {{ withdrawal.account_number }} - {{ withdrawal.account_holder_name }}</p>
                                     
                                     <div v-if="withdrawal.status === 'ditolak' && withdrawal.review_note" class="mt-2 p-2.5 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-900/50 rounded-md">
@@ -233,9 +270,10 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                     <div v-if="withdrawals.links && withdrawals.data.length > 0" class="p-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-center gap-1 flex-wrap">
                         <template v-for="(link, k) in withdrawals.links" :key="k">
                             <div v-if="link.url === null" class="px-3 py-1 text-sm text-gray-400 border border-transparent" v-html="link.label"></div>
-                            <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
+                            <Link v-else :href="link.url" :only="['withdrawals']" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label" @start="isLoadingWithdrawals = true" @finish="isLoadingWithdrawals = false"></Link>
                         </template>
                     </div>
+                    </template>
                     </Deferred>
                 </CardContent>
             </Card>
@@ -286,6 +324,17 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                             </div>
                         </template>
 
+                        <div v-if="isLoadingTransactions" class="divide-y dark:divide-slate-800">
+                            <div v-for="n in 5" :key="'t-skel-load-'+n" class="p-4 flex items-center justify-between gap-4 animate-pulse">
+                                <div class="space-y-2 flex-1">
+                                    <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
+                                    <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                                </div>
+                                <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-20"></div>
+                            </div>
+                        </div>
+
+                        <template v-else>
                         <div v-if="transactions.data.length" class="divide-y dark:divide-slate-800">
                         <div v-for="transaction in transactions.data" :key="transaction.id" class="p-4 flex items-center justify-between gap-4">
                             <div>
@@ -303,9 +352,10 @@ const submit = () => form.post(route('admin.wallet.withdrawals.store'), {
                     <div v-if="transactions.links && transactions.data.length > 0" class="p-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-center gap-1 flex-wrap">
                         <template v-for="(link, k) in transactions.links" :key="k">
                             <div v-if="link.url === null" class="px-3 py-1 text-sm text-gray-400 border border-transparent" v-html="link.label"></div>
-                            <Link v-else :href="link.url" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label"></Link>
+                            <Link v-else :href="link.url" :only="['transactions']" preserve-scroll class="px-3 py-1 text-sm border rounded-md transition-colors" :class="link.active ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/50 dark:border-emerald-500 dark:text-emerald-300' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'" v-html="link.label" @start="isLoadingTransactions = true" @finish="isLoadingTransactions = false"></Link>
                         </template>
                     </div>
+                    </template>
                     </Deferred>
                 </CardContent>
             </Card>

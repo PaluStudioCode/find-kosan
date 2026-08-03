@@ -118,13 +118,21 @@ class TenancyController extends Controller
             $endDate->addYear();
         }
 
+        $ppnPercent = (float) (\App\Models\Setting::getSetting('ppn_percent') ?: 0);
+        $rentPrice = $room->price;
+        $ppnAmount = $rentPrice * ($ppnPercent / 100);
+        $totalAmount = $rentPrice + $ppnAmount;
+
         $invoice = Invoice::create([
             'tenancy_id' => $tenancy->id,
             'user_id' => auth()->id(),
             'admin_id' => $room->boardingHouse->admin_id,
             'period_start' => $request->start_date,
             'period_end' => $endDate,
-            'amount' => $room->price,
+            'rent_price' => $rentPrice,
+            'ppn_percent' => $ppnPercent,
+            'ppn_amount' => $ppnAmount,
+            'amount' => $totalAmount,
             'due_date' => Carbon::parse($request->start_date)->addDays(1),
             'status' => 'belum_dibayar',
         ]);

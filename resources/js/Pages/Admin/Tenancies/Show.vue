@@ -134,8 +134,12 @@ const submitEndTenancy = () => {
                     </CardHeader>
                     <CardContent class="pt-6">
                         <div class="text-center">
-                            <p class="text-sm text-gray-500 dark:text-slate-400 mb-1">Total Tagihan</p>
-                            <p class="font-extrabold text-3xl text-gray-900 dark:text-white mb-4">{{ formatPrice(activeInvoice.amount) }}</p>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mb-1">Total Tagihan (Termasuk PPN)</p>
+                            <p class="font-extrabold text-3xl text-gray-900 dark:text-white mb-1">{{ formatPrice(activeInvoice.amount) }}</p>
+                            <p v-if="activeInvoice.ppn_amount > 0" class="text-xs text-gray-500 dark:text-slate-400 mb-4">
+                                Sewa: {{ formatPrice(activeInvoice.rent_price) }} | PPN: {{ formatPrice(activeInvoice.ppn_amount) }}
+                            </p>
+                            <div v-else class="mb-4"></div>
                             <StatusBadge :status="activeInvoice.status" class="px-3 py-1 mb-2 inline-flex" />
                             <p class="text-gray-500 dark:text-slate-400 text-xs mt-3">Menunggu penyewa melakukan pembayaran.</p>
                         </div>

@@ -24,8 +24,8 @@ const form = useForm({
     contact_email: props.settings.contact_email || '',
     contact_phone: props.settings.contact_phone || '',
     app_logo: null,
-    
-    fee_percent: props.settings.fee_percent || '',
+    ppn_percent: props.settings.ppn_percent || '',
+    pph_percent: props.settings.pph_percent || '',
     min_withdrawal: props.settings.min_withdrawal || '',
     
     link_instagram: props.settings.link_instagram || '',
@@ -315,14 +315,25 @@ onUnmounted(() => {
                             </CardHeader>
                             <CardContent>
                                 <form @submit.prevent="submitSettings" class="space-y-6">
-                                    <div class="space-y-2">
-                                        <Label for="fee_percent">Biaya Admin (Persentase %)</Label>
-                                        <div class="relative">
-                                            <Input id="fee_percent" type="number" step="0.1" v-model="form.fee_percent" placeholder="Misal: 5" class="pr-8" />
-                                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">%</div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="space-y-2">
+                                            <Label for="ppn_percent">PPN (Pajak Pertambahan Nilai)</Label>
+                                            <div class="relative">
+                                                <Input id="ppn_percent" type="number" step="0.1" v-model="form.ppn_percent" placeholder="Misal: 11" class="pr-8" />
+                                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">%</div>
+                                            </div>
+                                            <p class="text-xs text-slate-500">Ditambahkan ke tagihan sewa tenant.</p>
+                                            <p v-if="form.errors.ppn_percent" class="text-xs text-red-500">{{ form.errors.ppn_percent }}</p>
                                         </div>
-                                        <p class="text-xs text-slate-500">Potongan dari harga sewa setiap terjadi transaksi sukses.</p>
-                                        <p v-if="form.errors.fee_percent" class="text-xs text-red-500">{{ form.errors.fee_percent }}</p>
+                                        <div class="space-y-2">
+                                            <Label for="pph_percent">PPh (Pajak Penghasilan)</Label>
+                                            <div class="relative">
+                                                <Input id="pph_percent" type="number" step="0.1" v-model="form.pph_percent" placeholder="Misal: 10" class="pr-8" />
+                                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">%</div>
+                                            </div>
+                                            <p class="text-xs text-slate-500">Dipotong saat pemilik kos menarik dana.</p>
+                                            <p v-if="form.errors.pph_percent" class="text-xs text-red-500">{{ form.errors.pph_percent }}</p>
+                                        </div>
                                     </div>
 
                                     <div class="space-y-2">

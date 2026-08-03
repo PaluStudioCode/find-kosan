@@ -36,7 +36,8 @@ class SystemSettingsController extends Controller
             'footer_text' => 'nullable|string|max:500',
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:50',
-            'fee_percent' => 'nullable|numeric|min:0|max:100',
+            'ppn_percent' => 'nullable|numeric|min:0|max:100',
+            'pph_percent' => 'nullable|numeric|min:0|max:100',
             'min_withdrawal' => 'nullable|numeric|min:0',
             'link_instagram' => 'nullable|string|max:255',
             'link_facebook' => 'nullable|string|max:255',
@@ -51,7 +52,7 @@ class SystemSettingsController extends Controller
         // Process Text Settings
         $textSettings = [
             'app_name', 'footer_text', 'contact_email', 'contact_phone',
-            'fee_percent', 'min_withdrawal',
+            'ppn_percent', 'pph_percent', 'min_withdrawal',
             'link_instagram', 'link_facebook', 'link_tiktok',
             'meta_description',
             'about_us', 'terms_conditions', 'privacy_policy',

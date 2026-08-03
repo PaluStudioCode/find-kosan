@@ -87,21 +87,34 @@ class WalletController extends Controller
                 ]);
             }
 
+            $pphPercent = (float) (Setting::getSetting('pph_percent') ?: 0);
+            $grossAmount = (float) $validated['amount'];
+            $pphAmount = $grossAmount * ($pphPercent / 100);
+            $netAmount = $grossAmount - $pphAmount;
+
             $withdrawal = WithdrawalRequest::create([
                 ...$validated,
                 'admin_id' => $request->user()->id,
                 'status' => 'menunggu_persetujuan',
+                'pph_percent' => $pphPercent,
+                'pph_amount' => $pphAmount,
+                'net_amount' => $netAmount,
             ]);
 
-            $wallet->decrement('available_balance', $validated['amount']);
-            $wallet->increment('pending_withdrawal_balance', $validated['amount']);
+            $wallet->decrement('available_balance', $grossAmount);
+            $wallet->increment('pending_withdrawal_balance', $grossAmount);
+
+            $description = "Dana ditahan untuk penarikan #{$withdrawal->id}";
+            if ($pphPercent > 0) {
+                $description .= " (Termasuk potongan PPh {$pphPercent}%)";
+            }
 
             AdminWalletTransaction::create([
                 'admin_wallet_id' => $wallet->id,
                 'withdrawal_request_id' => $withdrawal->id,
                 'type' => 'withdrawal_hold',
-                'amount' => $validated['amount'],
-                'description' => "Dana ditahan untuk penarikan #{$withdrawal->id}",
+                'amount' => $grossAmount,
+                'description' => $description,
             ]);
 
             ActivityLog::create([

@@ -19,6 +19,7 @@ const props = defineProps({
 const latitude = ref(props.filters?.lat ? parseFloat(props.filters.lat) : null);
 const longitude = ref(props.filters?.lng ? parseFloat(props.filters.lng) : null);
 const radius = ref(props.filters?.radius ? parseFloat(props.filters.radius) : 5);
+const highlightKosId = ref(props.filters?.highlight_kos_id ? parseInt(props.filters.highlight_kos_id) : null);
 const mapContainer = ref(null);
 const cardRef = ref(null);
 const dragHandleRef = ref(null);
@@ -191,6 +192,13 @@ const updateMapMarkers = () => {
                 </div>
             `);
             markers.push(marker);
+
+            if (highlightKosId.value && kos.id === highlightKosId.value) {
+                // Use setTimeout to ensure map is fully loaded before opening popup
+                setTimeout(() => {
+                    marker.openPopup();
+                }, 300);
+            }
         }
     });
 };

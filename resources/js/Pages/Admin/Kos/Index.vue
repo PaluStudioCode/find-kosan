@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { toast } from 'vue-sonner';
 import { Head, Link } from '@inertiajs/vue3';
 import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import StatusBadge from '@/components/StatusBadge.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Plus, MapPin, Building, Trash2, AlertTriangle, ExternalLink } from 'lucide-vue-next';
+import { Plus, MapPin, Building, Trash2, AlertTriangle, ExternalLink, Share2 } from 'lucide-vue-next';
 
 defineProps({
     boardingHouses: Object
@@ -36,6 +37,26 @@ const deleteKos = () => {
         preserveScroll: true,
         onSuccess: () => closeModal(),
     });
+};
+
+const copyLink = (kosId) => {
+    const url = route('public.kos.show', kosId);
+    const absoluteUrl = new URL(url, window.location.origin).href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Lihat properti kos ini di FindKosan',
+            url: absoluteUrl
+        }).catch((err) => {
+            if (err.name !== 'AbortError') {
+                navigator.clipboard.writeText(absoluteUrl);
+                toast.success('Tautan kos berhasil disalin');
+            }
+        });
+    } else {
+        navigator.clipboard.writeText(absoluteUrl);
+        toast.success('Tautan kos berhasil disalin');
+    }
 };
 </script>
 
@@ -122,11 +143,16 @@ const deleteKos = () => {
                             <Link :href="route('admin.kos.show', kos.id)" class="flex-1">
                                 <Button variant="outline" class="w-full bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-700">Kelola Kos</Button>
                             </Link>
-                            <a v-if="kos.status === 'dipublikasikan'" :href="route('public.kos.show', kos.id)" target="_blank">
-                                <Button type="button" variant="outline" class="px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Lihat Halaman Publik">
-                                    <ExternalLink class="w-4 h-4" />
+                            <template v-if="kos.status === 'dipublikasikan'">
+                                <Button type="button" variant="outline" class="px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Bagikan Tautan Kos" @click="copyLink(kos.id)">
+                                    <Share2 class="w-4 h-4" />
                                 </Button>
-                            </a>
+                                <a :href="route('public.kos.show', kos.id)" target="_blank">
+                                    <Button type="button" variant="outline" class="px-3 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40" title="Lihat Halaman Publik">
+                                        <ExternalLink class="w-4 h-4" />
+                                    </Button>
+                                </a>
+                            </template>
                             <Button type="button" variant="destructive" class="px-3" @click="confirmKosDeletion(kos)" title="Hapus Kos" :disabled="kos.status === 'menunggu_verifikasi'">
                                 <Trash2 class="w-4 h-4" />
                             </Button>

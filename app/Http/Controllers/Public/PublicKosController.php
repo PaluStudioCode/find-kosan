@@ -14,6 +14,7 @@ class PublicKosController extends Controller
         $lat = (float) $request->query('lat');
         $lng = (float) $request->query('lng');
         $radius = (float) $request->query('radius', 5);
+        $highlightKosId = $request->query('highlight_kos_id');
 
         $query = BoardingHouse::with([
             'facilities',
@@ -47,6 +48,7 @@ class PublicKosController extends Controller
                 'lat' => $lat,
                 'lng' => $lng,
                 'radius' => $radius,
+                'highlight_kos_id' => $highlightKosId,
             ]
         ]);
     }

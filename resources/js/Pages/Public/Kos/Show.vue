@@ -14,10 +14,10 @@ import {
     X,
     ArrowLeft,
     ImageOff,
-    Star,
     MessageSquare,
     Flag,
     Check,
+    Map,
 } from 'lucide-vue-next';
 // Note: ChevronLeft/Right used for lightbox, BedDouble for empty rooms state
 import { ref, computed } from 'vue';
@@ -276,6 +276,11 @@ const groupedRooms = computed(() => {
                             <MapPin class="w-4 h-4 mt-0.5 shrink-0 text-teal-600" />
                             <span>{{ [kos.address, kos.subdistrict, kos.district, kos.city].filter(Boolean).join(', ') }}</span>
                         </p>
+                        <div class="mt-3">
+                            <Link v-if="kos.latitude && kos.longitude" :href="route('public.kos.index', { lat: kos.latitude, lng: kos.longitude, highlight_kos_id: kos.id })" class="inline-flex items-center gap-1.5 text-sm font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-full transition-colors border border-teal-100 shadow-sm">
+                                <Map class="w-4 h-4" /> Lihat di Peta
+                            </Link>
+                        </div>
                     </div>
 
                     <!-- Description -->

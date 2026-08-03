@@ -202,7 +202,7 @@ class PaymentGatewayController extends Controller
                         'admin_id' => $invoice->admin_id,
                         'send_via' => 'admin',
                         'phone_number' => $admin->whatsapp_number,
-                        'message_body' => "Halo {$admin->name}, pembayaran sewa dari {$userName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->amount, 0, ',', '.')." telah berhasil diterima.\n\nLihat detail sewa: ".route('admin.tenancies.show', $invoice->tenancy_id),
+                        'message_body' => "Halo {$admin->name}, pembayaran sewa dari {$userName} untuk kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->rent_price > 0 ? $invoice->rent_price : $invoice->amount, 0, ',', '.')." telah berhasil diterima.\n\nLihat detail sewa: ".route('admin.tenancies.show', $invoice->tenancy_id),
                         'status' => 'belum_dikirim',
                     ]
                 );
@@ -220,7 +220,7 @@ class PaymentGatewayController extends Controller
                         'admin_id' => $invoice->admin_id,
                         'send_via' => 'admin',
                         'phone_number' => $user->whatsapp_number,
-                        'message_body' => "Halo {$userName}, pembayaran sewa kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->amount, 0, ',', '.')." telah BERHASIL dikonfirmasi. Terima kasih!\n\nLihat detail sewa Anda:\n".route('user.tenancies.show', $invoice->tenancy_id),
+                        'message_body' => "Halo {$userName}, pembayaran sewa kamar {$roomNumber} di {$kosName} sebesar Rp".number_format($invoice->amount, 0, ',', '.').($invoice->ppn_amount > 0 ? " (termasuk PPN)" : "")." telah BERHASIL dikonfirmasi. Terima kasih!\n\nLihat detail sewa Anda:\n".route('user.tenancies.show', $invoice->tenancy_id),
                         'status' => 'belum_dikirim',
                     ]
                 );

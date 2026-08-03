@@ -19,12 +19,16 @@ class Invoice extends Model
 
     protected $fillable = [
         'tenancy_id', 'user_id', 'admin_id', 'period_start', 'period_end',
+        'rent_price', 'ppn_percent', 'ppn_amount',
         'amount', 'due_date', 'status', 'payment_reference', 'payment_method', 'payment_url',
     ];
 
     protected $casts = [
         'period_start' => 'date',
         'period_end' => 'date',
+        'rent_price' => 'decimal:2',
+        'ppn_percent' => 'decimal:2',
+        'ppn_amount' => 'decimal:2',
         'amount' => 'decimal:2',
         'due_date' => 'date',
     ];

@@ -4,7 +4,8 @@ import { Deferred } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ExternalLink, Loader2 } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
+import { ChevronLeft, ExternalLink, Loader2, Share2 } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 // Partials
@@ -22,6 +23,26 @@ const props = defineProps({
 });
 
 const isLocked = computed(() => props.kos?.status === 'menunggu_verifikasi');
+
+const copyLink = (kosId) => {
+    const url = route('public.kos.show', kosId);
+    const absoluteUrl = new URL(url, window.location.origin).href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Lihat properti kos ini di FindKosan',
+            url: absoluteUrl
+        }).catch((err) => {
+            if (err.name !== 'AbortError') {
+                navigator.clipboard.writeText(absoluteUrl);
+                toast.success('Tautan kos berhasil disalin');
+            }
+        });
+    } else {
+        navigator.clipboard.writeText(absoluteUrl);
+        toast.success('Tautan kos berhasil disalin');
+    }
+};
 
 const activeTab = ref(new URLSearchParams(window.location.search).get('tab') || 'info');
 const tabs = [
@@ -79,11 +100,16 @@ const tabs = [
             </div>
             
             <div class="flex gap-2 w-full md:w-auto">
-                <a v-if="kos.status === 'dipublikasikan'" :href="route('public.kos.show', kos.id)" target="_blank" class="w-full md:w-auto">
-                    <Button type="button" variant="outline" class="w-full md:w-auto border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 font-medium dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40">
-                        <ExternalLink class="w-4 h-4 mr-2" /> Halaman Publik
+                <template v-if="kos.status === 'dipublikasikan'">
+                    <Button type="button" @click="copyLink(kos.id)" variant="outline" class="w-full md:w-auto border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 font-medium dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40">
+                        <Share2 class="w-4 h-4 mr-2" /> Bagikan Link
                     </Button>
-                </a>
+                    <a :href="route('public.kos.show', kos.id)" target="_blank" class="w-full md:w-auto">
+                        <Button type="button" variant="outline" class="w-full md:w-auto border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40">
+                            <ExternalLink class="w-4 h-4 mr-2" /> Halaman Publik
+                        </Button>
+                    </a>
+                </template>
             </div>
         </div>
 

@@ -79,7 +79,7 @@ class WithdrawalController extends Controller
                     'send_via' => 'admin',
                     'phone_number' => $admin->whatsapp_number,
                     'message_type' => 'penarikan_disetujui',
-                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp".number_format($withdrawal->amount, 0, ',', '.')." telah disetujui dan ditransfer ke rekening Anda. No. Ref: {$validated['transfer_reference']}",
+                    'message_body' => "Halo {$admin->name}, penarikan dana sebesar Rp".number_format($withdrawal->net_amount ?: $withdrawal->amount, 0, ',', '.')." (setelah PPh) telah disetujui dan ditransfer ke rekening Anda. No. Ref: {$validated['transfer_reference']}",
                     'scheduled_date' => today(),
                     'status' => 'belum_dikirim',
                 ]);

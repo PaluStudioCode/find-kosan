@@ -36,7 +36,18 @@ const reject = () => reviewForm.post(route('superadmin.withdrawals.reject', prop
             <Card class="border-0 shadow-sm dark:bg-slate-900 dark:border-slate-800">
                 <CardHeader class="border-b dark:border-slate-800"><CardTitle class="dark:text-white">Detail Transfer</CardTitle></CardHeader>
                 <CardContent class="space-y-4 pt-6">
-                    <div><p class="text-sm text-gray-500 dark:text-slate-400">Nominal</p><p class="text-2xl font-bold dark:text-slate-200">{{ formatRupiah(withdrawal.amount) }}</p></div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-slate-400">Nominal Penarikan (Kotor)</p>
+                        <p class="text-2xl font-bold dark:text-slate-200">{{ formatRupiah(withdrawal.amount) }}</p>
+                    </div>
+                    <div v-if="withdrawal.pph_amount > 0">
+                        <p class="text-sm text-gray-500 dark:text-slate-400">Potongan PPh ({{ Number(withdrawal.pph_percent) }}%)</p>
+                        <p class="text-xl font-semibold text-orange-600 dark:text-orange-400">-{{ formatRupiah(withdrawal.pph_amount) }}</p>
+                    </div>
+                    <div v-if="withdrawal.pph_amount > 0">
+                        <p class="text-sm text-gray-500 dark:text-slate-400">Nominal Ditransfer (Bersih)</p>
+                        <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ formatRupiah(withdrawal.net_amount) }}</p>
+                    </div>
                     <div><p class="text-sm text-gray-500 dark:text-slate-400">Tujuan</p><p class="font-semibold dark:text-slate-200">{{ withdrawal.bank_name }} - {{ withdrawal.account_number }}</p><p class="dark:text-slate-300">{{ withdrawal.account_holder_name }}</p></div>
                     <div v-if="withdrawal.owner_note"><p class="text-sm text-gray-500 dark:text-slate-400">Catatan pemilik</p><p class="dark:text-slate-300">{{ withdrawal.owner_note }}</p></div>
                     <div v-if="withdrawal.review_note"><p class="text-sm text-gray-500 dark:text-slate-400">Catatan admin</p><p class="dark:text-slate-300">{{ withdrawal.review_note }}</p></div>

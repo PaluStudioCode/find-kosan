@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
@@ -243,7 +243,18 @@ onUnmounted(() => {
                             <Clock class="w-3.5 h-3.5" /> Waktu pembayaran telah habis
                         </div>
 
-                        <p :class="['text-sm text-slate-500 mb-1 font-medium uppercase tracking-wider', isInitialPayment ? 'mt-4' : '']">Total Pembayaran</p>
+                        <div class="mt-8 px-6 max-w-sm mx-auto" v-if="activeInvoice.ppn_amount > 0">
+                            <div class="flex justify-between text-sm text-slate-600 mb-2">
+                                <span>Harga Sewa</span>
+                                <span class="font-semibold text-slate-800">{{ formatPrice(activeInvoice.rent_price) }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-600 mb-4 pb-4 border-b border-slate-200">
+                                <span>PPN ({{ Number(activeInvoice.ppn_percent) }}%)</span>
+                                <span class="font-semibold text-slate-800">+{{ formatPrice(activeInvoice.ppn_amount) }}</span>
+                            </div>
+                        </div>
+
+                        <p :class="['text-sm text-slate-500 mb-1 font-medium uppercase tracking-wider', (!activeInvoice.ppn_amount && isInitialPayment) ? 'mt-8' : '']">Total Pembayaran</p>
                         <p class="text-4xl font-extrabold text-slate-900 tracking-tight">{{ formatPrice(activeInvoice.amount) }}</p>
                         <p v-if="isOverdue" class="text-sm text-red-700 mt-3 font-bold bg-red-100 inline-block px-3 py-1 rounded-full border border-red-200">
                             Telah Lewat Jatuh Tempo: {{ formatDate(activeInvoice.due_date) }}

@@ -25,15 +25,8 @@ class AdminWalletService
                 ['available_balance' => 0, 'pending_withdrawal_balance' => 0]
             );
 
-            // Calculate Platform Fee
-            $feePercent = (float) (Setting::getSetting('fee_percent') ?: 0);
-            $feeAmount = $invoice->amount * ($feePercent / 100);
-            $creditAmount = $invoice->amount - $feeAmount;
-
+            $creditAmount = $invoice->rent_price > 0 ? $invoice->rent_price : $invoice->amount;
             $description = "Dana sewa dari tagihan #{$invoice->id}";
-            if ($feePercent > 0) {
-                $description .= " (Dipotong biaya admin {$feePercent}%)";
-            }
 
             $transaction = AdminWalletTransaction::firstOrCreate(
                 ['invoice_id' => $invoice->id],

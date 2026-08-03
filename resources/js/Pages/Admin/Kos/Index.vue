@@ -96,9 +96,9 @@ const copyLink = (kosId) => {
                             <div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 mb-3"></div>
                         </CardContent>
                         
-                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap gap-2">
-                            <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded flex-1 min-w-[80px]"></div>
-                            <div class="flex gap-2 shrink-0">
+                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-nowrap items-center gap-2">
+                            <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded flex-1 min-w-0"></div>
+                            <div class="flex items-center gap-2 shrink-0">
                                 <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded w-9"></div>
                                 <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded w-9"></div>
                             </div>
@@ -143,22 +143,22 @@ const copyLink = (kosId) => {
                                 Menunggu verifikasi revisi data
                             </div>
                         </CardContent>
-                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 flex flex-wrap gap-2">
-                            <Link :href="route('admin.kos.show', kos.id)" class="flex-1 min-w-[80px]">
-                                <Button variant="outline" size="sm" class="w-full bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-700 px-2 sm:px-3 text-xs sm:text-sm truncate">Kelola</Button>
+                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 flex flex-nowrap items-center justify-between gap-2">
+                            <Link :href="route('admin.kos.show', kos.id)" class="flex-1 min-w-0 flex items-center">
+                                <Button variant="outline" size="sm" class="w-full h-9 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-700 px-2 sm:px-3 text-xs sm:text-sm truncate">Kelola</Button>
                             </Link>
-                            <div class="flex gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 <template v-if="kos.status === 'dipublikasikan'">
-                                    <Button type="button" size="sm" variant="outline" class="px-2.5 sm:px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Bagikan Tautan Kos" @click="copyLink(kos.id)">
+                                    <Button type="button" size="sm" variant="outline" class="h-9 px-2.5 sm:px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Bagikan Tautan Kos" @click="copyLink(kos.id)">
                                         <Share2 class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     </Button>
-                                    <a :href="route('public.kos.show', kos.id)" target="_blank">
-                                        <Button type="button" size="sm" variant="outline" class="px-2.5 sm:px-3 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40" title="Lihat Halaman Publik">
+                                    <a :href="route('public.kos.show', kos.id)" target="_blank" class="flex items-center">
+                                        <Button type="button" size="sm" variant="outline" class="h-9 px-2.5 sm:px-3 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40" title="Lihat Halaman Publik">
                                             <ExternalLink class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         </Button>
                                     </a>
                                 </template>
-                                <Button type="button" size="sm" variant="destructive" class="px-2.5 sm:px-3" @click="confirmKosDeletion(kos)" title="Hapus Kos" :disabled="kos.status === 'menunggu_verifikasi'">
+                                <Button type="button" size="sm" variant="destructive" class="h-9 px-2.5 sm:px-3" @click="confirmKosDeletion(kos)" title="Hapus Kos" :disabled="kos.status === 'menunggu_verifikasi'">
                                     <Trash2 class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </Button>
                             </div>

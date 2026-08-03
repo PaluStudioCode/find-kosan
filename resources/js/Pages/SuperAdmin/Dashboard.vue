@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref, watch, nextTick } from 'vue';
 import { useDark } from '@vueuse/core';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Users, FileCheck, Flag, Wallet, AlertCircle, Building2, Banknote } from 'lucide-vue-next';
+import { Users, FileCheck, Flag, Wallet, AlertCircle, Building2, Banknote, TrendingUp, Landmark, Receipt } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 import { Line, Doughnut } from 'vue-chartjs';
@@ -15,6 +15,7 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, ArcElement, 
 
 const props = defineProps({
     metrics: Object,
+    financials: Object,
     charts: Object,
     recentVerifications: Array,
     recentReports: Array,
@@ -23,6 +24,15 @@ const props = defineProps({
 
 const formatRupiah = (amount) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+};
+
+const formatRupiahCompact = (amount) => {
+    return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR',
+        notation: 'compact',
+        maximumFractionDigits: 1
+    }).format(amount);
 };
 
 const isDark = useDark();
@@ -104,7 +114,7 @@ const propertyChartOptions = computed(() => ({
     <AppLayout>
         <Head title="Dashboard Super Admin" />
 
-        <Deferred :data="['metrics', 'charts', 'recentVerifications', 'recentReports', 'recentWithdrawals']">
+        <Deferred :data="['metrics', 'financials', 'charts', 'recentVerifications', 'recentReports', 'recentWithdrawals']">
             <template #fallback>
                 <div class="animate-pulse">
                     <!-- Header Ringkas -->
@@ -113,6 +123,19 @@ const propertyChartOptions = computed(() => ({
                         <div class="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded"></div>
                     </div>
                     
+                    <!-- Financials Skeleton -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <Card v-for="n in 4" :key="'fin-skel-'+n" class="border-0 shadow-sm bg-white dark:bg-slate-900">
+                            <CardContent class="border-0 p-6 flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0"></div>
+                                <div>
+                                    <div class="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
                     <!-- Metrics Cards Skeleton -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <Card v-for="n in 4" :key="'metric-'+n" class="border-0 shadow-sm bg-white dark:bg-slate-900">
@@ -176,6 +199,61 @@ const propertyChartOptions = computed(() => ({
             <p class="text-gray-500 dark:text-slate-400 mt-1">Ringkasan sistem secara keseluruhan.</p>
         </div>
 
+        <!-- FINANCIAL METRICS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total GTV -->
+            <Card class="border border-blue-100 dark:border-0 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-b from-blue-50/50 to-white dark:bg-slate-900 dark:bg-none">
+                <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                    <CardTitle class="text-sm font-medium text-slate-500 dark:text-slate-400 border-0">Total Uang Masuk</CardTitle>
+                    <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
+                        <TrendingUp class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                </CardHeader>
+                <CardContent class="border-0">
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white truncate" :title="formatRupiah(financials.totalGTV)">{{ formatRupiahCompact(financials.totalGTV) }}</div>
+                </CardContent>
+            </Card>
+
+            <!-- Total Escrow -->
+            <Card class="border border-emerald-100 dark:border-0 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-b from-emerald-50/50 to-white dark:bg-slate-900 dark:bg-none">
+                <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                    <CardTitle class="text-sm font-medium text-slate-500 dark:text-slate-400 border-0">Saldo Pemilik Kos</CardTitle>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                        <Landmark class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                </CardHeader>
+                <CardContent class="border-0">
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white truncate" :title="formatRupiah(financials.totalEscrow)">{{ formatRupiahCompact(financials.totalEscrow) }}</div>
+                </CardContent>
+            </Card>
+
+            <!-- Total PPN -->
+            <Card class="border border-purple-100 dark:border-0 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-b from-purple-50/50 to-white dark:bg-slate-900 dark:bg-none">
+                <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                    <CardTitle class="text-sm font-medium text-slate-500 dark:text-slate-400 border-0">Total PPN Terkumpul</CardTitle>
+                    <div class="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center">
+                        <Receipt class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    </div>
+                </CardHeader>
+                <CardContent class="border-0">
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white truncate" :title="formatRupiah(financials.totalPpn)">{{ formatRupiahCompact(financials.totalPpn) }}</div>
+                </CardContent>
+            </Card>
+
+            <!-- Total PPh -->
+            <Card class="border border-orange-100 dark:border-0 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-b from-orange-50/50 to-white dark:bg-slate-900 dark:bg-none">
+                <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                    <CardTitle class="text-sm font-medium text-slate-500 dark:text-slate-400 border-0">Total PPh Terkumpul</CardTitle>
+                    <div class="w-8 h-8 rounded-xl bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center">
+                        <Banknote class="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                    </div>
+                </CardHeader>
+                <CardContent class="border-0">
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white truncate" :title="formatRupiah(financials.totalPph)">{{ formatRupiahCompact(financials.totalPph) }}</div>
+                </CardContent>
+            </Card>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Pengguna -->
             <Card class="relative overflow-hidden border-0 dark:border-0 shadow-lg bg-gradient-to-br from-blue-600 to-indigo-700 text-white transform hover:-translate-y-1 transition-all duration-300">
@@ -188,10 +266,6 @@ const propertyChartOptions = computed(() => ({
                 </CardHeader>
                 <CardContent class="relative z-10 border-0">
                     <div class="text-3xl font-extrabold tracking-tight">{{ metrics.totalUsers }}</div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="text-[10px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">{{ metrics.totalOwners }} Pemilik</span>
-                        <span class="text-[10px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">{{ metrics.totalTenants }} Penyewa</span>
-                    </div>
                 </CardContent>
             </Card>
 
@@ -204,11 +278,7 @@ const propertyChartOptions = computed(() => ({
                     </div>
                 </CardHeader>
                 <CardContent class="border-0">
-                    <div class="flex items-end gap-2">
-                        <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingKosVerifications }}</div>
-                        <span class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">Tertunda</span>
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-medium">Kos baru yang butuh di-review</p>
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingKosVerifications }}</div>
                 </CardContent>
             </Card>
 
@@ -221,11 +291,7 @@ const propertyChartOptions = computed(() => ({
                     </div>
                 </CardHeader>
                 <CardContent class="border-0">
-                    <div class="flex items-end gap-2">
-                        <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingWithdrawals }}</div>
-                        <span class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-1">Permintaan</span>
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-medium">Menunggu ditransfer ke pemilik</p>
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingWithdrawals }}</div>
                 </CardContent>
             </Card>
 
@@ -238,11 +304,7 @@ const propertyChartOptions = computed(() => ({
                     </div>
                 </CardHeader>
                 <CardContent class="border-0">
-                    <div class="flex items-end gap-2">
-                        <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingReports }}</div>
-                        <span class="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Tiket Terbuka</span>
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-medium">Aduan dari penyewa atau pengguna</p>
+                    <div class="text-3xl font-extrabold text-slate-800 dark:text-white">{{ metrics.pendingReports }}</div>
                 </CardContent>
             </Card>
         </div>

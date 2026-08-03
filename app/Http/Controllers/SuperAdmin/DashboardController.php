@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminWallet;
 use App\Models\BoardingHouse;
+use App\Models\Invoice;
 use App\Models\Report;
 use App\Models\User;
 use App\Models\WithdrawalRequest;
@@ -24,6 +26,14 @@ class DashboardController extends Controller
                     'pendingKosVerifications' => BoardingHouse::where('status', 'menunggu_verifikasi')->count(),
                     'pendingReports' => Report::where('status', 'menunggu')->count(),
                     'pendingWithdrawals' => WithdrawalRequest::where('status', 'menunggu_persetujuan')->count(),
+                ];
+            }),
+            'financials' => Inertia::defer(function () {
+                return [
+                    'totalGTV' => (float) Invoice::where('status', 'lunas')->sum('amount'),
+                    'totalEscrow' => (float) AdminWallet::sum('available_balance') + (float) AdminWallet::sum('pending_withdrawal_balance'),
+                    'totalPpn' => (float) Invoice::where('status', 'lunas')->sum('ppn_amount'),
+                    'totalPph' => (float) WithdrawalRequest::where('status', 'selesai')->sum('pph_amount'),
                 ];
             }),
             'charts' => Inertia::defer(function () {

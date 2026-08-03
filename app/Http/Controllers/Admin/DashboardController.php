@@ -20,12 +20,13 @@ class DashboardController extends Controller
 
         return Inertia::render('Admin/Dashboard', [
             'metrics' => Inertia::defer(function () use ($adminId) {
-                $currentMonthRevenue = Invoice::where('admin_id', $adminId)
-                    ->where('status', 'lunas')
-                    ->whereMonth('updated_at', now()->month)
-                    ->whereYear('updated_at', now()->year)
-                    ->sum('amount');
-
+                $currentMonthRevenue = \App\Models\AdminWalletTransaction::whereHas('wallet', function ($q) use ($adminId) {
+                    $q->where('admin_id', $adminId);
+                })
+                ->where('type', 'payment_credit')
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('amount');
                 $totalRooms = Room::whereHas('boardingHouse', function ($q) use ($adminId) {
                     $q->where('admin_id', $adminId);
                 })->count();
@@ -104,11 +105,13 @@ class DashboardController extends Controller
                 for ($i = 5; $i >= 0; $i--) {
                     $date = now()->startOfMonth()->subMonths($i);
                     $revenueChartLabels[] = $date->translatedFormat('M Y');
-                    $monthlyRevenue = Invoice::where('admin_id', $adminId)
-                        ->where('status', 'lunas')
-                        ->whereMonth('updated_at', $date->month)
-                        ->whereYear('updated_at', $date->year)
-                        ->sum('amount');
+                    $monthlyRevenue = \App\Models\AdminWalletTransaction::whereHas('wallet', function ($q) use ($adminId) {
+                        $q->where('admin_id', $adminId);
+                    })
+                    ->where('type', 'payment_credit')
+                    ->whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year)
+                    ->sum('amount');
                     $revenueChartData[] = $monthlyRevenue;
                 }
 

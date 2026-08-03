@@ -33,6 +33,12 @@ class TenancyDummySeeder extends Seeder
         $feeSetting = Setting::where('key', 'fee_percent')->first();
         $feePercent = $feeSetting ? (int)$feeSetting->value : 5;
 
+        $ppnSetting = Setting::where('key', 'ppn_percent')->first();
+        $ppnPercent = $ppnSetting ? (int)$ppnSetting->value : 11;
+        
+        $pphSetting = Setting::where('key', 'pph_percent')->first();
+        $pphPercent = $pphSetting ? (int)$pphSetting->value : 10;
+
         $this->command->info('Membuat 300 Tenant dummy asli Indonesia...');
         $tenants = [];
         
@@ -111,6 +117,9 @@ class TenancyDummySeeder extends Seeder
                     'updated_at' => $startDate,
                 ]);
 
+                $ppnAmount = ($room->price * $ppnPercent) / 100;
+                $totalAmount = $room->price + $ppnAmount;
+
                 // Buat Invoice Lunas
                 $invoice = Invoice::create([
                     'tenancy_id' => $tenancy->id,
@@ -118,7 +127,10 @@ class TenancyDummySeeder extends Seeder
                     'admin_id' => $adminId,
                     'period_start' => $startDate,
                     'period_end' => $endDate,
-                    'amount' => $room->price,
+                    'rent_price' => $room->price,
+                    'ppn_percent' => $ppnPercent,
+                    'ppn_amount' => $ppnAmount,
+                    'amount' => $totalAmount,
                     'due_date' => $startDate->copy()->addDays(3),
                     'status' => 'lunas',
                     'payment_method' => 'bank_transfer',
@@ -131,7 +143,7 @@ class TenancyDummySeeder extends Seeder
                     'invoice_id' => $invoice->id,
                     'user_id' => $tenant->id,
                     'admin_id' => $adminId,
-                    'amount' => $room->price,
+                    'amount' => $totalAmount,
                     'payment_date' => $startDate,
                     'status' => 'diterima',
                     'note' => 'Pembayaran lunas (Dummy)',
@@ -161,6 +173,57 @@ class TenancyDummySeeder extends Seeder
             }
         }
         
+        // Buat penarikan dummy untuk menguji PPh dan metrik
+        if (isset($adminWallet) && $adminWallet->available_balance > 10000000) {
+            $this->command->info('Membuat data penarikan dummy untuk Admin Wallet...');
+            $withdrawals = [
+                ['amount' => 5000000, 'status' => 'selesai'],
+                ['amount' => 2000000, 'status' => 'menunggu_persetujuan'],
+                ['amount' => 1000000, 'status' => 'ditolak'],
+            ];
+
+            foreach ($withdrawals as $wd) {
+                $pphAmount = ($wd['amount'] * $pphPercent) / 100;
+                $netAmount = $wd['amount'] - $pphAmount;
+                
+                if ($wd['status'] === 'selesai') {
+                    $adminWallet->decrement('available_balance', $wd['amount']);
+                } elseif ($wd['status'] === 'menunggu_persetujuan') {
+                    $adminWallet->decrement('available_balance', $wd['amount']);
+                    $adminWallet->increment('pending_withdrawal_balance', $wd['amount']);
+                } // jika ditolak, saldo seolah sudah dikembalikan (tidak diubah)
+
+                $withdrawalRecord = \App\Models\WithdrawalRequest::create([
+                    'admin_id' => $adminWallet->admin_id,
+                    'amount' => $wd['amount'],
+                    'pph_percent' => $pphPercent,
+                    'pph_amount' => $pphAmount,
+                    'net_amount' => $netAmount,
+                    'bank_name' => 'BCA',
+                    'account_number' => '1234567890',
+                    'account_holder_name' => 'Pemilik Kos',
+                    'status' => $wd['status'],
+                    'owner_note' => 'Tarik dana untuk operasional',
+                    'reviewed_by' => $wd['status'] !== 'menunggu_persetujuan' ? $superAdmin->id : null,
+                    'reviewed_at' => $wd['status'] !== 'menunggu_persetujuan' ? Carbon::now()->subDays(1) : null,
+                    'review_note' => $wd['status'] === 'ditolak' ? 'Nomor rekening tidak valid' : null,
+                    'transferred_by' => $wd['status'] === 'selesai' ? $superAdmin->id : null,
+                    'transferred_at' => $wd['status'] === 'selesai' ? Carbon::now()->subDays(1) : null,
+                    'transfer_reference' => $wd['status'] === 'selesai' ? 'TRX-' . mt_rand(10000, 99999) : null,
+                ]);
+
+                if ($wd['status'] === 'selesai') {
+                    AdminWalletTransaction::create([
+                        'admin_wallet_id' => $adminWallet->id,
+                        'withdrawal_request_id' => $withdrawalRecord->id,
+                        'type' => 'withdrawal_debit',
+                        'amount' => $wd['amount'],
+                        'description' => "Penarikan #{$withdrawalRecord->id} berhasil ditransfer",
+                    ]);
+                }
+            }
+        }
+
         $this->command->info('Seeding transaksi sewa selesai. Total kamar disewa: ' . $tenantIndex);
     }
 }

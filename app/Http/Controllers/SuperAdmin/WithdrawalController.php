@@ -18,6 +18,13 @@ class WithdrawalController extends Controller
     public function index()
     {
         return Inertia::render('SuperAdmin/Withdrawals/Index', [
+            'metrics' => Inertia::defer(function () {
+                return [
+                    'pendingAmount' => (float) WithdrawalRequest::where('status', 'menunggu_persetujuan')->sum('amount'),
+                    'completedPayouts' => (float) WithdrawalRequest::where('status', 'selesai')->sum('net_amount'),
+                    'collectedPph' => (float) WithdrawalRequest::where('status', 'selesai')->sum('pph_amount'),
+                ];
+            }),
             'withdrawals' => Inertia::defer(fn () => WithdrawalRequest::with(['admin', 'reviewer', 'transferer'])
                 ->latest()
                 ->paginate(10)

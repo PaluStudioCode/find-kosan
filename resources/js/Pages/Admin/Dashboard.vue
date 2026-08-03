@@ -296,7 +296,7 @@ const capacityChartOptions = computed(() => ({
                                 </div>
                                 <div class="flex flex-col items-end">
                                     <span class="text-[10px] font-bold px-2 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 rounded-md mb-1">Jatuh Tempo: {{ new Date(invoice.due_date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'}) }}</span>
-                                    <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ formatRupiah(invoice.amount) }}</span>
+                                    <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ formatRupiah(invoice.rent_price) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -332,7 +332,7 @@ const capacityChartOptions = computed(() => ({
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="font-bold text-sm text-emerald-600 dark:text-emerald-400">{{ formatRupiah(transaction.amount) }}</span>
+                                    <span class="font-bold text-sm text-emerald-600 dark:text-emerald-400">{{ formatRupiah(transaction.rent_price) }}</span>
                                     <span class="text-[10px] text-slate-400 dark:text-slate-500">{{ new Date(transaction.updated_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'}) }}</span>
                                 </div>
                             </div>

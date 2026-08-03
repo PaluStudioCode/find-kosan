@@ -3,17 +3,17 @@ import { Home, ShieldCheck, CreditCard, Star, MapPin } from 'lucide-vue-next';
 </script>
 
 <template>
-    <div class="relative flex h-full w-full items-center justify-center pb-40 overflow-hidden bg-slate-900">
+    <div class="relative flex h-full w-full items-center justify-center pb-24 lg:pb-32 xl:pb-40 overflow-hidden bg-slate-900">
         <!-- Animated Background Glows -->
         <div class="absolute -top-[20%] -left-[10%] h-[70%] w-[70%] rounded-full bg-teal-600/40 mix-blend-screen blur-[120px] animate-[pulse_8s_ease-in-out_infinite]"></div>
         <div class="absolute top-[40%] -right-[20%] h-[60%] w-[60%] rounded-full bg-indigo-600/40 mix-blend-screen blur-[120px] animate-[pulse_10s_ease-in-out_infinite_reverse]"></div>
         <div class="absolute -bottom-[20%] left-[20%] h-[50%] w-[50%] rounded-full bg-amber-500/20 mix-blend-screen blur-[100px] animate-[pulse_6s_ease-in-out_infinite]"></div>
 
         <!-- Floating UI Collage Wrapper (CSS 3D Transform) -->
-        <div class="relative z-10 grid w-full max-w-[500px] grid-cols-2 gap-6 p-8" style="transform: perspective(1000px) rotateX(12deg) rotateY(-18deg) rotateZ(6deg);">
+        <div class="relative z-10 grid w-full max-w-[350px] lg:max-w-[420px] xl:max-w-[500px] grid-cols-2 gap-4 xl:gap-6 p-4 xl:p-8 scale-90 lg:scale-95 xl:scale-100" style="transform: perspective(1000px) rotateX(12deg) rotateY(-18deg) rotateZ(6deg);">
             
             <!-- Left Column -->
-            <div class="space-y-6 pt-12 animate-[float_6s_ease-in-out_infinite]">
+            <div class="space-y-4 xl:space-y-6 pt-12 animate-[float_6s_ease-in-out_infinite]">
                 
                 <!-- Mock Card 1: Notification -->
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
@@ -48,7 +48,7 @@ import { Home, ShieldCheck, CreditCard, Star, MapPin } from 'lucide-vue-next';
             </div>
 
             <!-- Right Column -->
-            <div class="space-y-6 animate-[float_7s_ease-in-out_infinite_reverse]">
+            <div class="space-y-4 xl:space-y-6 animate-[float_7s_ease-in-out_infinite_reverse]">
                 
                 <!-- Mock Card 3: Payment -->
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md shadow-[0_20px_40px_rgba(0,0,0,0.4)]">

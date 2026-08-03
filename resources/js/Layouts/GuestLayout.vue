@@ -49,9 +49,9 @@ watch(() => page.props.flash, (flash) => {
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none"></div>
             
             <!-- Branding Text (Light Text) -->
-            <div class="absolute bottom-16 left-16 right-16 text-white max-w-2xl pointer-events-none z-10">
-                <blockquote class="space-y-6">
-                    <p class="text-3xl xl:text-4xl font-extrabold leading-tight text-white drop-shadow-lg">
+            <div class="absolute bottom-8 lg:bottom-12 xl:bottom-16 left-8 lg:left-12 xl:left-16 right-8 lg:right-12 xl:right-16 text-white max-w-2xl pointer-events-none z-10">
+                <blockquote class="space-y-4 lg:space-y-6">
+                    <p class="text-2xl lg:text-3xl xl:text-4xl font-extrabold leading-tight text-white drop-shadow-lg">
                         "Mencari kos dan manajemen penyewaan kini menjadi lebih cepat, aman, dan tanpa repot."
                     </p>
                     <footer class="flex items-center gap-3">

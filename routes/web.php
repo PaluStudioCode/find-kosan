@@ -102,6 +102,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/whatsapp-settings/stop', [SuperAdminWhatsappSettingsController::class, 'stopSession'])->name('whatsapp.stop');
             Route::get('/whatsapp-settings/status', [SuperAdminWhatsappSettingsController::class, 'getStatus'])->name('whatsapp.status');
             Route::get('/whatsapp-settings/qr', [SuperAdminWhatsappSettingsController::class, 'getQrCode'])->name('whatsapp.qr');
+            Route::get('/whatsapp-settings/test', [SuperAdminWhatsappSettingsController::class, 'testMessage'])->name('whatsapp.test');
 
             // System Settings
             Route::get('/settings', [SystemSettingsController::class, 'index'])->name('settings.index');

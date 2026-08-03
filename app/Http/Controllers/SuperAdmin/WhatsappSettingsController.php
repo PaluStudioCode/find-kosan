@@ -62,4 +62,31 @@ class WhatsappSettingsController extends Controller
 
         return response()->json($result);
     }
+
+    public function testMessage(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'regex:/^(\+62|62|08)\d{8,13}$/'],
+        ]);
+
+        $phoneNumber = $request->phone;
+        $type = $request->query('type', 'jatuh_tempo');
+
+        if ($type === 'jatuh_tempo') {
+            $message = "Halo Uji Coba, ini adalah pengingat simulasi bahwa tagihan sewa kamar Anda di Kos Dummy sebesar Rp1.500.000 jatuh tempo HARI INI (" . today()->format('d M Y') . ").\n\nSilakan abaikan pesan ini, ini hanya testing dari SuperAdmin.";
+        } else {
+            $message = "Halo! Ini adalah pesan uji coba (testing) dari sistem Find Kosan. Jika Anda menerima pesan ini, artinya Gateway WhatsApp beroperasi dengan baik.";
+        }
+
+        // Send immediately bypassing queue
+        $result = $this->waService->sendMessage(self::ADMIN_SESSION_ID, $phoneNumber, $message);
+
+        return response()->json([
+            'success' => $result['status'] ?? false,
+            'message_type' => $type,
+            'phone' => $phoneNumber,
+            'wa_api_response' => $result,
+            'note' => 'Pesan dikirim secara instan (bypassing queue)'
+        ]);
+    }
 }

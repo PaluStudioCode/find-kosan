@@ -230,7 +230,7 @@ const deleteRule = () => {
                                             </tr>
                                         </thead>
                                         <tbody class="animate-pulse">
-                                            <tr v-for="n in 10" :key="n" class="border-b dark:border-slate-800">
+                                            <tr v-for="n in 10" :key="'skel-fac-' + n" class="border-b dark:border-slate-800">
                                                 <td class="px-4 py-3"><div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                                                 <td class="px-4 py-3"><div class="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                                                 <td class="px-4 py-3"><div class="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
@@ -262,13 +262,15 @@ const deleteRule = () => {
                                         <td class="px-4 py-3">
                                             <StatusBadge :status="facility.status" />
                                         </td>
-                                        <td class="px-4 py-3 text-right flex justify-end gap-2">
-                                            <Button variant="outline" size="sm" @click="openFacilityEditModal(facility)" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
-                                                <Edit2 class="w-4 h-4" />
-                                            </Button>
-                                            <Button variant="destructive" size="sm" @click="confirmFacilityDeletion(facility)">
-                                                <Trash2 class="w-4 h-4" />
-                                            </Button>
+                                        <td class="px-4 py-3 text-right">
+                                            <div class="flex justify-end gap-2">
+                                                <Button variant="outline" size="sm" @click="openFacilityEditModal(facility)" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
+                                                    <Edit2 class="w-4 h-4" />
+                                                </Button>
+                                                <Button variant="destructive" size="sm" @click="confirmFacilityDeletion(facility)">
+                                                    <Trash2 class="w-4 h-4" />
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr v-if="facilities.data.length === 0">
@@ -306,7 +308,7 @@ const deleteRule = () => {
                                             </tr>
                                         </thead>
                                         <tbody class="animate-pulse">
-                                            <tr v-for="n in 10" :key="n" class="border-b dark:border-slate-800">
+                                            <tr v-for="n in 10" :key="'skel-rule-' + n" class="border-b dark:border-slate-800">
                                                 <td class="px-4 py-3"><div class="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div></td>
                                                 <td class="px-4 py-3"><div class="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-full"></div></td>
                                                 <td class="px-4 py-3 text-right">
@@ -342,13 +344,15 @@ const deleteRule = () => {
                                                 Dilarang
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3 text-right flex justify-end gap-2">
-                                            <Button variant="outline" size="sm" @click="openRuleEditModal(rule)" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
-                                                <Edit2 class="w-4 h-4" />
-                                            </Button>
-                                            <Button variant="destructive" size="sm" @click="confirmRuleDeletion(rule)">
-                                                <Trash2 class="w-4 h-4" />
-                                            </Button>
+                                        <td class="px-4 py-3 text-right">
+                                            <div class="flex justify-end gap-2">
+                                                <Button variant="outline" size="sm" @click="openRuleEditModal(rule)" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
+                                                    <Edit2 class="w-4 h-4" />
+                                                </Button>
+                                                <Button variant="destructive" size="sm" @click="confirmRuleDeletion(rule)">
+                                                    <Trash2 class="w-4 h-4" />
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr v-if="rules.data.length === 0">

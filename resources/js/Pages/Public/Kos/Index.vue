@@ -276,6 +276,12 @@ watch(() => props.allKos, () => {
 
 onMounted(() => {
     initMap();
+    
+    // Auto-open settings card on desktop/laptop (>= 1024px)
+    if (window.innerWidth >= 1024) {
+        isSettingsOpen.value = true;
+    }
+
     // Auto-detect location on page load (silent mode: no alert if denied)
     getLocation(true);
 });

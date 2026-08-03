@@ -85,8 +85,8 @@ const copyLink = (kosId) => {
                         <div class="w-full h-40 bg-slate-200 dark:bg-slate-800"></div>
                         
                         <CardHeader class="p-4 pb-2">
-                            <div class="flex justify-between items-start gap-4">
-                                <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                            <div class="flex justify-between items-start gap-3">
+                                <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
                                 <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-16 shrink-0"></div>
                             </div>
                             <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mt-3"></div>
@@ -96,10 +96,12 @@ const copyLink = (kosId) => {
                             <div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 mb-3"></div>
                         </CardContent>
                         
-                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex gap-2">
-                            <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded flex-1"></div>
-                            <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded w-12"></div>
-                            <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded w-12"></div>
+                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap gap-2">
+                            <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded flex-1 min-w-[80px]"></div>
+                            <div class="flex gap-2 shrink-0">
+                                <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded w-9"></div>
+                                <div class="h-9 bg-slate-200 dark:bg-slate-700 rounded w-9"></div>
+                            </div>
                         </CardFooter>
                     </Card>
                 </div>
@@ -115,12 +117,14 @@ const copyLink = (kosId) => {
                         </div>
                         
                         <CardHeader class="p-4 pb-2">
-                            <div class="flex justify-between items-start">
-                                <CardTitle class="text-lg line-clamp-1 dark:text-white">{{ kos.name }}</CardTitle>
-                                <StatusBadge :status="kos.status" />
+                            <div class="flex justify-between items-start gap-2">
+                                <CardTitle class="text-base sm:text-lg line-clamp-1 dark:text-white" :title="kos.name">{{ kos.name }}</CardTitle>
+                                <div class="shrink-0">
+                                    <StatusBadge :status="kos.status" />
+                                </div>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-slate-400 flex items-center mt-1 line-clamp-1">
-                                <MapPin class="w-3 h-3 mr-1 shrink-0" /> {{ kos.address }}, {{ kos.city }}
+                            <p class="text-xs sm:text-sm text-gray-500 dark:text-slate-400 flex items-center mt-1" :title="kos.address + ', ' + kos.city">
+                                <MapPin class="w-3 h-3 mr-1 shrink-0" /> <span class="truncate">{{ kos.address }}, {{ kos.city }}</span>
                             </p>
                         </CardHeader>
                         <CardContent class="p-4 py-2">
@@ -139,23 +143,25 @@ const copyLink = (kosId) => {
                                 Menunggu verifikasi revisi data
                             </div>
                         </CardContent>
-                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 flex gap-2">
-                            <Link :href="route('admin.kos.show', kos.id)" class="flex-1">
-                                <Button variant="outline" class="w-full bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-700">Kelola Kos</Button>
+                        <CardFooter class="p-4 pt-4 border-t dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 flex flex-wrap gap-2">
+                            <Link :href="route('admin.kos.show', kos.id)" class="flex-1 min-w-[80px]">
+                                <Button variant="outline" size="sm" class="w-full bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-700 px-2 sm:px-3 text-xs sm:text-sm truncate">Kelola</Button>
                             </Link>
-                            <template v-if="kos.status === 'dipublikasikan'">
-                                <Button type="button" variant="outline" class="px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Bagikan Tautan Kos" @click="copyLink(kos.id)">
-                                    <Share2 class="w-4 h-4" />
-                                </Button>
-                                <a :href="route('public.kos.show', kos.id)" target="_blank">
-                                    <Button type="button" variant="outline" class="px-3 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40" title="Lihat Halaman Publik">
-                                        <ExternalLink class="w-4 h-4" />
+                            <div class="flex gap-1.5 shrink-0">
+                                <template v-if="kos.status === 'dipublikasikan'">
+                                    <Button type="button" size="sm" variant="outline" class="px-2.5 sm:px-3 border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 dark:border-teal-900/50 dark:text-teal-400 dark:bg-teal-900/20 dark:hover:bg-teal-900/40" title="Bagikan Tautan Kos" @click="copyLink(kos.id)">
+                                        <Share2 class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     </Button>
-                                </a>
-                            </template>
-                            <Button type="button" variant="destructive" class="px-3" @click="confirmKosDeletion(kos)" title="Hapus Kos" :disabled="kos.status === 'menunggu_verifikasi'">
-                                <Trash2 class="w-4 h-4" />
-                            </Button>
+                                    <a :href="route('public.kos.show', kos.id)" target="_blank">
+                                        <Button type="button" size="sm" variant="outline" class="px-2.5 sm:px-3 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40" title="Lihat Halaman Publik">
+                                            <ExternalLink class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        </Button>
+                                    </a>
+                                </template>
+                                <Button type="button" size="sm" variant="destructive" class="px-2.5 sm:px-3" @click="confirmKosDeletion(kos)" title="Hapus Kos" :disabled="kos.status === 'menunggu_verifikasi'">
+                                    <Trash2 class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                </Button>
+                            </div>
                         </CardFooter>
                     </Card>
                 </div>

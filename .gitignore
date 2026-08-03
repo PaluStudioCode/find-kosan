@@ -29,3 +29,6 @@ Thumbs.db
 # WhatsApp Service
 /wa-service/node_modules
 /wa-service/.env
+
+/public/build
+

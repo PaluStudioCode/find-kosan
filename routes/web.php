@@ -80,6 +80,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
             Route::resource('reports', App\Http\Controllers\SuperAdmin\ReportController::class)->only(['index', 'show', 'update', 'destroy']);
+            
+            Route::get('/financial-reports', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'index'])->name('financial-reports.index');
+            Route::get('/financial-reports/export-excel', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'exportExcel'])->name('financial-reports.export-excel');
+            Route::get('/financial-reports/export-pdf', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'exportPdf'])->name('financial-reports.export-pdf');
+
 
             Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
             Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show', 'index']);

@@ -1,9 +1,9 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings, Database } from 'lucide-vue-next';
+import { LogOut, User, LayoutDashboard, Building2, Users, ReceiptText, Flag, UserCog, Menu, Landmark, WalletCards, MessageSquare, Smartphone, Moon, Sun, Settings, Database, FileText } from 'lucide-vue-next';
 import { useDark, useToggle } from '@vueuse/core';
 
 const isDark = useDark();
@@ -41,6 +41,7 @@ const navItems = computed(() => {
         items.push({ name: 'Master Data', route: 'superadmin.master-data.index', icon: Database });
         items.push({ name: 'Laporan', route: 'superadmin.reports.index', icon: Flag });
         items.push({ name: 'Penarikan Dana', route: 'superadmin.withdrawals.index', icon: Landmark });
+        items.push({ name: 'Laporan Keuangan', route: 'superadmin.financial-reports.index', icon: FileText });
         items.push({ name: 'Manajemen Pengguna', route: 'superadmin.users.index', icon: UserCog });
         items.push({ name: 'Pengaturan Sistem', route: 'superadmin.settings.index', icon: Settings });
     } else if (role === 'admin') {

@@ -22,7 +22,7 @@ class GuestOrTenant
                 return $next($request);
             }
             if ($role === 'super_admin') {
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('superadmin.dashboard');
             } elseif ($role === 'admin') {
                 return redirect()->route('admin.dashboard');
             }

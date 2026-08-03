@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Download, CheckCircle, FileText, Eye, MapPin, Map, Check, X, AlertTriangle, Image as ImageIcon } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Download, CheckCircle, FileText, Eye, MapPin, Map, Check, X, AlertTriangle, Image as ImageIcon, Loader2 } from 'lucide-vue-next';
 import MapPicker from '@/components/MapPicker.vue';
 
 const props = defineProps({
@@ -19,14 +19,19 @@ const rejectForm = useForm({ note: '' });
 const showRejectForm = ref(false);
 
 const confirmingApproval = ref(false);
+const isApproving = ref(false);
 
 const approve = () => {
+    isApproving.value = true;
     router.post(route('superadmin.verifications.approve', props.kos.id), {}, {
         preserveScroll: true,
         onSuccess: () => {
             confirmingApproval.value = false;
             toast.success('Kos disetujui dan dipublikasikan.');
         },
+        onFinish: () => {
+            isApproving.value = false;
+        }
     });
 };
 
@@ -367,8 +372,11 @@ const groupedRooms = computed(() => {
                     <p v-if="rejectForm.errors.note" class="text-xs text-red-500 mt-1">{{ rejectForm.errors.note }}</p>
                 </div>
                 <DialogFooter class="flex flex-col sm:flex-row gap-2 mt-4">
-                    <Button variant="ghost" @click="showRejectForm = false" class="w-full sm:w-auto dark:text-slate-300">Batal</Button>
-                    <Button variant="destructive" @click="reject" :disabled="rejectForm.processing" class="w-full sm:w-auto">Kirim Penolakan</Button>
+                    <Button variant="ghost" @click="showRejectForm = false" class="w-full sm:w-auto dark:text-slate-300" :disabled="rejectForm.processing">Batal</Button>
+                    <Button variant="destructive" @click="reject" :disabled="rejectForm.processing" class="w-full sm:w-auto">
+                        <Loader2 v-if="rejectForm.processing" class="w-4 h-4 mr-2 animate-spin" />
+                        {{ rejectForm.processing ? 'Menolak...' : 'Kirim Penolakan' }}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -493,8 +501,11 @@ const groupedRooms = computed(() => {
                 </div>
 
                 <DialogFooter class="mt-4 flex flex-col sm:flex-row gap-2">
-                    <Button variant="outline" @click="confirmingApproval = false" class="w-full sm:w-auto dark:text-slate-300 dark:border-slate-700">Batal</Button>
-                    <Button class="w-full sm:w-auto bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white" @click="approve">Ya, Publikasikan</Button>
+                    <Button variant="outline" @click="confirmingApproval = false" class="w-full sm:w-auto dark:text-slate-300 dark:border-slate-700" :disabled="isApproving">Batal</Button>
+                    <Button class="w-full sm:w-auto bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white" @click="approve" :disabled="isApproving">
+                        <Loader2 v-if="isApproving" class="w-4 h-4 mr-2 animate-spin" />
+                        {{ isApproving ? 'Memproses...' : 'Ya, Publikasikan' }}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

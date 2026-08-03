@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { toast } from 'vue-sonner';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { Deferred } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import StatusBadge from '@/components/StatusBadge.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Plus, MapPin, Building, Trash2, AlertTriangle, ExternalLink, Share2 } from 'lucide-vue-next';
+import { Plus, MapPin, Building, Trash2, AlertTriangle, ExternalLink, Share2, Loader2 } from 'lucide-vue-next';
 
 defineProps({
     boardingHouses: Object
@@ -17,6 +17,7 @@ defineProps({
 
 const confirmingKosDeletion = ref(false);
 const kosToDelete = ref(null);
+const isDeleting = ref(false);
 
 const confirmKosDeletion = (kos) => {
     kosToDelete.value = kos;
@@ -33,9 +34,13 @@ const closeModal = () => {
 const deleteKos = () => {
     if (!kosToDelete.value) return;
     
+    isDeleting.value = true;
     router.delete(route('admin.kos.destroy', kosToDelete.value.id), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
+        onFinish: () => {
+            isDeleting.value = false;
+        }
     });
 };
 
@@ -80,7 +85,7 @@ const copyLink = (kosId) => {
             <template #fallback>
                 <!-- Skeleton Loader (tampil secara instan berkat fitur Deferred Inertia) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <Card v-for="n in 6" :key="'skeleton-'+n" class="overflow-hidden dark:bg-slate-900 dark:border-slate-800 animate-pulse border-slate-200">
+                    <Card v-for="n in 6" :key="'skeleton-'+n" class="flex flex-col h-full overflow-hidden dark:bg-slate-900 dark:border-slate-800 animate-pulse border-slate-200">
                         <!-- Skeleton Image -->
                         <div class="w-full h-40 bg-slate-200 dark:bg-slate-800"></div>
                         
@@ -92,7 +97,7 @@ const copyLink = (kosId) => {
                             <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mt-3"></div>
                         </CardHeader>
                         
-                        <CardContent class="p-4 py-2">
+                        <CardContent class="p-4 py-2 flex-1">
                             <div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 mb-3"></div>
                         </CardContent>
                         
@@ -110,7 +115,7 @@ const copyLink = (kosId) => {
             <!-- Actual Data -->
             <div v-if="boardingHouses.data.length > 0">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <Card v-for="kos in boardingHouses.data" :key="kos.id" class="overflow-hidden hover:shadow-md transition-shadow dark:bg-slate-900 dark:border-slate-800">
+                    <Card v-for="kos in boardingHouses.data" :key="kos.id" class="flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow dark:bg-slate-900 dark:border-slate-800">
                         <img v-if="kos.photos && kos.photos.length > 0" :src="kos.photos[0].file_path" class="w-full h-40 object-cover" />
                         <div v-else class="w-full h-40 bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
                             <Building class="w-12 h-12 text-gray-300 dark:text-slate-600" />
@@ -127,7 +132,7 @@ const copyLink = (kosId) => {
                                 <MapPin class="w-3 h-3 mr-1 shrink-0" /> <span class="truncate">{{ kos.address }}, {{ kos.city }}</span>
                             </p>
                         </CardHeader>
-                        <CardContent class="p-4 py-2">
+                        <CardContent class="p-4 py-2 flex-1">
                             <div class="text-sm font-medium mb-3 bg-gray-50 dark:bg-slate-800 p-2 rounded border dark:border-slate-700 inline-flex items-center">
                                 <Building class="w-4 h-4 mr-2 text-gray-400 dark:text-slate-400" />
                                 <span class="dark:text-slate-200">{{ kos.rooms_count }}</span> <span class="text-gray-500 dark:text-slate-400 ml-1">Kamar</span>
@@ -199,8 +204,11 @@ const copyLink = (kosId) => {
             </DialogDescription>
 
             <DialogFooter class="mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-2">
-                <Button variant="outline" @click="closeModal" class="w-full sm:w-auto dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
-                <Button variant="destructive" @click="deleteKos" class="w-full sm:w-auto">Ya, Hapus Kos</Button>
+                <Button variant="outline" @click="closeModal" class="w-full sm:w-auto dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" :disabled="isDeleting">Batal</Button>
+                <Button variant="destructive" @click="deleteKos" class="w-full sm:w-auto" :disabled="isDeleting">
+                    <Loader2 v-if="isDeleting" class="w-4 h-4 mr-2 animate-spin" />
+                    {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus Kos' }}
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

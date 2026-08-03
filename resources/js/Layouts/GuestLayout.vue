@@ -9,9 +9,9 @@ import { watch } from 'vue';
 const page = usePage();
 
 watch(() => page.props.flash, (flash) => {
-    if (flash?.success) toast.success(flash.success);
-    if (flash?.error) toast.error(flash.error);
-    if (flash?.status) toast.info(flash.status);
+    if (flash?.success) toast.success(flash.success, { id: 'success' });
+    if (flash?.error) toast.error(flash.error, { id: 'error' });
+    if (flash?.status) toast.info(flash.status, { id: 'status' });
 }, { deep: true, immediate: true });
 </script>
 

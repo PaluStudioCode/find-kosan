@@ -5,7 +5,7 @@ import {  router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import {  Star, UploadCloud, X, AlertTriangle } from 'lucide-vue-next';
+import {  Star, UploadCloud, X, AlertTriangle, Loader2 } from 'lucide-vue-next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const props = defineProps({
@@ -104,6 +104,7 @@ const setMainPhoto = (photoId) => {
 
 const confirmingPhotoDeletion = ref(false);
 const photoToDelete = ref(null);
+const isDeletingPhoto = ref(false);
 
 const confirmPhotoDeletion = (photoId) => {
     photoToDelete.value = photoId;
@@ -120,6 +121,7 @@ const closePhotoModal = () => {
 const deletePhoto = () => {
     if (!photoToDelete.value) return;
 
+    isDeletingPhoto.value = true;
     router.delete(route('admin.kos.photos.destroy', { kos: props.kos.id, photo: photoToDelete.value }), {
         preserveScroll: true,
         onSuccess: () => {
@@ -128,6 +130,9 @@ const deletePhoto = () => {
         onError: () => {
             toast.error('Gagal menghapus foto.');
             closePhotoModal();
+        },
+        onFinish: () => {
+            isDeletingPhoto.value = false;
         }
     });
 };
@@ -248,8 +253,11 @@ const deletePhoto = () => {
             </DialogDescription>
 
             <DialogFooter class="mt-6 flex flex-col sm:flex-row justify-end gap-2">
-                <Button variant="outline" @click="closePhotoModal" class="w-full sm:w-auto">Batal</Button>
-                <Button variant="destructive" @click="deletePhoto" class="w-full sm:w-auto">Ya, Hapus</Button>
+                <Button variant="outline" @click="closePhotoModal" class="w-full sm:w-auto" :disabled="isDeletingPhoto">Batal</Button>
+                <Button variant="destructive" @click="deletePhoto" class="w-full sm:w-auto" :disabled="isDeletingPhoto">
+                    <Loader2 v-if="isDeletingPhoto" class="w-4 h-4 mr-2 animate-spin" />
+                    {{ isDeletingPhoto ? 'Menghapus...' : 'Ya, Hapus' }}
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

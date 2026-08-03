@@ -21,13 +21,13 @@ const userRole = computed(() => page.props.auth.user.role);
 
 watch(() => page.props.flash, (flash) => {
     if (flash?.success) {
-        toast.success(flash.success);
+        toast.success(flash.success, { id: 'success' });
     }
     if (flash?.error) {
-        toast.error(flash.error);
+        toast.error(flash.error, { id: 'error' });
     }
     if (flash?.status) {
-        toast.info(flash.status);
+        toast.info(flash.status, { id: 'status' });
     }
 }, { deep: true, immediate: true });
 

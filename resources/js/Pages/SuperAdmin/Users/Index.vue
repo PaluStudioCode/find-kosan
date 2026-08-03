@@ -306,7 +306,7 @@ const executeDelete = () => {
                     </DialogDescription>
 
                     <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
-                        <Button variant="outline" @click="showDeleteModal = false" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
+                        <Button variant="outline" @click="showDeleteModal = false" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" :disabled="isDeleting">Batal</Button>
                         <Button variant="destructive" :disabled="isDeleting" @click="executeDelete">
                             <Loader2 v-if="isDeleting" class="w-4 h-4 mr-2 animate-spin" />
                             Hapus

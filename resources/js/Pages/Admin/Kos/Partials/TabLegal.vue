@@ -1,11 +1,11 @@
-﻿<script setup>
+<script setup>
 import { toast } from 'vue-sonner';
 import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { FileText, Trash2, UploadCloud, AlertCircle, AlertTriangle } from 'lucide-vue-next';
+import { FileText, Trash2, UploadCloud, AlertCircle, AlertTriangle, Loader2 } from 'lucide-vue-next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const props = defineProps({
@@ -34,6 +34,7 @@ const uploadDocument = () => {
 
 const confirmingDocDeletion = ref(false);
 const docToDelete = ref(null);
+const isDeletingDoc = ref(false);
 
 const confirmDocDeletion = (docId) => {
     docToDelete.value = docId;
@@ -50,6 +51,7 @@ const closeDocModal = () => {
 const deleteDocument = () => {
     if (!docToDelete.value) return;
 
+    isDeletingDoc.value = true;
     router.delete(route('admin.kos.legal-documents.destroy', { kos: props.kos.id, legalDocument: docToDelete.value }), {
         preserveScroll: true,
         onSuccess: () => {
@@ -59,6 +61,9 @@ const deleteDocument = () => {
         onError: () => {
             toast.error('Gagal menghapus dokumen.');
             closeDocModal();
+        },
+        onFinish: () => {
+            isDeletingDoc.value = false;
         }
     });
 };
@@ -158,8 +163,11 @@ const docTypes = [
             </DialogDescription>
 
             <DialogFooter class="mt-6 flex flex-col sm:flex-row justify-end gap-2">
-                <Button variant="outline" @click="closeDocModal" class="w-full sm:w-auto">Batal</Button>
-                <Button variant="destructive" @click="deleteDocument" class="w-full sm:w-auto">Ya, Hapus Dokumen</Button>
+                <Button variant="outline" @click="closeDocModal" class="w-full sm:w-auto" :disabled="isDeletingDoc">Batal</Button>
+                <Button variant="destructive" @click="deleteDocument" class="w-full sm:w-auto" :disabled="isDeletingDoc">
+                    <Loader2 v-if="isDeletingDoc" class="w-4 h-4 mr-2 animate-spin" />
+                    {{ isDeletingDoc ? 'Menghapus...' : 'Ya, Hapus Dokumen' }}
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

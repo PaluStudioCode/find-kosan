@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, CheckCircle2, MessageCircle, ShieldAlert } from 'lucide-vue-next';
+import { ChevronLeft, CheckCircle2, MessageCircle, ShieldAlert, Loader2 } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -174,8 +174,8 @@ const categoryLabel = (cat) => {
                 <DialogFooter class="mt-4 gap-2 sm:gap-0">
                     <Button variant="outline" @click="closeModal" :disabled="isDeleting">Batal</Button>
                     <Button variant="destructive" @click="deleteReport" :disabled="isDeleting">
-                        <span v-if="isDeleting">Menghapus...</span>
-                        <span v-else>Ya, Hapus Laporan</span>
+                        <Loader2 v-if="isDeleting" class="w-4 h-4 mr-2 animate-spin" />
+                        {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus Laporan' }}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -209,8 +209,11 @@ const categoryLabel = (cat) => {
                     </div>
 
                     <DialogFooter class="mt-4 gap-2 sm:gap-0">
-                        <Button type="button" variant="outline" @click="isActionModalOpen = false" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
-                        <Button type="submit" :disabled="form.processing">Simpan Keputusan</Button>
+                        <Button type="button" variant="outline" @click="isActionModalOpen = false" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" :disabled="form.processing">Batal</Button>
+                        <Button type="submit" :disabled="form.processing">
+                            <Loader2 v-if="form.processing" class="w-4 h-4 mr-2 animate-spin" />
+                            {{ form.processing ? 'Menyimpan...' : 'Simpan Keputusan' }}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

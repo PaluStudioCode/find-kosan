@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit2, Trash2, AlertTriangle, X } from 'lucide-vue-next';
+import { Plus, Edit2, Trash2, AlertTriangle, X, Loader2 } from 'lucide-vue-next';
 import { Deferred } from '@inertiajs/vue3';
 import StatusBadge from '@/components/StatusBadge.vue';
 import Pagination from '@/components/Pagination.vue';
@@ -79,6 +79,7 @@ const submitFacility = () => {
 
 const confirmingFacilityDeletion = ref(false);
 const facilityToDelete = ref(null);
+const isDeletingFacility = ref(false);
 
 const confirmFacilityDeletion = (facility) => {
     facilityToDelete.value = facility;
@@ -95,9 +96,11 @@ const closeFacilityDeleteModal = () => {
 const deleteFacility = () => {
     if (!facilityToDelete.value) return;
     
+    isDeletingFacility.value = true;
     router.delete(route('superadmin.facilities.destroy', facilityToDelete.value.id), {
         preserveScroll: true,
         onSuccess: () => closeFacilityDeleteModal(),
+        onFinish: () => isDeletingFacility.value = false,
     });
 };
 
@@ -151,6 +154,7 @@ const submitRule = () => {
 
 const confirmingRuleDeletion = ref(false);
 const ruleToDelete = ref(null);
+const isDeletingRule = ref(false);
 
 const confirmRuleDeletion = (rule) => {
     ruleToDelete.value = rule;
@@ -167,9 +171,11 @@ const closeRuleDeleteModal = () => {
 const deleteRule = () => {
     if (!ruleToDelete.value) return;
     
+    isDeletingRule.value = true;
     router.delete(route('superadmin.rules.destroy', ruleToDelete.value.id), {
         preserveScroll: true,
         onSuccess: () => closeRuleDeleteModal(),
+        onFinish: () => isDeletingRule.value = false,
     });
 };
 
@@ -477,8 +483,11 @@ const deleteRule = () => {
                     Apakah Anda yakin ingin menghapus fasilitas <strong class="text-foreground dark:text-white">{{ facilityToDelete?.name }}</strong>? Tindakan ini tidak dapat dibatalkan.
                 </DialogDescription>
                 <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
-                    <Button variant="outline" @click="closeFacilityDeleteModal" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
-                    <Button variant="destructive" @click="deleteFacility">Ya, Hapus</Button>
+                    <Button variant="outline" @click="closeFacilityDeleteModal" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" :disabled="isDeletingFacility">Batal</Button>
+                    <Button variant="destructive" @click="deleteFacility" :disabled="isDeletingFacility">
+                        <Loader2 v-if="isDeletingFacility" class="w-4 h-4 mr-2 animate-spin" />
+                        {{ isDeletingFacility ? 'Menghapus...' : 'Ya, Hapus' }}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -498,8 +507,11 @@ const deleteRule = () => {
                     Apakah Anda yakin ingin menghapus peraturan <strong class="text-foreground dark:text-white">{{ ruleToDelete?.name }}</strong>? Tindakan ini tidak dapat dibatalkan.
                 </DialogDescription>
                 <DialogFooter class="mt-6 flex justify-end gap-3 sm:justify-end">
-                    <Button variant="outline" @click="closeRuleDeleteModal" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</Button>
-                    <Button variant="destructive" @click="deleteRule">Ya, Hapus</Button>
+                    <Button variant="outline" @click="closeRuleDeleteModal" class="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800" :disabled="isDeletingRule">Batal</Button>
+                    <Button variant="destructive" @click="deleteRule" :disabled="isDeletingRule">
+                        <Loader2 v-if="isDeletingRule" class="w-4 h-4 mr-2 animate-spin" />
+                        {{ isDeletingRule ? 'Menghapus...' : 'Ya, Hapus' }}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

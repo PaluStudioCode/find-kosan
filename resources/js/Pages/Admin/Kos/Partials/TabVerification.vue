@@ -3,7 +3,7 @@ import { toast } from 'vue-sonner';
 import { ref, computed } from 'vue';
 import { router, Link, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Clock, XCircle, AlertTriangle, ShieldCheck } from 'lucide-vue-next';
+import { CheckCircle, Clock, XCircle, AlertTriangle, ShieldCheck, Loader2 } from 'lucide-vue-next';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
@@ -13,6 +13,7 @@ const props = defineProps({
 
 
 const confirmingVerification = ref(false);
+const isVerifying = ref(false);
 
 const confirmVerification = () => {
     confirmingVerification.value = true;
@@ -23,6 +24,7 @@ const closeVerificationModal = () => {
 };
 
 const requestVerification = () => {
+    isVerifying.value = true;
     router.post(route('admin.kos.verify', props.kos.id), {}, {
         preserveScroll: true,
         onSuccess: () => {
@@ -32,6 +34,9 @@ const requestVerification = () => {
         onError: () => {
             // Error validation fields or general flash handled by global
             closeVerificationModal();
+        },
+        onFinish: () => {
+            isVerifying.value = false;
         }
     });
 };
@@ -160,8 +165,11 @@ const canSubmit = computed(() => hasLegalDocs && hasPhotos && isAccountVerified.
             </DialogDescription>
 
             <DialogFooter class="mt-6 flex flex-col sm:flex-row justify-end gap-2">
-                <Button variant="outline" @click="closeVerificationModal" class="w-full sm:w-auto">Batal</Button>
-                <Button @click="requestVerification" class="w-full sm:w-auto">Ya, Ajukan Verifikasi</Button>
+                <Button variant="outline" @click="closeVerificationModal" class="w-full sm:w-auto" :disabled="isVerifying">Batal</Button>
+                <Button @click="requestVerification" class="w-full sm:w-auto" :disabled="isVerifying">
+                    <Loader2 v-if="isVerifying" class="w-4 h-4 mr-2 animate-spin" />
+                    {{ isVerifying ? 'Mengajukan...' : 'Ya, Ajukan Verifikasi' }}
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

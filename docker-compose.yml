@@ -47,13 +47,11 @@ services:
     restart: always
 
   9router:
-    build:
-      context: ./9router
-      dockerfile: Dockerfile
+    image: decolua/9router:latest
     ports:
       - "127.0.0.1:20128:20128"
     volumes:
-      - 9router_data:/root/.9router
+      - 9router_data:/app/data
     restart: always
 
   queue:

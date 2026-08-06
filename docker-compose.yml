@@ -23,8 +23,6 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - 9ROUTER_BASE_URL=http://9router:20128
-      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
       - 9router
@@ -73,8 +71,6 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - 9ROUTER_BASE_URL=http://9router:20128
-      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
       - 9router
@@ -93,8 +89,6 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - 9ROUTER_BASE_URL=http://9router:20128
-      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
       - 9router

@@ -120,13 +120,20 @@ class WhatsappService
 
     /**
      * Send a WhatsApp message using an owner's session.
+     *
+     * @param int $adminId Session admin_id (0 = SuperAdmin/system session)
+     * @param string $phoneOrJid Nomor telepon (mis. "628xxx") ATAU JID lengkap (mis. "628xxx@s.whatsapp.net" / "173xxx@lid")
+     * @param string $message Isi pesan
+     * @param bool $useRawJid Jika true, $phoneOrJid dianggap JID lengkap & dikirim apa adanya ke wa-service
+     *                        (penting untuk @lid yang tidak bisa di-normalize ke nomor telepon)
      */
-    public function sendMessage(int $adminId, string $phoneNumber, string $message): array
+    public function sendMessage(int $adminId, string $phoneOrJid, string $message, bool $useRawJid = false): array
     {
         try {
             $response = $this->request()->post("/sessions/{$adminId}/send", [
-                'phone' => $phoneNumber,
+                'phone' => $phoneOrJid,
                 'message' => $message,
+                'use_raw_jid' => $useRawJid,
             ]);
 
             $data = $response->json() ?? [];

@@ -41,6 +41,7 @@ use App\Http\Controllers\SuperAdmin\WhatsappSettingsController as SuperAdminWhat
 use App\Http\Controllers\SuperAdmin\WithdrawalController;
 use App\Http\Controllers\User\KosReviewController;
 use App\Http\Controllers\User\TenancyController;
+use App\Http\Controllers\WhatsappBotController;
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -180,6 +181,9 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:user'])->grou
     Route::post('/duitku/verify-local', [PaymentGatewayController::class, 'verifyLocal'])->name('duitku.verify-local');
 });
 Route::post('/duitku/callback', [PaymentGatewayController::class, 'callback'])->name('duitku.callback');
+
+// WhatsApp Bot Webhook (diterima dari wa-service saat ada pesan masuk ke nomor SuperAdmin)
+Route::post('/wa/webhook/incoming', [WhatsappBotController::class, 'handleIncoming'])->name('wa.webhook.incoming');
 
 // Google Login
 Route::middleware('guest')->group(function () {

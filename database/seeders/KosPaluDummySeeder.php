@@ -124,6 +124,25 @@ class KosPaluDummySeeder extends Seeder
             ['lat_min' => -0.8600, 'lat_max' => -0.8300, 'lng_min' => 119.8850, 'lng_max' => 119.9100],
         ];
 
+        // Daftar fasilitas umum / landmark di Kota Palu untuk referensi deskripsi kos.
+        // Mendorong pemilik kos menyebutkan landmark terdekat agar mudah ditemukan via WhatsApp bot.
+        $paluLandmarks = [
+            // Pendidikan
+            'Universitas Tadulako (Untad)', 'UIN Datokarama Palu', 'Universitas Alkhairaat',
+            'Politeknik Palu', 'STAIN Palu', 'Kampus UNISMUH Palu',
+            // Kesehatan
+            'RSUD Undata', 'RS Anutapura', 'RS Bhayangkara Palu', 'RSI Palu',
+            // Pasar & Pusat Belanja
+            'Pasar Mal Palu', 'Pasar Manondo', 'Pasar Cemara', 'Pasar Tawaeli',
+            'Mall Tatura', 'Palu Grand Mall', 'Transmart Palu', 'Ramayana Palu',
+            // Transportasi
+            'Bandara Mutiara SIS Al-Jufrie', 'Pelabuhan Pantoloan', 'Terminal Type A Palu',
+            // Pemerintahan & Tempat Ibadah
+            'Balaikota Palu', 'Masjid Raya Nur Al-Ikhlas', 'Masjid Agung Al-Khairaat',
+            // Wisata
+            'Pantai Talise', 'Jembatan Palu IV', 'Anjungan Palu', 'Tugu Rajawali',
+        ];
+
         for ($i = 1; $i <= 50; $i++) {
             // Pilih salah satu zona daratan secara acak
             $zone = $landZones[array_rand($landZones)];
@@ -139,10 +158,27 @@ class KosPaluDummySeeder extends Seeder
             $areaName = ucwords(strtolower($district->name));
             $name = 'Kos ' . $faker->firstName() . ' ' . $areaName;
 
+            // Pilih 1-2 landmark acak dari daftar fasilitas umum Kota Palu
+            // untuk disebutkan di deskripsi (mendukung pencarian bot WhatsApp by lokasi)
+            $selectedLandmarks = array_rand(array_flip($paluLandmarks), rand(1, 2));
+            if (!is_array($selectedLandmarks)) {
+                $selectedLandmarks = [$selectedLandmarks];
+            }
+            $landmarkText = count($selectedLandmarks) === 1
+                ? 'dekat dengan ' . $selectedLandmarks[0]
+                : 'dekat dengan ' . $selectedLandmarks[0] . ' dan ' . $selectedLandmarks[1];
+
+            $descriptionTemplates = [
+                'Kos nyaman dan strategis di area ' . $areaName . ', ' . $landmarkText . '. Dilengkapi dengan berbagai fasilitas pendukung untuk kenyamanan penghuni.',
+                'Lokasi sangat mantap di ' . $areaName . ', ' . $landmarkText . '. Tempat kost yang cocok untuk mahasiswa dan pekerja.',
+                'Kos elok di kawasan ' . $areaName . ', berjarak dekat ke ' . $selectedLandmarks[0] . '. Akses jalan mudah dan aman.',
+                'Tempat tinggal nyaman di ' . $areaName . ', ' . $landmarkText . '. Fasilitas lengkap, lingkungan bersih dan kondusif.',
+            ];
+
             $kos = BoardingHouse::create([
                 'admin_id' => $admin->id,
                 'name' => $name,
-                'description' => 'Kos nyaman dan strategis di area ' . $areaName . '. Dilengkapi dengan berbagai fasilitas pendukung untuk kenyamanan penghuni.',
+                'description' => $descriptionTemplates[array_rand($descriptionTemplates)],
                 'address' => 'Jl. ' . $faker->streetName() . ' No. ' . rand(1, 100),
                 'public_contact_name' => $admin->name,
                 'public_contact_whatsapp_number' => '08' . mt_rand(1000000000, 9999999999),

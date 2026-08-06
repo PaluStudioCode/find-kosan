@@ -17,3 +17,6 @@ Schedule::command('whatsapp:process')->everyMinute();
 
 // Bersihkan data dan file sampah (Soft Delete) yang lebih dari 30 hari secara otomatis setiap hari jam 00:00
 Schedule::command('prune:soft-deleted --days=30')->daily();
+
+// Kompresi riwayat percakapan bot WhatsApp yang panjang (>50 pesan) setiap minggu
+Schedule::command('whatsapp:compact-bot-conversations')->weekly();

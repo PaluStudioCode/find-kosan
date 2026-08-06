@@ -23,8 +23,11 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - 9ROUTER_BASE_URL=http://9router:20128
+      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
+      - 9router
 
   db:
     image: mysql:8.0
@@ -47,6 +50,16 @@ services:
       - /app/node_modules
     restart: always
 
+  9router:
+    build:
+      context: ./9router
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:20128:20128"
+    volumes:
+      - 9router_data:/root/.9router
+    restart: always
+
   queue:
     build:
       context: .
@@ -60,8 +73,11 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - 9ROUTER_BASE_URL=http://9router:20128
+      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
+      - 9router
     restart: always
 
   schedule:
@@ -77,9 +93,13 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - 9ROUTER_BASE_URL=http://9router:20128
+      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
     depends_on:
       - db
+      - 9router
     restart: always
 
 volumes:
   dbdata:
+  9router_data:

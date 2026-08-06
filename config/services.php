@@ -40,6 +40,18 @@ return [
         'api_key' => env('WA_SERVICE_API_KEY'),
     ],
 
+    'nine_router' => [
+        'base_url' => env('9ROUTER_BASE_URL', 'http://localhost:20128'),
+        'api_key' => env('9ROUTER_API_KEY'),
+        'default_model' => env('9ROUTER_DEFAULT_MODEL', 'gemini-3.1-pro-high'),
+    ],
+
+    'wa_bot' => [
+        'enabled' => env('WA_BOT_ENABLED', true),
+        'rate_limit_per_hour' => env('WA_BOT_RATE_LIMIT_PER_HOUR', 20),
+        'history_size' => env('WA_BOT_HISTORY_SIZE', 10),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

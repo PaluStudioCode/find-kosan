@@ -203,7 +203,7 @@ class WhatsappBotController extends Controller
     {
         try {
             // useRawJid=true → kirim ke JID apa adanya (penting untuk @lid)
-            app(\App\Services\WhatsappService::class)->sendMessage(0, $jid, $message, true);
+            app(\App\Services\WhatsappService::class)->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $jid, $message, true);
         } catch (\Exception $e) {
             Log::error('[WA Bot] Failed to send reply', [
                 'to_jid' => $jid,
@@ -227,7 +227,7 @@ class WhatsappBotController extends Controller
             return false;
         }
 
-        $ownNumber = WaSession::where('admin_id', 0)
+        $ownNumber = WaSession::superAdminSession()
             ->where('status', 'connected')
             ->value('phone_number');
 

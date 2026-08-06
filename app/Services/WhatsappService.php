@@ -34,6 +34,56 @@ class WhatsappService
     }
 
     /**
+     * Normalize the response from wa-service into a consistent shape.
+     *
+     * wa-service returns `{ success: true, ...payload }` on success,
+     * and `{ success: false, error: "..." }` (with non-2xx HTTP status)
+     * on failure. This method enforces that contract so callers can
+     * reliably check `success` and `status`.
+     *
+     * @return array{success: bool, status: ?string, error: ?string}
+     */
+    protected function normalizeResponse($response, array $context = []): array
+    {
+        $data = $response->json();
+
+        // Non-2xx response = failure, regardless of body.
+        if ($response->failed()) {
+            $error = $data['error'] ?? 'WA service error (HTTP '.$response->status().')';
+
+            Log::error('WA Service error response', array_merge($context, [
+                'http_status' => $response->status(),
+                'error' => $error,
+            ]));
+
+            return array_merge([
+                'success' => false,
+                'status' => null,
+                'error' => $error,
+            ], $data ?? []);
+        }
+
+        // 2xx but missing/invalid body.
+        if (! is_array($data)) {
+            Log::error('WA Service empty/invalid response body', $context);
+
+            return [
+                'success' => false,
+                'status' => null,
+                'error' => 'Empty response from WA service',
+            ];
+        }
+
+        // Preserve everything wa-service returned, but ensure
+        // `success` and `status` keys always exist for callers.
+        return array_merge([
+            'success' => false,
+            'status' => null,
+            'error' => null,
+        ], $data);
+    }
+
+    /**
      * Start a WhatsApp session for an owner (QR Code mode).
      */
     public function startSession(int $adminId): array
@@ -43,11 +93,11 @@ class WhatsappService
                 'usePairingCode' => false,
             ]);
 
-            return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
+            return $this->normalizeResponse($response, ['method' => 'startSession', 'admin_id' => $adminId]);
         } catch (\Exception $e) {
             Log::error('WA Service startSession error: '.$e->getMessage());
 
-            return ['success' => false, 'error' => $e->getMessage()];
+            return ['success' => false, 'status' => null, 'error' => $e->getMessage()];
         }
     }
 
@@ -62,11 +112,11 @@ class WhatsappService
                 'phoneNumber' => $phoneNumber,
             ]);
 
-            return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
+            return $this->normalizeResponse($response, ['method' => 'startSessionWithPairingCode', 'admin_id' => $adminId]);
         } catch (\Exception $e) {
             Log::error('WA Service startSessionWithPairingCode error: '.$e->getMessage());
 
-            return ['success' => false, 'error' => $e->getMessage()];
+            return ['success' => false, 'status' => null, 'error' => $e->getMessage()];
         }
     }
 
@@ -78,43 +128,79 @@ class WhatsappService
         try {
             $response = $this->request()->post("/sessions/{$adminId}/stop");
 
-            return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
+            return $this->normalizeResponse($response, ['method' => 'stopSession', 'admin_id' => $adminId]);
         } catch (\Exception $e) {
             Log::error('WA Service stopSession error: '.$e->getMessage());
 
-            return ['success' => false, 'error' => $e->getMessage()];
+            return ['success' => false, 'status' => null, 'error' => $e->getMessage()];
         }
     }
 
     /**
      * Get session status for an owner.
+     *
+     * @return array{success: bool, status: ?string, phone_number: ?string, connected_at: ?string}
      */
     public function getStatus(int $adminId): array
     {
         try {
             $response = $this->request()->get("/sessions/{$adminId}/status");
 
-            return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
+            $data = $this->normalizeResponse($response, ['method' => 'getStatus', 'admin_id' => $adminId]);
+
+            return [
+                'success' => $data['success'],
+                'status' => $data['status'] ?? 'disconnected',
+                'phoneNumber' => $data['phoneNumber'] ?? null,
+                'pairingCode' => $data['pairingCode'] ?? null,
+                'qr' => $data['qr'] ?? null,
+                'error' => $data['error'] ?? null,
+            ];
         } catch (\Exception $e) {
             Log::error('WA Service getStatus error: '.$e->getMessage());
 
-            return ['success' => false, 'status' => 'disconnected', 'error' => $e->getMessage()];
+            return [
+                'success' => false,
+                'status' => 'disconnected',
+                'phoneNumber' => null,
+                'pairingCode' => null,
+                'qr' => null,
+                'error' => $e->getMessage(),
+            ];
         }
     }
 
     /**
      * Get QR code for an owner's session.
+     *
+     * @return array{success: bool, status: ?string, qr: ?string, pairingCode: ?string, phoneNumber: ?string}
      */
     public function getQrCode(int $adminId): array
     {
         try {
             $response = $this->request()->get("/sessions/{$adminId}/qr");
 
-            return $response->json() ?? ['success' => false, 'error' => 'Empty response'];
+            $data = $this->normalizeResponse($response, ['method' => 'getQrCode', 'admin_id' => $adminId]);
+
+            return [
+                'success' => $data['success'],
+                'status' => $data['status'] ?? null,
+                'qr' => $data['qr'] ?? null,
+                'pairingCode' => $data['pairingCode'] ?? null,
+                'phoneNumber' => $data['phoneNumber'] ?? null,
+                'error' => $data['error'] ?? null,
+            ];
         } catch (\Exception $e) {
             Log::error('WA Service getQrCode error: '.$e->getMessage());
 
-            return ['success' => false, 'error' => $e->getMessage()];
+            return [
+                'success' => false,
+                'status' => null,
+                'qr' => null,
+                'pairingCode' => null,
+                'phoneNumber' => null,
+                'error' => $e->getMessage(),
+            ];
         }
     }
 

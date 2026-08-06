@@ -230,7 +230,7 @@ class WhatsappBotContextService
                 'type' => 'function',
                 'function' => [
                     'name' => 'get_platform_info',
-                    'description' => 'Ambil info platform CariKosan: total kos, kamar tersedia, kontak email, cara daftar.',
+                    'description' => 'Ambil info platform CariKosanMu: total kos, kamar tersedia, kontak email, cara daftar.',
                     'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
                 ],
             ];
@@ -292,8 +292,8 @@ class WhatsappBotContextService
         };
 
         $appUrl = config('app.url');
-        $contactEmail = Setting::getSetting('contact_email', 'admin@cariKosan.com');
-        $appName = Setting::getSetting('app_name', 'CariKosan');
+        $contactEmail = Setting::getSetting('contact_email', 'support@carikosanmu.com');
+        $appName = Setting::getSetting('app_name', 'CariKosanMu');
 
         $summaryBlock = '';
         if ($contextSummary) {
@@ -524,7 +524,7 @@ PROMPT;
     {
         return [
             'ppn_percent' => (float) Setting::getSetting('ppn_percent', 11),
-            'pph_percent' => (float) Setting::getSetting('pph_percent', 0.5),
+            'pph_percent' => (float) Setting::getSetting('pph_percent', 10),
             'min_withdrawal' => (float) Setting::getSetting('min_withdrawal', 50000),
             'note' => 'PPN dikenakan ke penyewa per invoice. PPh dipotong dari withdrawal pemilik.',
         ];
@@ -559,7 +559,7 @@ PROMPT;
         $availableRooms = \App\Models\Room::where('status', 'tersedia')->count();
 
         return [
-            'app_name' => Setting::getSetting('app_name', 'CariKosan'),
+            'app_name' => Setting::getSetting('app_name', 'CariKosanMu'),
             'app_url' => config('app.url'),
             'about_us' => \Illuminate\Support\Str::limit(Setting::getSetting('about_us', ''), 500),
             'contact_email' => Setting::getSetting('contact_email'),

@@ -79,7 +79,7 @@ const scrollToSection = (id) => {
                 <span v-else class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
                     <Home class="w-4 h-4" />
                 </span>
-                {{ $page.props.appSettings?.app_name || 'Kos Online' }}
+                {{ $page.props.appSettings?.app_name || 'CariKosanMu' }}
             </Link>
             
             <nav class="hidden md:flex gap-6 items-center">

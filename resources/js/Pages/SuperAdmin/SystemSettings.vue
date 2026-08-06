@@ -81,6 +81,22 @@ const isConnected = computed(() => status.value === 'connected');
 const isConnecting = computed(() => status.value === 'connecting');
 const isDisconnected = computed(() => status.value === 'disconnected');
 
+/**
+ * Extract the most specific error message from a failed axios response.
+ * Laravel validation errors (422) return `{ message, errors: { field: [msg] } }`,
+ * so we prefer the first field-specific message over the generic `message`.
+ */
+function extractError(error, fallback) {
+    const data = error.response?.data;
+    if (!data) return fallback;
+    if (data.errors) {
+        const firstField = Object.values(data.errors)[0];
+        if (Array.isArray(firstField) && firstField.length) return firstField[0];
+        if (typeof firstField === 'string') return firstField;
+    }
+    return data.error || data.message || fallback;
+}
+
 async function startQrSession() {
     isLoading.value = true;
     errorMessage.value = '';
@@ -88,9 +104,16 @@ async function startQrSession() {
 
     try {
         const response = await axios.post(route('superadmin.whatsapp.start'));
-        if (response.data.status === 'already_connected') {
+        const data = response.data || {};
+
+        if (data.success === false) {
+            errorMessage.value = data.error || 'Gagal memulai sesi.';
+            return;
+        }
+
+        if (data.status === 'already_connected') {
             status.value = 'connected';
-            phoneNumber.value = response.data.phoneNumber;
+            phoneNumber.value = data.phoneNumber || '';
         } else {
             status.value = 'connecting';
             startPolling();
@@ -115,16 +138,22 @@ async function startPairingSession() {
         const response = await axios.post(route('superadmin.whatsapp.start-pairing'), {
             phone_number: pairingPhoneInput.value,
         });
+        const data = response.data || {};
 
-        if (response.data.status === 'already_connected') {
+        if (data.success === false) {
+            errorMessage.value = data.error || 'Gagal memulai sesi pairing.';
+            return;
+        }
+
+        if (data.status === 'already_connected') {
             status.value = 'connected';
-            phoneNumber.value = response.data.phoneNumber;
+            phoneNumber.value = data.phoneNumber || '';
         } else {
             status.value = 'connecting';
             startPolling();
         }
     } catch (error) {
-        errorMessage.value = error.response?.data?.message || 'Gagal memulai sesi pairing.';
+        errorMessage.value = extractError(error, 'Gagal memulai sesi pairing.');
     } finally {
         isLoading.value = false;
     }
@@ -135,12 +164,22 @@ async function stopSession() {
     errorMessage.value = '';
 
     try {
-        await axios.post(route('superadmin.whatsapp.stop'));
+        const response = await axios.post(route('superadmin.whatsapp.stop'));
+        const data = response.data || {};
+
+        if (data.success === false) {
+            errorMessage.value = data.error || 'Gagal memutuskan sesi.';
+            return;
+        }
+
         status.value = 'disconnected';
         phoneNumber.value = '';
         qrCodeImage.value = null;
         pairingCode.value = null;
         connectedAt.value = null;
+        // Reset connection-method state so the next attempt starts clean.
+        connectMethod.value = 'qr';
+        pairingPhoneInput.value = '';
         stopPolling();
     } catch (error) {
         errorMessage.value = error.response?.data?.error || 'Gagal memutuskan sesi.';
@@ -160,7 +199,11 @@ async function pollStatus() {
                 phoneNumber.value = data.phoneNumber || '';
                 qrCodeImage.value = null;
                 pairingCode.value = null;
+                // Switch from 3s connecting-poll to 30s connected-poll so
+                // we keep detecting server-side disconnects (e.g. logout
+                // from phone) instead of stopping polling entirely.
                 stopPolling();
+                startConnectedPolling();
                 const statusRes = await axios.get(route('superadmin.whatsapp.status'));
                 connectedAt.value = statusRes.data.connected_at;
                 return;
@@ -175,6 +218,8 @@ async function pollStatus() {
                 status.value = 'disconnected';
                 phoneNumber.value = '';
                 connectedAt.value = null;
+                // Stop the 30s connected-poll; no longer needed once disconnected.
+                stopPolling();
             }
         }
     } catch (error) {
@@ -186,6 +231,15 @@ function startPolling() {
     stopPolling();
     pollInterval = setInterval(pollStatus, 3000);
     pollStatus();
+}
+
+/**
+ * Poll every 30s while connected to detect server-side disconnects
+ * (e.g. user logs out the linked device from their phone).
+ */
+function startConnectedPolling() {
+    stopPolling();
+    pollInterval = setInterval(pollStatus, 30000);
 }
 
 function stopPolling() {
@@ -204,7 +258,7 @@ function formatDate(dateStr) {
 
 onMounted(() => {
     if (isConnecting.value) startPolling();
-    if (isConnected.value) pollInterval = setInterval(pollStatus, 30000);
+    if (isConnected.value) startConnectedPolling();
 });
 
 onUnmounted(() => {
@@ -255,7 +309,7 @@ onUnmounted(() => {
                                     <!-- Application Name -->
                                     <div class="space-y-2">
                                         <Label for="app_name">Nama Aplikasi</Label>
-                                        <Input id="app_name" type="text" v-model="form.app_name" placeholder="Misal: Find Kosan" />
+                                        <Input id="app_name" type="text" v-model="form.app_name" placeholder="Misal: CariKosanMu" />
                                         <p v-if="form.errors.app_name" class="text-xs text-red-500">{{ form.errors.app_name }}</p>
                                     </div>
 

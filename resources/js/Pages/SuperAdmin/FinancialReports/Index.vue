@@ -128,13 +128,39 @@ const yearOptions = [new Date().getFullYear() - 1, new Date().getFullYear(), new
 
         <Deferred data="summary">
             <template #fallback>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-                    <div v-for="i in 6" :key="i" class="h-32 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Card v-for="i in 5" :key="'skel-'+i" class="animate-pulse">
+                        <CardHeader class="pb-2">
+                            <CardDescription class="flex items-center justify-between">
+                                <div class="h-4 w-36 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="h-4 w-4 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            </CardDescription>
+                            <CardTitle class="text-2xl">
+                                <div class="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded mt-1"></div>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="h-3 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        </CardContent>
+                    </Card>
                 </div>
             </template>
 
-            <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-                <div v-for="i in 6" :key="'load-'+i" class="h-32 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+            <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card v-for="i in 5" :key="'load-'+i" class="animate-pulse">
+                    <CardHeader class="pb-2">
+                        <CardDescription class="flex items-center justify-between">
+                            <div class="h-4 w-36 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-4 w-4 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        </CardDescription>
+                        <CardTitle class="text-2xl">
+                            <div class="h-7 w-28 bg-slate-200 dark:bg-slate-800 rounded mt-1"></div>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="h-3 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </CardContent>
+                </Card>
             </div>
 
             <template v-else>

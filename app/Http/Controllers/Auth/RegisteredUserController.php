@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\User;
+use App\Models\WaSession;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,10 +70,11 @@ class RegisteredUserController extends Controller
         Cache::put('register_otp_' . $whatsappNumber, $userData, now()->addMinutes(5));
 
         $waService = new WhatsappService();
-        $message = "Kode OTP pendaftaran CariKosan Anda adalah: *{$otp}*\nBerlaku selama 5 menit.";
+        $appName = Setting::getSetting('app_name', 'CariKosanMu');
+        $message = "Kode OTP pendaftaran {$appName} Anda adalah: *{$otp}*\nBerlaku selama 5 menit.";
         
-        // Asumsi adminId = 0 (Superadmin Session ID)
-        $response = $waService->sendMessage(0, $whatsappNumber, $message);
+        // Superadmin system session
+        $response = $waService->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $whatsappNumber, $message);
 
         if (empty($response['status']) || !$response['status']) {
             Cache::forget('register_otp_' . $whatsappNumber);

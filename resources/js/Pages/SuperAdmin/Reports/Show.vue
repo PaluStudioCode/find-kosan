@@ -27,8 +27,8 @@ const getWaLink = (phone, role) => {
     if (!phone) return '#';
     let formattedPhone = phone.replace(/^0/, '62');
     let message = role === 'reporter' 
-        ? `Halo, kami dari Admin FindKosan menindaklanjuti laporan Anda terkait kos ${props.report.boarding_house?.name}. Bisa tolong kirimkan foto/bukti kendalanya?`
-        : `Halo Bapak/Ibu Owner, kami dari Admin FindKosan mendapat laporan dari penyewa terkait kos ${props.report.boarding_house?.name}. Mohon klarifikasinya.`;
+        ? `Halo, kami dari Admin CariKosanMu menindaklanjuti laporan Anda terkait kos ${props.report.boarding_house?.name}. Bisa tolong kirimkan foto/bukti kendalanya?`
+        : `Halo Bapak/Ibu Owner, kami dari Admin CariKosanMu mendapat laporan dari penyewa terkait kos ${props.report.boarding_house?.name}. Mohon klarifikasinya.`;
     return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
 };
 

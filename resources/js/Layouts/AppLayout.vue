@@ -81,7 +81,7 @@ const isActive = (routeName) => {
       <div class="h-16 flex items-center px-6 border-b dark:border-slate-800">
         <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400 flex items-center gap-2">
             <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" alt="Logo" class="h-8 w-auto" />
-            <span>{{ $page.props.appSettings?.app_name || 'Kos Online' }}</span>
+            <span>{{ $page.props.appSettings?.app_name || 'CariKosanMu' }}</span>
         </Link>
       </div>
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -110,7 +110,7 @@ const isActive = (routeName) => {
       <div class="h-16 flex items-center justify-between px-6 border-b dark:border-slate-800">
         <Link href="/" class="text-xl font-bold text-primary dark:text-blue-400 flex items-center gap-2">
             <img v-if="$page.props.appSettings?.app_logo" :src="'/storage/' + $page.props.appSettings.app_logo" alt="Logo" class="h-8 w-auto" />
-            <span>{{ $page.props.appSettings?.app_name || 'Kos Online' }}</span>
+            <span>{{ $page.props.appSettings?.app_name || 'CariKosanMu' }}</span>
         </Link>
         <button @click="isMobileMenuOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>

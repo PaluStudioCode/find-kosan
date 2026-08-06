@@ -79,7 +79,7 @@
     </div>
 
     <div class="footer">
-        Dicetak secara otomatis oleh Sistem Find Kosan pada {{ $printDate }}.<br>
+        Dicetak secara otomatis oleh Sistem CariKosanMu pada {{ $printDate }}.<br>
         Dokumen ini sah dan di-*generate* berdasarkan data mutasi *database* terkini.
     </div>
 

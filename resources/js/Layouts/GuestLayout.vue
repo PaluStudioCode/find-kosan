@@ -26,7 +26,7 @@ watch(() => page.props.flash, (flash) => {
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-white shadow-md transition-transform group-hover:scale-105">
                             <Building2 class="h-6 w-6" />
                         </div>
-                        <span class="bg-gradient-to-r from-teal-600 to-slate-800 bg-clip-text text-transparent">CariKosan</span>
+                        <span class="bg-gradient-to-r from-teal-600 to-slate-800 bg-clip-text text-transparent">{{ $page.props.appSettings?.app_name || 'CariKosanMu' }}</span>
                     </Link>
                 </div>
             </div>

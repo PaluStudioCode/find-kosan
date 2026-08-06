@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Setting;
+use App\Models\WaSession;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -166,9 +168,10 @@ class ProfileController extends Controller
         Cache::put('wa_otp_' . $user->id, ['otp' => $otp, 'whatsapp_number' => $whatsappNumber], now()->addMinutes(5));
 
         $waService = new \App\Services\WhatsappService();
-        $message = "Kode OTP verifikasi WhatsApp CariKosan Anda adalah: *{$otp}*\nBerlaku selama 5 menit.";
+        $appName = Setting::getSetting('app_name', 'CariKosanMu');
+        $message = "Kode OTP verifikasi WhatsApp {$appName} Anda adalah: *{$otp}*\nBerlaku selama 5 menit.";
         
-        $response = $waService->sendMessage(0, $whatsappNumber, $message);
+        $response = $waService->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $whatsappNumber, $message);
 
         if (empty($response['status']) || !$response['status']) {
             Cache::forget('wa_otp_' . $user->id);

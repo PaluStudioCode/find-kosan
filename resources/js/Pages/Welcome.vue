@@ -543,7 +543,7 @@ onBeforeUnmount(() => {
                                     <MessageCircle class="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <p class="text-base font-bold text-white">Kos Online Bot</p>
+                                    <p class="text-base font-bold text-white">CariKosanMu Bot</p>
                                     <p class="flex items-center gap-1.5 text-xs text-teal-300"><span class="h-1.5 w-1.5 rounded-full bg-[#25D366]"></span> Otomatis 24/7</p>
                                 </div>
                             </div>
@@ -753,7 +753,7 @@ onBeforeUnmount(() => {
                             <span v-else class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
                                 <Home class="h-4 w-4" />
                             </span>
-                            {{ $page.props.appSettings?.app_name || 'Kos Online' }}
+                            {{ $page.props.appSettings?.app_name || 'CariKosanMu' }}
                         </Link>
                         <p class="mt-4 text-sm leading-relaxed text-slate-500">
                             {{ $page.props.appSettings?.footer_text || 'Platform pencarian dan pengelolaan kos yang mempertemukan kebutuhan penyewa dan pemilik dalam alur yang lebih tertata.' }}
@@ -809,7 +809,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="mt-12 flex flex-col gap-4 border-t border-slate-100 pt-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-                    <p>&copy; {{ new Date().getFullYear() }} {{ $page.props.appSettings?.app_name || 'Kos Online' }}. Seluruh hak dilindungi.</p>
+                    <p>&copy; {{ new Date().getFullYear() }} {{ $page.props.appSettings?.app_name || 'CariKosanMu' }}. Seluruh hak dilindungi.</p>
                     <p>Dibangun untuk ekosistem sewa kos yang lebih tertata.</p>
                 </div>
             </div>

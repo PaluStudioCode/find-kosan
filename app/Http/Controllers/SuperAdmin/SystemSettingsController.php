@@ -15,7 +15,7 @@ class SystemSettingsController extends Controller
     public function index()
     {
         $settings = Setting::pluck('value', 'key')->toArray();
-        $session = WaSession::where('admin_id', 0)->first();
+        $session = WaSession::superAdminSession()->first();
 
         return Inertia::render('SuperAdmin/SystemSettings', [
             'settings' => $settings,

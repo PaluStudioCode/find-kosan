@@ -37,7 +37,14 @@ const formatRupiahCompact = (amount) => {
             <template #fallback>
                 <!-- Metrics Skeleton -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <Card v-for="n in 3" :key="'metric-skel-'+n" class="border-0 shadow-sm bg-slate-100 dark:bg-slate-800/50 animate-pulse h-[120px]">
+                    <Card v-for="n in 3" :key="'metric-skel-'+n" class="border shadow-sm bg-white dark:bg-slate-900">
+                        <CardHeader class="flex flex-row items-center justify-between pb-2 border-0">
+                            <div class="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
+                            <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
+                        </CardHeader>
+                        <CardContent class="border-0">
+                            <div class="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
+                        </CardContent>
                     </Card>
                 </div>
             </template>

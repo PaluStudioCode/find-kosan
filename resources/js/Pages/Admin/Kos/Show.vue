@@ -30,7 +30,7 @@ const copyLink = (kosId) => {
     
     if (navigator.share) {
         navigator.share({
-            title: 'Lihat properti kos ini di FindKosan',
+            title: 'Lihat properti kos ini di CariKosanMu',
             url: absoluteUrl
         }).catch((err) => {
             if (err.name !== 'AbortError') {

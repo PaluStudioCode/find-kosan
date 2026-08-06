@@ -191,12 +191,14 @@ onMounted(() => {
     }
 
     const startedAt = performance.now();
+    const cycleDuration = 3500; // durasi satu siklus expand (ms)
     const animate = (timestamp) => {
         animationFrame = window.requestAnimationFrame(animate);
         if (!isVisible || !autoAnimation.value) return;
 
-        const cycle = (Math.sin((timestamp - startedAt) / 1500) + 1) / 2;
-        radiusKm.value = minimumRadius + cycle * (maximumRadius - minimumRadius);
+        // Linear expand: 0 -> 1 lalu reset ke 0 (kecil -> besar -> ulang)
+        const progress = ((timestamp - startedAt) % cycleDuration) / cycleDuration;
+        radiusKm.value = minimumRadius + progress * (maximumRadius - minimumRadius);
         updateRadiusState();
     };
 

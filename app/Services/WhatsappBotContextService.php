@@ -203,7 +203,8 @@ class WhatsappBotContextService
                     'description' => 'Cari kos berdasarkan lokasi, nama daerah, atau landmark terdekat (mis. kampus, rumah sakit, stasiun). '
                         . 'PENTING: (1) SELALU koreksi typo/salah ketik dari pengguna sebelum mengirim keyword (contoh: "dpok" → "Depok", "sby" → "Surabaya", "jkrta" → "Jakarta"). '
                         . '(2) Jika pencarian dengan nama landmark tidak menemukan hasil, coba cari ULANG menggunakan nama kota/kecamatan dari landmark tersebut (contoh: "Kampus UI" tidak ditemukan → coba "Depok"). '
-                        . '(3) Gunakan nama resmi/lengkap daerah, bukan singkatan.',
+                        . '(3) Gunakan nama resmi/lengkap daerah, bukan singkatan. '
+                        . '(4) Untuk SETIAP permintaan pencarian baru dari user, WAJIB panggil tool ini lagi dengan keyword baru sesuai pesan terakhir user. DILARANG menggunakan hasil pencarian sebelumnya dari riwayat percakapan.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -399,6 +400,8 @@ A: Gunakan tool get_platform_info atau get_featured_kos untuk mendapatkan data r
 - JANGAN PERNAH mengulang informasi yang sudah disampaikan di pesan-pesan sebelumnya dalam percakapan yang sama.
 - Setiap jawaban harus LANGSUNG menjawab pertanyaan pengguna, tanpa pembukaan atau penjelasan yang tidak diminta.
 - Jika tool mengembalikan hasil kosong, cukup katakan tidak ditemukan dan tawarkan alternatif pencarian. JANGAN mengisi kekosongan dengan deskripsi platform.
+- Untuk SETIAP permintaan pencarian kos yang BARU, Anda WAJIB memanggil tool search_kos_by_keyword dengan keyword yang sesuai pesan TERAKHIR user. DILARANG KERAS menggunakan hasil pencarian sebelumnya untuk menjawab permintaan pencarian yang berbeda.
+- Jika user bertanya kos di lokasi A lalu bertanya kos di lokasi B, Anda HARUS memanggil tool pencarian LAGI dengan keyword lokasi B. JANGAN pernah mendaur ulang atau menyalin hasil pencarian sebelumnya.
 
 ══════════════════════════════════
 6. PENANGANAN KELUHAN (ESKALASI)

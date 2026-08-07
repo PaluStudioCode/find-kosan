@@ -61,39 +61,10 @@ class WhatsappBotService
     {
         try {
             $systemPrompt = $this->buildSystemPrompt($sender, $role, $conversation->context_summary);
-            $messages = [['role' => 'system', 'content' => $systemPrompt]];
-            $recent = $conversation->recentMessages((int) config('services.wa_bot.history_size', 20));
-
-            $lastUserIdx = null;
-            foreach ($recent as $i => $msg) {
-                if ($msg->role === 'user') {
-                    $lastUserIdx = $i;
-                }
-            }
-
-            $prevUserTexts = [];
-            foreach ($recent as $i => $msg) {
-                $isBefore = $lastUserIdx !== null && $i < $lastUserIdx;
-
-                if ($isBefore && $msg->role === 'user') {
-                    $prevUserTexts[] = $msg->content;
-                } elseif ($isBefore) {
-                    continue;
-                } else {
-                    if (! empty($prevUserTexts) && $msg->role === 'user') {
-                        $messages[] = [
-                            'role' => 'user',
-                            'content' => '[Pertanyaan sebelumnya: '.implode(' | ', $prevUserTexts).']',
-                        ];
-                        $messages[] = [
-                            'role' => 'assistant',
-                            'content' => 'Sudah saya jawab sebelumnya.',
-                        ];
-                        $prevUserTexts = [];
-                    }
-                    $messages[] = $msg->toOpenAiFormat();
-                }
-            }
+            $messages = [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $userText],
+            ];
 
             $tools = $this->getToolsForRole($role);
 

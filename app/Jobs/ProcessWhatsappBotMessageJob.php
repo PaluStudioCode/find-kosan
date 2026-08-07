@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\WaBotConversation;
+use App\Models\WaBotMessage;
 use App\Models\WaSession;
 use App\Services\WhatsappBotReplyService;
 use App\Services\WhatsappService;
@@ -49,6 +50,13 @@ class ProcessWhatsappBotMessageJob implements ShouldQueue
         }
 
         try {
+            WaBotMessage::create([
+                'conversation_id' => $this->conversation->id,
+                'role' => 'user',
+                'content' => $this->text,
+            ]);
+            $this->conversation->touchActivity();
+
             $reply = app(WhatsappBotReplyService::class)
                 ->generateReply($this->conversation, $this->sender, $this->role, $this->text);
 

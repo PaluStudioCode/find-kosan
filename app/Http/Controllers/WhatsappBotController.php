@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\WhatsappNumber;
+use App\Jobs\ProcessWhatsappBotMessageJob;
 use App\Models\ActivityLog;
 use App\Models\WaBotConversation;
-use App\Models\WaBotMessage;
 use App\Models\WaSession;
-use App\Jobs\ProcessWhatsappBotMessageJob;
 use App\Services\WhatsappBotContextService;
+use App\Services\WhatsappService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -35,9 +35,7 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 class WhatsappBotController extends Controller
 {
-    public function __construct(protected WhatsappBotContextService $contextService)
-    {
-    }
+    public function __construct(protected WhatsappBotContextService $contextService) {}
 
     /**
      * Handle incoming WhatsApp message forwarded by wa-service.
@@ -60,6 +58,7 @@ class WhatsappBotController extends Controller
                 'ip' => $request->ip(),
                 'signature_present' => ! empty($signature),
             ]);
+
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
         }
 
@@ -99,17 +98,18 @@ class WhatsappBotController extends Controller
         }
 
         // 6. Rate-limit per JID (20 pesan/jam)
-        $rateLimitKey = 'wa_bot_rate_' . $fromJid;
+        $rateLimitKey = 'wa_bot_rate_'.$fromJid;
         $maxAttempts = (int) config('services.wa_bot.rate_limit_per_hour', 20);
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, $maxAttempts)) {
             // Hanya balas 1x saat pertama kali hit limit, lalu silent
-            $notifiedKey = 'wa_bot_ratelimited_' . $fromJid;
+            $notifiedKey = 'wa_bot_ratelimited_'.$fromJid;
             if (! Cache::has($notifiedKey)) {
                 Cache::put($notifiedKey, true, now()->addHour());
-                $this->sendReply($fromJid, 'Anda telah mencapai batas ' . $maxAttempts . ' pesan/jam. Silakan coba lagi nanti ya. 😊');
+                $this->sendReply($fromJid, 'Anda telah mencapai batas '.$maxAttempts.' pesan/jam. Silakan coba lagi nanti ya. 😊');
                 Log::info('[WA Bot] Rate limit hit, notified', ['from_jid' => $fromJid]);
             }
+
             return response()->json(['success' => true, 'message' => 'Rate limited']);
         }
         RateLimiter::hit($rateLimitKey, 3600); // 1 jam window
@@ -137,18 +137,11 @@ class WhatsappBotController extends Controller
                 'metadata' => ['from_jid' => $fromJid, 'conversation_id' => $conversation->id],
             ]);
             $this->sendReply($fromJid, '✅ Riwayat percakapan Anda telah direset. Ada yang bisa saya bantu?');
+
             return response()->json(['success' => true, 'message' => 'Reset done']);
         }
 
-        // 10. Simpan pesan user
-        WaBotMessage::create([
-            'conversation_id' => $conversation->id,
-            'role' => 'user',
-            'content' => $validated['text'],
-        ]);
-        $conversation->touchActivity();
-
-        // 11. Log inbound
+        // 10. Log inbound (pesan user disimpan di dalam Job agar urutan terjamin via lock)
         ActivityLog::create([
             'user_id' => $sender?->id,
             'action' => 'bot.inbound',
@@ -162,7 +155,7 @@ class WhatsappBotController extends Controller
             ],
         ]);
 
-        // 12. Pindahkan proses LLM yang berat ke Queue (Background Job)
+        // 11. Dispatch ke Queue (penyimpanan pesan + LLM processing)
         ProcessWhatsappBotMessageJob::dispatch(
             $conversation,
             $sender,
@@ -184,13 +177,13 @@ class WhatsappBotController extends Controller
     /**
      * Kirim balasan WA via WhatsappService (session SuperAdmin admin_id=0).
      *
-     * @param string $jid JID asli pengirim (mis. "628xxx@s.whatsapp.net" atau "173xxx@lid")
+     * @param  string  $jid  JID asli pengirim (mis. "628xxx@s.whatsapp.net" atau "173xxx@lid")
      */
     protected function sendReply(string $jid, string $message): void
     {
         try {
             // useRawJid=true → kirim ke JID apa adanya (penting untuk @lid)
-            app(\App\Services\WhatsappService::class)->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $jid, $message, true);
+            app(WhatsappService::class)->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $jid, $message, true);
         } catch (\Exception $e) {
             Log::error('[WA Bot] Failed to send reply', [
                 'to_jid' => $jid,

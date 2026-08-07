@@ -1,0 +1,63 @@
+*PANDUAN KEMAMPUAN WHATSAPP BOT "CARIKOSANMU"*
+Nomor WhatsApp Bot: 081355322522
+Website: https://carikosanmu.online
+
+---
+
+*CARA KERJA BOT PADA SISTEM*
+Bot ini beroperasi menggunakan Kecerdasan Buatan (AI) terintegrasi yang cerdas dan memahami konteks. Berikut adalah alur kerjanya:
+
+1. *Identifikasi Pengguna:* Saat pesan Anda masuk, sistem akan mencocokkan nomor WhatsApp Anda dengan data di sistem. Ini menentukan apakah Anda dilayani sebagai Tamu, Penyewa, atau Pemilik.
+2. *Pemrosesan Bahasa Natural:* Pesan Anda dibaca oleh Asisten AI. Anda tidak perlu mengetik format kaku (seperti "INFO TAGIHAN"). Anda cukup mengobrol santai seperti "Bulan ini saya belum bayar berapa ya?".
+3. *Pengambilan Data Aman:* Jika AI membutuhkan data spesifik (misalnya cek tagihan atau cari kos), AI akan meminta sistem untuk menarik data tersebut langsung dari database secara aman.
+4. *Penyusunan Balasan:* Setelah mendapat data, AI merangkumnya menjadi balasan bahasa Indonesia yang ramah dan mengirimkannya kembali ke WhatsApp Anda.
+
+---
+
+*PERHATIAN UNTUK TESTING*
+Agar bot dapat merespons sesuai peran (Penyewa atau Pemilik), *nomor WhatsApp pengirim HARUS cocok dengan nomor di database*. Jika tidak cocok, Anda akan dianggap sebagai *Tamu Umum*.
+
+Cara setting untuk testing (login ke website):
+*Pemilik Kos:* admin@example.com
+*Penyewa:* user@example.com
+
+Buka halaman *Profil*, lalu ubah "Nomor WhatsApp" menjadi nomor yang sedang Anda pegang (nomor yang akan Anda gunakan untuk chat dengan bot).
+
+---
+
+*DAFTAR PERTANYAAN YANG BISA DIJAWAB BOT:*
+
+*1. TAMU UMUM (GUEST)*
+(Nomor belum terdaftar di sistem)
+- "Apa itu platform CariKosanMu?"
+- "Bagaimana cara kerja website ini?"
+- "Ada berapa jumlah kos atau kamar yang tersedia saat ini?"
+- "Bisa tolong rekomendasikan 5 kos terbaik/terbaru?"
+- "Tolong carikan saya kos di daerah [Nama Daerah]" (Contoh: Surabaya)
+- "Ada kos yang dekat dengan [Nama Landmark]?" (Contoh: Kampus UI)
+- "Bagaimana cara saya mendaftar?"
+
+*2. PENYEWA (USER)*
+(Mencakup semua kemampuan Tamu Umum, ditambah:)
+- "Kos apa yang sedang saya sewa sekarang?"
+- "Kapan batas akhir sewa saya?"
+- "Siapa nama pemilik kos saya dan berapa nomor WA-nya?"
+- "Berapa tagihan saya yang belum dibayar bulan ini?"
+- "Cek semua tagihan/invoice saya"
+- "Tolong tampilkan riwayat pembayaran saya bulan lalu"
+
+*3. PEMILIK KOS (ADMIN)*
+- "Bagaimana status kos saya, apakah sudah diverifikasi?"
+- "Berapa banyak kamar yang kosong dan terisi di kos saya?"
+- "Cek saldo pendapatan (wallet) saya saat ini"
+- "Berapa batas minimal penarikan saldo?"
+- "Siapa saja penyewa yang saat ini ngekos di properti saya?"
+- "Apakah ada ulasan atau rating terbaru dari penyewa?"
+- "Berapa rata-rata rating kos saya?"
+- "Tolong jelaskan potongan biaya platform dan pajak (PPN/PPh)"
+
+---
+*CATATAN TAMBAHAN:*
+- Bot tidak menerima upload gambar/struk (diarahkan ke web).
+- Bot tidak melayani negosiasi harga atau permintaan refund.
+- Ketik "/reset" untuk mereset riwayat percakapan jika bot mulai kebingungan.

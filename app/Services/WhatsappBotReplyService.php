@@ -56,6 +56,7 @@ class WhatsappBotReplyService
                 }
             }
 
+            $prevUserMessages = [];
             foreach ($recent as $i => $msg) {
                 if ($msg->role === 'system') {
                     continue;
@@ -63,25 +64,38 @@ class WhatsappBotReplyService
 
                 $isBeforeLastUserMsg = $lastUserMsgIndex !== null && $i < $lastUserMsgIndex;
 
-                if ($isBeforeLastUserMsg && $msg->role === 'tool') {
-                    $messages[] = [
-                        'role' => 'tool',
-                        'tool_call_id' => $msg->tool_call_id,
-                        'content' => json_encode([
-                            'summary' => 'Hasil pencarian sebelumnya sudah ditampilkan ke user. Data ini TIDAK BOLEH digunakan lagi. Untuk pertanyaan baru, WAJIB panggil tool lagi dengan keyword baru.',
-                        ], JSON_UNESCAPED_UNICODE),
-                    ];
-                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && ! empty($msg->tool_calls)) {
-                    $messages[] = $msg->toOpenAiMessage();
-                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && empty($msg->tool_calls)) {
-                    $messages[] = [
-                        'role' => 'assistant',
-                        'content' => '[Jawaban sebelumnya sudah dikirim ke user. Fokus pada pertanyaan terbaru.]',
-                    ];
+                if ($isBeforeLastUserMsg && $msg->role === 'user') {
+                    $prevUserMessages[] = $msg->content;
+                } elseif ($isBeforeLastUserMsg) {
+                    continue;
                 } else {
+                    if (! empty($prevUserMessages) && $msg->role === 'user') {
+                        $messages[] = [
+                            'role' => 'user',
+                            'content' => '[Pertanyaan sebelumnya: '.implode(' | ', $prevUserMessages).']',
+                        ];
+                        $messages[] = [
+                            'role' => 'assistant',
+                            'content' => 'Sudah saya jawab sebelumnya.',
+                        ];
+                        $prevUserMessages = [];
+                    }
                     $messages[] = $msg->toOpenAiMessage();
                 }
             }
+
+            Log::info('[WA Bot] Messages built for LLM', [
+                'conversation_id' => $conversation->id,
+                'user_text' => $userText,
+                'recent_count' => count($recent),
+                'last_user_msg_index' => $lastUserMsgIndex,
+                'messages_summary' => collect($messages)->map(fn ($m, $i) => [
+                    'idx' => $i,
+                    'role' => $m['role'],
+                    'has_tool_calls' => ! empty($m['tool_calls']),
+                    'content_preview' => mb_substr($m['content'] ?? '', 0, 80),
+                ])->toArray(),
+            ]);
 
             // 3. Definisi tools sesuai role
             $tools = $this->contextService->getToolsForRole($role);

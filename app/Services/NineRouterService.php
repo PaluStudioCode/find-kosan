@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\WhatsappBotController;
+use App\Models\Setting;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  *
  * Default model: gemini-3.1-pro-high (verified working di Fase 0, support tools:true).
  *
- * @see \App\Http\Controllers\WhatsappBotController
+ * @see WhatsappBotController
  */
 class NineRouterService
 {
@@ -50,13 +53,14 @@ class NineRouterService
         try {
             $response = Http::withToken($this->apiKey)
                 ->timeout(30)
-                ->get($this->baseUrl . '/v1/models');
+                ->get($this->baseUrl.'/v1/models');
 
             if (! $response->successful()) {
                 Log::warning('[NineRouter] listModels failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 return [];
             }
 
@@ -70,7 +74,8 @@ class NineRouterService
 
             return $models;
         } catch (\Exception $e) {
-            Log::error('[NineRouter] listModels exception: ' . $e->getMessage());
+            Log::error('[NineRouter] listModels exception: '.$e->getMessage());
+
             return [];
         }
     }
@@ -92,12 +97,11 @@ class NineRouterService
      * Ambil model Gemini default yang akan dipakai bot.
      * Jika setting nine_router_model di-override, pakai itu.
      * Jika tidak, pakai config default (gemini-3.1-pro-high).
-     *
-     * @return string
      */
     public function getDefaultGeminiModel(): string
     {
-        $override = \App\Models\Setting::getSetting('nine_router_model');
+        $override = Setting::getSetting('nine_router_model');
+
         return $override ?: $this->defaultModel;
     }
 
@@ -105,11 +109,11 @@ class NineRouterService
      * Chat completion sederhana (tanpa function calling).
      * Untuk kasus yang tidak butuh tool, atau command sederhana.
      *
-     * @param array $messages Array of {role, content} (OpenAI format).
-     * @param string|null $model Override model default.
+     * @param  array  $messages  Array of {role, content} (OpenAI format).
+     * @param  string|null  $model  Override model default.
      * @return array{content: string, tokens: int, model: string, finish_reason: string}
      *
-     * @throws \App\Services\NineRouterException Jika request gagal.
+     * @throws NineRouterException Jika request gagal.
      */
     public function chat(array $messages, ?string $model = null): array
     {
@@ -149,9 +153,9 @@ class NineRouterService
      *  3. Tambahkan hasil tool ke messages array
      *  4. Panggil method ini lagi untuk dapat balasan final
      *
-     * @param array $messages Array of messages (OpenAI format, termasuk role:tool untuk hasil tool).
-     * @param array $tools Array of tool definitions (OpenAI tools format).
-     * @param string|null $model Override model default.
+     * @param  array  $messages  Array of messages (OpenAI format, termasuk role:tool untuk hasil tool).
+     * @param  array  $tools  Array of tool definitions (OpenAI tools format).
+     * @param  string|null  $model  Override model default.
      * @return array{
      *     content: string|null,
      *     tool_calls: array|null,
@@ -161,7 +165,7 @@ class NineRouterService
      *     raw_response: array
      * }
      *
-     * @throws \App\Services\NineRouterException
+     * @throws NineRouterException
      */
     public function chatWithTools(array $messages, array $tools, ?string $model = null): array
     {
@@ -200,35 +204,54 @@ class NineRouterService
     /**
      * Kirim HTTP request ke endpoint 9Router.
      *
-     * @throws \App\Services\NineRouterException
+     * @throws NineRouterException
      */
     protected function sendRequest(string $endpoint, array $payload): array
     {
         try {
+            Log::debug('[NineRouter] Request payload', [
+                'endpoint' => $endpoint,
+                'model' => $payload['model'] ?? null,
+                'messages_count' => count($payload['messages'] ?? []),
+                'messages_roles' => collect($payload['messages'] ?? [])->pluck('role')->toArray(),
+                'has_tools' => ! empty($payload['tools']),
+            ]);
+
             $response = Http::withToken($this->apiKey)
                 ->timeout($this->timeout)
-                ->post($this->baseUrl . $endpoint, $payload);
-
+                ->post($this->baseUrl.$endpoint, $payload);
             if (! $response->successful()) {
                 Log::error('[NineRouter] Request failed', [
                     'endpoint' => $endpoint,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 throw new NineRouterException(
-                    '9Router request failed: HTTP ' . $response->status() . ' - ' . $response->body()
+                    '9Router request failed: HTTP '.$response->status().' - '.$response->body()
                 );
             }
 
-            return $response->json() ?? [];
+            $json = $response->json() ?? [];
+
+            Log::debug('[NineRouter] Response received', [
+                'endpoint' => $endpoint,
+                'finish_reason' => $json['choices'][0]['finish_reason'] ?? null,
+                'has_tool_calls' => ! empty($json['choices'][0]['message']['tool_calls'] ?? null),
+                'content_preview' => mb_substr($json['choices'][0]['message']['content'] ?? '', 0, 100),
+                'total_tokens' => $json['usage']['total_tokens'] ?? 0,
+                'cached' => $json['cached'] ?? $json['x_cache'] ?? null,
+            ]);
+
+            return $json;
         } catch (NineRouterException $e) {
             throw $e;
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            Log::error('[NineRouter] Connection timeout: ' . $e->getMessage());
-            throw new NineRouterException('9Router timeout: ' . $e->getMessage());
+        } catch (ConnectionException $e) {
+            Log::error('[NineRouter] Connection timeout: '.$e->getMessage());
+            throw new NineRouterException('9Router timeout: '.$e->getMessage());
         } catch (\Exception $e) {
-            Log::error('[NineRouter] Exception: ' . $e->getMessage());
-            throw new NineRouterException('9Router error: ' . $e->getMessage());
+            Log::error('[NineRouter] Exception: '.$e->getMessage());
+            throw new NineRouterException('9Router error: '.$e->getMessage());
         }
     }
 }

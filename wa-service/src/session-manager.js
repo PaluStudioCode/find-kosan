@@ -324,7 +324,7 @@ class SessionManager {
                         sessionId: adminId,
                     }, {
                         headers: { 'X-WA-Signature': WEBHOOK_API_KEY },
-                        timeout: 15000,
+                        timeout: 60000,
                     }).catch((err) => {
                         console.error(`[Session ${adminId}] Webhook forward failed:`, err.message);
                     });

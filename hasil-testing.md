@@ -1,52 +1,23 @@
-user : Apa itu carikosanmu
+user: tolong carikan kos yang dekat dengan kampus Universitas Alkhairaat.
 
-bot : Halo Kak! CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online. 
+bot: Mohon maaf atas kebingungan pada pesan sebelumnya ya, Kak. 🙏
 
-Melalui platform ini, penyewa bisa mencari kos, melihat detail dan foto, serta melakukan pembayaran secara online dengan mudah. Di sisi lain, pemilik kos juga bisa mendaftarkan propertinya, mengelola penyewa, dan menerima pembayaran dengan praktis.
+**CariKosanMu** adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online. Lewat platform ini, penyewa bisa mencari kos, melihat foto dan fasilitas, serta membayar sewa secara online dengan aman. Sedangkan pemilik kos bisa mendaftarkan dan mengelola kos mereka dengan lebih praktis.
 
-Ada yang bisa saya bantu terkait pencarian kos atau informasi lainnya hari ini? 😊
+Untuk pencarian kos di dekat **Universitas Alkhairaat**, berikut adalah rekomendasi yang tersedia:
 
-user : Bagaimana cara kerja website ini ?
+1. **Kos Lala Palu Utara** 
+   - 📍 Lokasi: Jl. Pacuan Kuda No. 68, Palu Utara, Kota Palu
+   - 💰 Harga mulai: Rp600.000/bulanan
+   - 🛏️ Kamar tersedia: 4 kamar
+   - 🔗 Detail & Booking: [Klik di sini](https://carikosanmu.online/kos/4)
 
-bot : CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online, Kak. 
+Apakah ada lagi informasi yang bisa saya bantu, Kak? 😊
 
-Melalui platform ini, penyewa bisa dengan mudah mencari kos, melihat detail beserta foto, lalu melakukan pembayaran secara online. Sementara untuk pemilik kos, platform ini sangat membantu untuk mendaftarkan properti, mengelola penyewa, hingga menerima pembayaran sewa. 
+user: tolong carikan kos yg dekat dengan Mall Tatura
 
-Ada informasi spesifik atau fitur tertentu yang ingin Kakak ketahui lebih lanjut? 😊
+bot: CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online, Kak. 
 
-user : Tolong carikan kosan dekat kampus untad
+Melalui platform ini, penyewa bisa mencari kos, melihat detail kamar beserta foto, lalu melakukan pembayaran secara online dengan aman. Bagi pemilik kos, platform ini memudahkan untuk mendaftarkan properti, mengelola penyewa, dan menerima pembayaran sewa.
 
-bot : CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online, Kak. 
-
-Untuk cara kerjanya sangat sederhana: 
-1. Kakak bisa mencari kos di website https://carikosanmu.online.
-2. Pilih kos dan kamar yang sesuai dengan kebutuhan.
-3. Lakukan booking dan pembayaran secara online melalui sistem kami.
-4. Pemilik kos akan langsung mendapat notifikasi secara otomatis.
-5. Kakak sudah bisa mulai menempati kamar tersebut. Semua prosesnya transparan dan tercatat di sistem!
-
-Oh ya, terkait pencarian kos di dekat **kampus Untad** yang Kakak tanyakan sebelumnya, mohon maaf sekali saat ini belum ada kos yang tersedia di area tersebut. 
-
-Apakah ada lokasi lain yang ingin Kakak coba cari? 😊
-
-user : Coba carikan yang dekat dengan kampus universitas alkhairat
-
-bot : CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online, Kak. 
-
-Di platform ini, penyewa bisa dengan mudah mencari kos, melihat detail beserta foto kamarnya, dan langsung melakukan pembayaran secara aman secara online. Sedangkan untuk pemilik kos, CariKosanMu membantu untuk mendaftarkan properti, mengelola data penyewa, dan menerima pembayaran sewa secara praktis.
-
-Ada yang bisa saya bantu hari ini? Kakak mau dicarikan kos di daerah atau dekat kampus tertentu? 😊
-
-user : Tolong rekomendasikan kos terbaik
-
-bot : CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online. Penyewa bisa mencari kos, melihat detail dan foto, lalu melakukan pembayaran secara aman secara online. Sedangkan untuk pemilik kos, platform ini memudahkan dalam mendaftarkan properti, mengelola penyewa, dan menerima pembayaran sewa secara praktis.
-
-Ada hal lain yang ingin Kakak tanyakan atau mungkin ingin dicarikan kos di lokasi tertentu? 😊
-
-user : Bagaimana cara saya mendaftar
-
-bot : CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online, Kak. 
-
-Di sini, penyewa bisa mencari kos, melihat detail beserta foto kamarnya, dan langsung melakukan pembayaran secara online. Sementara untuk pemilik kos, platform ini memudahkan mereka untuk mendaftarkan properti, mengelola penyewa, hingga menerima pembayaran sewa secara praktis.
-
-Ada lagi yang bisa saya bantu, Kak? 😊
+Ada lagi yang bisa saya bantu, Kak? Mungkin ada area atau lokasi tertentu yang ingin dicarikan kos? 😊

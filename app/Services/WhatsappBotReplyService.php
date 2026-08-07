@@ -45,16 +45,39 @@ class WhatsappBotReplyService
             // 1. Build system prompt (dengan context_summary dari kompresi riwayat)
             $systemPrompt = $this->contextService->buildSystemPrompt($sender, $role, $conversation->context_summary);
 
-            // 2. Build messages array untuk LLM (system + 10 riwayat terakhir)
+            // 2. Build messages array untuk LLM (system + riwayat terakhir)
             //    Catatan: pesan user baru sudah disimpan sebelumnya, jadi termasuk di recentMessages
+            //    Tool results lama diringkas agar LLM tidak menyalin/mendaur ulang data dari pencarian sebelumnya
             $messages = [['role' => 'system', 'content' => $systemPrompt]];
             $recent = $conversation->recentMessages((int) config('services.wa_bot.history_size', 10));
-            foreach ($recent as $msg) {
-                // Skip pesan system (sudah di-add manual di atas)
+
+            $lastUserMsgIndex = null;
+            foreach ($recent as $i => $msg) {
+                if ($msg->role === 'user') {
+                    $lastUserMsgIndex = $i;
+                }
+            }
+
+            foreach ($recent as $i => $msg) {
                 if ($msg->role === 'system') {
                     continue;
                 }
-                $messages[] = $msg->toOpenAiMessage();
+
+                $isBeforeLastUserMsg = $lastUserMsgIndex !== null && $i < $lastUserMsgIndex;
+
+                if ($isBeforeLastUserMsg && $msg->role === 'tool') {
+                    $messages[] = [
+                        'role' => 'tool',
+                        'tool_call_id' => $msg->tool_call_id,
+                        'content' => json_encode([
+                            'summary' => 'Hasil pencarian sebelumnya sudah ditampilkan ke user. Data ini TIDAK BOLEH digunakan lagi. Untuk pertanyaan baru, WAJIB panggil tool lagi dengan keyword baru.',
+                        ], JSON_UNESCAPED_UNICODE),
+                    ];
+                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && !empty($msg->tool_calls)) {
+                    $messages[] = $msg->toOpenAiMessage();
+                } else {
+                    $messages[] = $msg->toOpenAiMessage();
+                }
             }
 
             // 3. Definisi tools sesuai role

@@ -118,6 +118,7 @@ class NineRouterService
             'messages' => $messages,
             'stream' => false,
             'max_tokens' => $this->maxTokens,
+            'temperature' => 0.3,
         ];
 
         $response = $this->sendRequest('/v1/chat/completions', $payload);
@@ -169,6 +170,7 @@ class NineRouterService
             'messages' => $messages,
             'stream' => false,
             'max_tokens' => $this->maxTokens,
+            'temperature' => 0.3,
         ];
 
         if (! empty($tools)) {

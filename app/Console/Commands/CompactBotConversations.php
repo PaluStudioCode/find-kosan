@@ -3,145 +3,86 @@
 namespace App\Console\Commands;
 
 use App\Models\WaBotConversation;
-use App\Models\WaBotMessage;
 use App\Services\NineRouterService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-/**
- * Class CompactBotConversations
- *
- * Kompresi riwayat percakapan bot WhatsApp yang sudah terlalu panjang
- * (> threshold pesan) agar token yang dikirim ke LLM tetap terkontrol.
- *
- * Cara kerja:
- *  1. Ambil semua conversation dengan total_messages > threshold
- *  2. Ambil N pesan terlama yang akan dikompresi
- *  3. Minta LLM rangkum pesan-pesan tsb dalam beberapa kalimat
- *  4. Simpan ringkasan ke context_summary (append jika sudah ada)
- *  5. Hapus pesan-pesan terlama yang sudah dirangkum
- *  6. Reset counter total_messages
- *
- * Run: php artisan whatsapp:compact-bot-conversations
- * Scheduled: weekly (lihat routes/console.php)
- */
 class CompactBotConversations extends Command
 {
-    /** Threshold: conversation dengan pesan lebih dari ini akan dikompresi. */
-    const COMPACTION_THRESHOLD = 50;
+    protected $signature = 'whatsapp:compact-conversations';
 
-    /** Jumlah pesan terlama yang akan dirangkum per run. */
-    const MESSAGES_TO_COMPACT = 40;
-
-    /** Jumlah pesan yang dipertahankan (tidak dikompresi). */
-    const KEEP_RECENT = 10;
-
-    protected $signature = 'whatsapp:compact-bot-conversations';
-
-    protected $description = 'Kompresi riwayat percakapan bot WhatsApp yang panjang (>50 pesan) menggunakan LLM';
+    protected $description = 'Kompres riwayat percakapan bot WhatsApp yang panjang (>50 pesan)';
 
     public function handle(NineRouterService $nineRouter): int
     {
-        $conversations = WaBotConversation::where('total_messages', '>', self::COMPACTION_THRESHOLD)->get();
+        $conversations = WaBotConversation::where('total_messages', '>', 50)->get();
 
         if ($conversations->isEmpty()) {
-            $this->info('No conversations need compaction.');
+            $this->info('Tidak ada percakapan yang perlu dikompres.');
+
             return self::SUCCESS;
         }
 
-        $this->info("Found {$conversations->count()} conversation(s) to compact.");
-        $compacted = 0;
+        $this->info("Memproses {$conversations->count()} percakapan...");
 
         foreach ($conversations as $conversation) {
             try {
-                $totalMessages = $conversation->messages()->count();
-                if ($totalMessages <= self::KEEP_RECENT) {
-                    continue;
-                }
-
-                // Ambil pesan terlama yang akan dikompresi (skip KEEP_RECENT terbaru)
-                $toCompact = $conversation->messages()
-                    ->orderBy('id')
-                    ->limit($totalMessages - self::KEEP_RECENT)
+                $messages = $conversation->messages()
+                    ->whereIn('role', ['user', 'assistant'])
+                    ->orderBy('id', 'asc')
                     ->get();
 
-                if ($toCompact->isEmpty()) {
+                $keepCount = 10;
+                if ($messages->count() <= $keepCount) {
                     continue;
                 }
 
-                // Build teks untuk dirangkum
-                $conversationText = $toCompact->map(function ($msg) {
-                    $role = $msg->role === 'assistant' ? 'Bot' : ($msg->role === 'user' ? 'User' : 'System');
-                    $content = $msg->content ?? '(tool call)';
-                    return "[{$role}]: {$content}";
-                })->implode("\n");
+                $toCompact = $messages->slice(0, -$keepCount);
+                $compactText = $toCompact->map(fn ($m) => "[{$m->role}]: {$m->content}")->implode("\n");
 
-                // Minta LLM rangkum
-                $summary = $this->summarizeConversation($nineRouter, $conversationText, $conversation->context_summary);
+                $response = $nineRouter->chat([
+                    ['role' => 'system', 'content' => 'Rangkum percakapan berikut dalam maksimal 5 kalimat singkat dalam Bahasa Indonesia. Fokus pada topik utama dan informasi penting. Jangan sertakan data spesifik seperti harga atau nama kos.'],
+                    ['role' => 'user', 'content' => $compactText],
+                ]);
 
-                if ($summary === null) {
-                    $this->warn("Failed to summarize conversation {$conversation->id}, skipping.");
+                $summary = $response['content'] ?? '';
+                if (empty($summary)) {
                     continue;
                 }
 
-                // Simpan ringkasan (append ke context_summary yang ada)
                 $existingSummary = $conversation->context_summary;
-                $conversation->context_summary = $existingSummary
-                    ? $existingSummary . "\n\n---\n\n" . $summary
+                $newSummary = $existingSummary
+                    ? $existingSummary."\n---\n".$summary
                     : $summary;
 
-                // Hapus pesan yang sudah dikompresi
-                $toCompact->each(fn ($msg) => $msg->delete());
+                $compactIds = $toCompact->pluck('id')->toArray();
+                $conversation->messages()->whereIn('id', $compactIds)->delete();
 
-                // Update counter
-                $conversation->total_messages = $conversation->messages()->count();
-                $conversation->save();
+                $toolMsgIds = $conversation->messages()
+                    ->where('role', 'tool')
+                    ->whereNotIn('id', $conversation->messages()
+                        ->where('role', 'assistant')
+                        ->whereNotNull('tool_calls')
+                        ->pluck('id'))
+                    ->pluck('id');
 
-                $compacted++;
-                $this->info("Compacted conversation #{$conversation->id}: removed " . $toCompact->count() . ' messages, summary saved.');
-
-                Log::info('[WA Bot] Conversation compacted', [
-                    'conversation_id' => $conversation->id,
-                    'removed_messages' => $toCompact->count(),
-                    'summary_length' => strlen($summary),
+                $conversation->update([
+                    'context_summary' => $newSummary,
+                    'total_messages' => $conversation->messages()->count(),
                 ]);
+
+                $this->info("Conversation #{$conversation->id}: dikompres ({$toCompact->count()} pesan → ringkasan)");
             } catch (\Exception $e) {
-                $this->error("Failed to compact conversation {$conversation->id}: {$e->getMessage()}");
-                Log::error('[WA Bot] Compaction failed', [
+                Log::error('[WA Bot Compact] Failed', [
                     'conversation_id' => $conversation->id,
                     'error' => $e->getMessage(),
                 ]);
+                $this->error("Conversation #{$conversation->id}: gagal - {$e->getMessage()}");
             }
         }
 
-        $this->info("Done. Compacted {$compacted} conversation(s).");
+        $this->info('Selesai.');
+
         return self::SUCCESS;
-    }
-
-    /**
-     * Minta LLM untuk merangkum percakapan.
-     */
-    protected function summarizeConversation(NineRouterService $nineRouter, string $conversationText, ?string $existingSummary): ?string
-    {
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => 'Anda adalah asisten yang merangkum percakapan WhatsApp bot. Buat ringkasan SINGKAT (maksimal 5 kalimat) berisi poin-poin penting: siapa pengirim, apa yang ditanyakan, dan info kunci yang sudah dibagikan. Ringkasan ini akan dipakai sebagai konteks untuk percakapan selanjutnya.'
-                    . ($existingSummary ? ' Ada ringkasan sebelumnya yang harus Anda gabungkan dengan ringkasan baru.' : ''),
-            ],
-            [
-                'role' => 'user',
-                'content' => ($existingSummary ? "Ringkasan sebelumnya:\n{$existingSummary}\n\n" : '')
-                    . "Percakapan yang perlu dirangkum:\n" . $conversationText,
-            ],
-        ];
-
-        try {
-            $result = $nineRouter->chat($messages);
-            return $result['content'] ?: null;
-        } catch (\Exception $e) {
-            Log::error('[WA Bot] Summary generation failed: ' . $e->getMessage());
-            return null;
-        }
     }
 }

@@ -2,33 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WaBotConversation extends Model
 {
-    use HasFactory;
-
     protected $table = 'wa_bot_conversations';
 
     protected $fillable = [
-        'phone_number',
         'from_jid',
+        'phone_number',
         'user_id',
         'identified_role',
         'context_summary',
-        'last_message_at',
         'is_bot_enabled',
         'total_messages',
+        'last_message_at',
     ];
 
-    protected $casts = [
-        'last_message_at' => 'datetime',
-        'is_bot_enabled' => 'boolean',
-        'total_messages' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_bot_enabled' => 'boolean',
+            'total_messages' => 'integer',
+            'last_message_at' => 'datetime',
+        ];
+    }
 
     public function user(): BelongsTo
     {
@@ -40,23 +40,10 @@ class WaBotConversation extends Model
         return $this->hasMany(WaBotMessage::class, 'conversation_id')->orderBy('id', 'asc');
     }
 
-    /**
-     * Scope: ambil conversation berdasarkan nomor WA (normalized).
-     */
-    public function scopeForPhone($query, string $phone)
-    {
-        return $query->where('phone_number', $phone);
-    }
-
-    /**
-     * Ambil N pesan terakhir untuk dikirim ke LLM.
-     * Include role 'tool' agar assistant message dengan tool_calls
-     * selalu berpasangan dengan hasil tool-nya (mencegah LLM bingung).
-     */
-    public function recentMessages(int $limit = 10)
+    public function recentMessages(int $limit = 20)
     {
         return $this->messages()
-            ->whereIn('role', ['system', 'user', 'assistant', 'tool'])
+            ->whereIn('role', ['user', 'assistant', 'tool'])
             ->orderByDesc('id')
             ->limit($limit)
             ->get()
@@ -64,9 +51,6 @@ class WaBotConversation extends Model
             ->values();
     }
 
-    /**
-     * Tambah counter pesan & update last_message_at.
-     */
     public function touchActivity(): void
     {
         $this->increment('total_messages');

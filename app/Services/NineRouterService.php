@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Controllers\WhatsappBotController;
 use App\Models\Setting;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -12,14 +11,10 @@ use Illuminate\Support\Facades\Log;
  * Class NineRouterService
  *
  * Client untuk 9Router (LLM gateway OpenAI-compatible) yang berjalan di localhost:20128.
- * Digunakan oleh WhatsApp Bot untuk:
+ * Fitur:
  *  - Mengambil daftar model (filter Gemini)
  *  - Chat completion biasa (stream:false)
  *  - Function calling multi-turn (tools + tool_calls loop)
- *
- * Default model: gemini-3.1-pro-high (verified working di Fase 0, support tools:true).
- *
- * @see WhatsappBotController
  */
 class NineRouterService
 {
@@ -147,7 +142,7 @@ class NineRouterService
      *  - 'content': balasan teks final, ATAU
      *  - 'tool_calls': daftar tool yang harus dipanggil
      *
-     * Pemanggil (WhatsappBotController) bertanggung jawab untuk:
+     * Pemanggil bertanggung jawab untuk:
      *  1. Deteksi apakah response berisi tool_calls
      *  2. Eksekusi tool yang diminta
      *  3. Tambahkan hasil tool ke messages array

@@ -49,7 +49,7 @@ return [
     'wa_bot' => [
         'enabled' => env('WA_BOT_ENABLED', true),
         'rate_limit_per_hour' => env('WA_BOT_RATE_LIMIT_PER_HOUR', 20),
-        'history_size' => env('WA_BOT_HISTORY_SIZE', 10),
+        'history_size' => env('WA_BOT_HISTORY_SIZE', 20),
     ],
 
     'google' => [

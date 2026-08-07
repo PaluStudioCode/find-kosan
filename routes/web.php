@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\LandingPageController;
-use App\Http\Controllers\Public\PublicKosController;
 use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\Public\PublicKosController;
 use App\Http\Middleware\GuestOrTenant;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +32,7 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\SuperAdmin\FacilityController;
+use App\Http\Controllers\SuperAdmin\FinancialReportController;
 use App\Http\Controllers\SuperAdmin\MasterDataController;
 use App\Http\Controllers\SuperAdmin\RuleController;
 use App\Http\Controllers\SuperAdmin\SystemSettingsController;
@@ -81,11 +82,10 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
             Route::resource('reports', App\Http\Controllers\SuperAdmin\ReportController::class)->only(['index', 'show', 'update', 'destroy']);
-            
-            Route::get('/financial-reports', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'index'])->name('financial-reports.index');
-            Route::get('/financial-reports/export-excel', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'exportExcel'])->name('financial-reports.export-excel');
-            Route::get('/financial-reports/export-pdf', [App\Http\Controllers\SuperAdmin\FinancialReportController::class, 'exportPdf'])->name('financial-reports.export-pdf');
 
+            Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('financial-reports.index');
+            Route::get('/financial-reports/export-excel', [FinancialReportController::class, 'exportExcel'])->name('financial-reports.export-excel');
+            Route::get('/financial-reports/export-pdf', [FinancialReportController::class, 'exportPdf'])->name('financial-reports.export-pdf');
 
             Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
             Route::resource('facilities', FacilityController::class)->except(['create', 'edit', 'show', 'index']);
@@ -182,7 +182,6 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:user'])->grou
 });
 Route::post('/duitku/callback', [PaymentGatewayController::class, 'callback'])->name('duitku.callback');
 
-// WhatsApp Bot Webhook (diterima dari wa-service saat ada pesan masuk ke nomor SuperAdmin)
 Route::post('/wa/webhook/incoming', [WhatsappBotController::class, 'handleIncoming'])->name('wa.webhook.incoming');
 
 // Google Login

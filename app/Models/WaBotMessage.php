@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WaBotMessage extends Model
 {
-    use HasFactory;
-
     protected $table = 'wa_bot_messages';
 
     protected $fillable = [
@@ -23,21 +20,20 @@ class WaBotMessage extends Model
         'model_used',
     ];
 
-    protected $casts = [
-        'tool_calls' => 'array',
-        'tokens_used' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'tool_calls' => 'array',
+            'tokens_used' => 'integer',
+        ];
+    }
 
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(WaBotConversation::class, 'conversation_id');
     }
 
-    /**
-     * Konversi ke format message OpenAI-compatible.
-     * Digunakan saat membangun array messages untuk request LLM.
-     */
-    public function toOpenAiMessage(): array
+    public function toOpenAiFormat(): array
     {
         $msg = ['role' => $this->role];
 

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\WaBotConversation;
 use App\Models\WaBotMessage;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -27,16 +27,14 @@ class WhatsappBotReplyService
     public function __construct(
         protected NineRouterService $nineRouter,
         protected WhatsappBotContextService $contextService,
-    ) {
-    }
+    ) {}
 
     /**
      * Proses pesan user & dapatkan balasan dari LLM.
      *
-     * @param WaBotConversation $conversation
-     * @param User|null $sender User pengirim (null jika public)
-     * @param string $role 'user' | 'admin' | 'public'
-     * @param string $userText Pesan user yang baru saja disimpan
+     * @param  User|null  $sender  User pengirim (null jika public)
+     * @param  string  $role  'user' | 'admin' | 'public'
+     * @param  string  $userText  Pesan user yang baru saja disimpan
      * @return string Balasan bot untuk dikirim via WA
      */
     public function generateReply(WaBotConversation $conversation, ?User $sender, string $role, string $userText): string
@@ -73,8 +71,13 @@ class WhatsappBotReplyService
                             'summary' => 'Hasil pencarian sebelumnya sudah ditampilkan ke user. Data ini TIDAK BOLEH digunakan lagi. Untuk pertanyaan baru, WAJIB panggil tool lagi dengan keyword baru.',
                         ], JSON_UNESCAPED_UNICODE),
                     ];
-                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && !empty($msg->tool_calls)) {
+                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && ! empty($msg->tool_calls)) {
                     $messages[] = $msg->toOpenAiMessage();
+                } elseif ($isBeforeLastUserMsg && $msg->role === 'assistant' && empty($msg->tool_calls)) {
+                    $messages[] = [
+                        'role' => 'assistant',
+                        'content' => '[Jawaban sebelumnya sudah dikirim ke user. Fokus pada pertanyaan terbaru.]',
+                    ];
                 } else {
                     $messages[] = $msg->toOpenAiMessage();
                 }
@@ -180,18 +183,21 @@ class WhatsappBotReplyService
             Log::warning('[WA Bot] Max tool iterations reached', [
                 'conversation_id' => $conversation->id,
             ]);
+
             return 'Maaf, permintaan Anda terlalu kompleks untuk diproses. Mohon sederhanakan pertanyaan Anda.';
         } catch (NineRouterException $e) {
             Log::error('[WA Bot] LLM error', [
                 'conversation_id' => $conversation->id,
                 'error' => $e->getMessage(),
             ]);
+
             return 'Maaf, bot sedang mengalami gangguan. Silakan coba lagi sebentar ya. 😊';
         } catch (\Exception $e) {
             Log::error('[WA Bot] Reply generation failed', [
                 'conversation_id' => $conversation->id,
                 'error' => $e->getMessage(),
             ]);
+
             return 'Maaf, terjadi kesalahan. Silakan coba lagi nanti.';
         }
     }

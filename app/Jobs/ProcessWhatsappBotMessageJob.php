@@ -6,22 +6,23 @@ use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\WaBotConversation;
 use App\Models\WaSession;
+use App\Services\WhatsappBotReplyService;
+use App\Services\WhatsappService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ProcessWhatsappBotMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Waktu maksimal job boleh berjalan (detik).
-     * Set agak panjang (120 detik) untuk memberi waktu LLM memproses.
-     */
     public $timeout = 120;
+
+    public $tries = 3;
 
     /**
      * Create a new job instance.
@@ -32,23 +33,27 @@ class ProcessWhatsappBotMessageJob implements ShouldQueue
         public string $role,
         public string $text,
         public string $fromJid
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
+        $lock = Cache::lock('wa_bot_processing_'.$this->conversation->id, 110);
+
+        if (! $lock->get()) {
+            $this->release(5);
+
+            return;
+        }
+
         try {
-            // Generate reply via LLM (function calling)
-            $reply = app(\App\Services\WhatsappBotReplyService::class)
+            $reply = app(WhatsappBotReplyService::class)
                 ->generateReply($this->conversation, $this->sender, $this->role, $this->text);
 
-            // Kirim balasan WA (ke JID asli)
             $this->sendReply($this->fromJid, $reply);
 
-            // Log outbound
             ActivityLog::create([
                 'user_id' => $this->sender?->id,
                 'action' => 'bot.reply_sent',
@@ -66,6 +71,8 @@ class ProcessWhatsappBotMessageJob implements ShouldQueue
                 'conversation_id' => $this->conversation->id,
                 'error' => $e->getMessage(),
             ]);
+        } finally {
+            $lock->release();
         }
     }
 
@@ -75,7 +82,7 @@ class ProcessWhatsappBotMessageJob implements ShouldQueue
     protected function sendReply(string $jid, string $message): void
     {
         try {
-            app(\App\Services\WhatsappService::class)->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $jid, $message, true);
+            app(WhatsappService::class)->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $jid, $message, true);
         } catch (\Exception $e) {
             Log::error('[WA Bot Queue] Failed to send reply via WA Service', [
                 'to_jid' => $jid,

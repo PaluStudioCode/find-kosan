@@ -1,61 +1,35 @@
-user:tolong carikan kos yg dekat dengan Mall Tatura
+user: Apa itu carikosanmu
 
-bot: Berikut adalah beberapa kos yang berada di sekitar Mall Tatura, Kota Palu:
+bot: Halo Kak! CariKosanMu adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online. 
 
-1. **Kos Bagiya Palu Utara**
-📍 Jl. Baiduri No. 8, Palu Utara, Kota Palu
-💰 Harga mulai: Rp700.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/25
+Melalui platform ini, penyewa bisa mencari kos, melihat detail beserta foto, dan melakukan pembayaran dengan mudah. Sementara itu, pemilik kos bisa mendaftarkan propertinya, mengelola penyewa, serta menerima pembayaran sewa secara praktis.
 
-2. **Kos Wisnu Mantikulore**
-📍 Jl. Raya Ujungberung No. 57, Mantikulore, Kota Palu
-💰 Harga mulai: Rp700.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/28
+Ada yang bisa saya bantu terkait pencarian kos atau informasi lainnya, Kak? 😊
 
-3. **Kos Salimah Palu Utara**
-📍 Jl. Bakhita No. 18, Palu Utara, Kota Palu
-💰 Harga mulai: Rp600.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/20
+user : Carikan kosan dekat kampus untad
 
-4. **Kos Kamaria Palu Selatan**
-📍 Jl. Soekarno Hatta No. 43, Palu Selatan, Kota Palu
-💰 Harga mulai: Rp600.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/5
+bot : *CariKosanMu* adalah platform digital yang memudahkan pencarian dan pengelolaan kos-kosan secara online. 
 
-Silakan klik link pada masing-masing kos untuk melihat detail fasilitas, foto, dan melakukan pemesanan ya. Ada lagi yang bisa saya bantu, Kak? 😊
+Di platform ini, *penyewa* bisa mencari kos, melihat detail dan foto kamar, lalu melakukan pembayaran secara online. Sementara untuk *pemilik kos*, platform ini memudahkan untuk mendaftarkan properti, mengelola data penyewa, dan menerima pembayaran sewa dengan praktis.
 
-user: tolong carikan kos yg dekat dengan Universitas Alkhairaat
+Ada lagi yang bisa saya bantu, Kak? 😊
 
-bot : Tentu Kak! Berikut adalah beberapa kos yang berada di sekitar Mall Tatura, Kota Palu:
+user : /reset
 
-1. **Kos Bagiya Palu Utara**
-📍 Jl. Baiduri No. 8, Palu Utara, Kota Palu
-💰 Harga mulai: Rp700.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/25
+user : Carikan kosan dekat kampus untad
 
-2. **Kos Wisnu Mantikulore**
-📍 Jl. Raya Ujungberung No. 57, Mantikulore, Kota Palu
-💰 Harga mulai: Rp700.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/28
+bot : Tentu Kak, ini beberapa pilihan kos di sekitar area Untad (Palu) yang tersedia saat ini:
 
-3. **Kos Salimah Palu Utara**
-📍 Jl. Bakhita No. 18, Palu Utara, Kota Palu
-💰 Harga mulai: Rp600.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/20
+1. **Kos Karman Palu Timur**
+- Lokasi: Palu Timur, Kota Palu
+- Harga: Mulai dari Rp800.000/bulan
+- Kamar tersedia: 4 kamar
+- Detail & Booking: https://carikosanmu.online/kos/9
 
-4. **Kos Kamaria Palu Selatan**
-📍 Jl. Soekarno Hatta No. 43, Palu Selatan, Kota Palu
-💰 Harga mulai: Rp600.000/bulan
-🛏️ Tersedia: 4 kamar
-🔗 Detail & Booking: https://carikosanmu.online/kos/5
+2. **Kos Mutia Tatanga**
+- Lokasi: Tatanga, Kota Palu
+- Harga: Mulai dari Rp500.000/bulan
+- Kamar tersedia: 4 kamar
+- Detail & Booking: https://carikosanmu.online/kos/6
 
-Silakan klik link pada masing-masing kos untuk melihat foto, fasilitas lengkap, dan melakukan pemesanan. Ada lagi yang ingin dicari, Kak? 😊
-
-user : tolong carikan kos yg dekat dengan Universitas Alkhairaat
+Silakan klik link detailnya untuk melihat foto dan fasilitas lengkapnya ya. Ada lagi yang bisa saya bantu, Kak? 😊

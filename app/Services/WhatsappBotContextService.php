@@ -4,13 +4,16 @@ namespace App\Services;
 
 use App\Helpers\WhatsappNumber;
 use App\Models\BoardingHouse;
+use App\Models\BoardingHouseReview;
 use App\Models\Invoice;
+use App\Models\Room;
 use App\Models\Setting;
 use App\Models\Tenancy;
 use App\Models\User;
 use App\Models\WaBotConversation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Class WhatsappBotContextService
@@ -35,11 +38,11 @@ class WhatsappBotContextService
      *
      * Preferensi role (untuk @s.whatsapp.net): user (penyewa) > admin (pemilik) > super_admin.
      *
-     * @param string $fromJid JID asli lengkap (mis. "628xxx@s.whatsapp.net" atau "173xxx@lid")
+     * @param  string  $fromJid  JID asli lengkap (mis. "628xxx@s.whatsapp.net" atau "173xxx@lid")
      * @return array{user: ?User, role: string, phone: ?string}
-     *   - user: User model atau null (jika public/@lid)
-     *   - role: 'user' | 'admin' | 'super_admin' | 'public'
-     *   - phone: nomor telepon normalized (atau null jika @lid)
+     *                                                          - user: User model atau null (jika public/@lid)
+     *                                                          - role: 'user' | 'admin' | 'super_admin' | 'public'
+     *                                                          - phone: nomor telepon normalized (atau null jika @lid)
      */
     public function identifySender(string $fromJid): array
     {
@@ -60,7 +63,7 @@ class WhatsappBotContextService
         // 2. Format 08xxx (standar lama, konversi dari 62xxx)
         $candidates = [$phone];
         if (str_starts_with($phone, '62')) {
-            $candidates[] = '0' . substr($phone, 2);
+            $candidates[] = '0'.substr($phone, 2);
         }
 
         $user = User::whereIn('whatsapp_number', $candidates)
@@ -99,8 +102,7 @@ class WhatsappBotContextService
      * Definisi tools yang tersedia untuk LLM (OpenAI tools format).
      * Tools yang tersedia dibatasi per role agar LLM tidak memanggil tool di luar konteks.
      *
-     * @param string $role 'user' | 'admin' | 'public'
-     * @return array
+     * @param  string  $role  'user' | 'admin' | 'public'
      */
     public function getToolsForRole(string $role): array
     {
@@ -131,7 +133,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_my_tenancy',
                     'description' => 'Ambil info sewa aktif penyewa: kos, kamar, nama pemilik, nomor WhatsApp pemilik (berguna untuk meneruskan keluhan/laporan), tanggal mulai/selesai, jumlah penghuni.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -140,7 +142,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_payment_history',
                     'description' => 'Ambil riwayat pembayaran penyewa (invoice yang sudah lunas).',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
         }
@@ -152,7 +154,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_my_kos_list',
                     'description' => 'Ambil daftar kos milik pemilik (maksimal 5 teratas) dengan status verifikasi, jumlah kamar, kamar terisi/kosong.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -161,7 +163,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_my_wallet',
                     'description' => 'Ambil info saldo wallet pemilik: available_balance, pending_withdrawal_balance, dan jumlah withdrawal request pending.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -170,7 +172,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_my_tenants',
                     'description' => 'Ambil daftar penyewa aktif di semua kos milik pemilik: nama, kamar, kos, tanggal mulai sewa.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -179,7 +181,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_my_reviews',
                     'description' => 'Ambil ringkasan ulasan kos milik pemilik: rating rata-rata, jumlah review, review terbaru.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -188,7 +190,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_platform_fees',
                     'description' => 'Ambil info PPN (pajak penyewa) dan PPh (pajak pemilik) dari pengaturan platform.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
         }
@@ -201,10 +203,10 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'search_kos_by_keyword',
                     'description' => 'Cari kos berdasarkan lokasi, nama daerah, atau landmark terdekat (mis. kampus, rumah sakit, stasiun). '
-                        . 'PENTING: (1) SELALU koreksi typo/salah ketik dari pengguna sebelum mengirim keyword (contoh: "dpok" → "Depok", "sby" → "Surabaya", "jkrta" → "Jakarta"). '
-                        . '(2) Jika pencarian dengan nama landmark tidak menemukan hasil, coba cari ULANG menggunakan nama kota/kecamatan dari landmark tersebut (contoh: "Kampus UI" tidak ditemukan → coba "Depok"). '
-                        . '(3) Gunakan nama resmi/lengkap daerah, bukan singkatan. '
-                        . '(4) Untuk SETIAP permintaan pencarian baru dari user, WAJIB panggil tool ini lagi dengan keyword baru sesuai pesan terakhir user. DILARANG menggunakan hasil pencarian sebelumnya dari riwayat percakapan.',
+                        .'PENTING: (1) SELALU koreksi typo/salah ketik dari pengguna sebelum mengirim keyword (contoh: "dpok" → "Depok", "sby" → "Surabaya", "jkrta" → "Jakarta"). '
+                        .'(2) Jika pencarian dengan nama landmark tidak menemukan hasil, coba cari ULANG menggunakan nama kota/kecamatan dari landmark tersebut (contoh: "Kampus UI" tidak ditemukan → coba "Depok"). '
+                        .'(3) Gunakan nama resmi/lengkap daerah, bukan singkatan. '
+                        .'(4) Untuk SETIAP permintaan pencarian baru dari user, WAJIB panggil tool ini lagi dengan keyword baru sesuai pesan terakhir user. DILARANG menggunakan hasil pencarian sebelumnya dari riwayat percakapan.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -227,7 +229,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_featured_kos',
                     'description' => 'Ambil daftar kos rekomendasi (5 kos dipublikasikan terbaru) dengan nama, kota, harga mulai, jumlah kamar tersedia, dan link detail.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
 
@@ -236,7 +238,7 @@ class WhatsappBotContextService
                 'function' => [
                     'name' => 'get_platform_info',
                     'description' => 'Ambil info platform CariKosanMu: total kos terdaftar, total kamar tersedia, kontak, cara kerja platform, dan cara mendaftar.',
-                    'parameters' => ['type' => 'object', 'properties' => new \stdClass()],
+                    'parameters' => ['type' => 'object', 'properties' => new \stdClass],
                 ],
             ];
         }
@@ -247,9 +249,9 @@ class WhatsappBotContextService
     /**
      * Eksekusi tool call dari LLM.
      *
-     * @param string $toolName Nama function yang dipanggil LLM
-     * @param array $arguments Arguments dari LLM (decoded JSON)
-     * @param ?User $sender User pengirim (null jika public)
+     * @param  string  $toolName  Nama function yang dipanggil LLM
+     * @param  array  $arguments  Arguments dari LLM (decoded JSON)
+     * @param  ?User  $sender  User pengirim (null jika public)
      * @return string Hasil eksekusi tool (JSON string untuk dikirim balik ke LLM)
      */
     public function executeTool(string $toolName, array $arguments, ?User $sender): string
@@ -276,25 +278,26 @@ class WhatsappBotContextService
                 'tool' => $toolName,
                 'error' => $e->getMessage(),
             ]);
-            return json_encode(['error' => 'Tool execution failed: ' . $e->getMessage()]);
+
+            return json_encode(['error' => 'Tool execution failed: '.$e->getMessage()]);
         }
     }
 
     /**
      * Build system prompt untuk LLM.
      *
-     * @param ?User $sender User pengirim (null jika public)
-     * @param string $role 'user' | 'admin' | 'public'
-     * @param ?string $contextSummary Ringkasan percakapan sebelumnya (dari kompresi)
+     * @param  ?User  $sender  User pengirim (null jika public)
+     * @param  string  $role  'user' | 'admin' | 'public'
+     * @param  ?string  $contextSummary  Ringkasan percakapan sebelumnya (dari kompresi)
      */
     public function buildSystemPrompt(?User $sender, string $role, ?string $contextSummary = null): string
     {
         $senderName = $sender?->name;
         $identifiedText = match ($role) {
-            'user' => "Penyewa terdaftar" . ($senderName ? " bernama *{$senderName}*" : ''),
-            'admin' => "Pemilik Kos terdaftar" . ($senderName ? " bernama *{$senderName}*" : ''),
-            'super_admin' => "Super Admin platform",
-            default => "Tamu (belum terdaftar di platform)",
+            'user' => 'Penyewa terdaftar'.($senderName ? " bernama *{$senderName}*" : ''),
+            'admin' => 'Pemilik Kos terdaftar'.($senderName ? " bernama *{$senderName}*" : ''),
+            'super_admin' => 'Super Admin platform',
+            default => 'Tamu (belum terdaftar di platform)',
         };
 
         $appUrl = config('app.url');
@@ -404,6 +407,8 @@ A: Gunakan tool get_platform_info atau get_featured_kos untuk mendapatkan data r
 - Jika user bertanya kos di lokasi A lalu bertanya kos di lokasi B, Anda HARUS memanggil tool pencarian LAGI dengan keyword lokasi B. JANGAN pernah mendaur ulang atau menyalin hasil pencarian sebelumnya.
 - Riwayat percakapan di bawah hanya untuk KONTEKS percakapan (mengetahui topik sebelumnya). Anda DILARANG KERAS menyalin, mendaur ulang, atau menggunakan data/hasil tool dari riwayat untuk menjawab pertanyaan baru. Untuk SETIAP pertanyaan yang membutuhkan data, Anda HARUS memanggil tool yang sesuai dengan keyword/parameter BARU.
 - Jika di riwayat ada hasil tool yang sudah diringkas dengan pesan "sudah ditampilkan ke user", itu artinya data tersebut SUDAH KADALUARSA dan TIDAK BOLEH digunakan lagi.
+- Pesan assistant yang berisi "[Jawaban sebelumnya sudah dikirim ke user. Fokus pada pertanyaan terbaru.]" berarti topik tersebut SUDAH SELESAI. JANGAN ulangi jawaban itu. Anda WAJIB menjawab berdasarkan PESAN USER PALING TERAKHIR saja.
+- ATURAN UTAMA: Selalu baca pesan user TERAKHIR (paling bawah) dan jawab HANYA pertanyaan itu. ABAIKAN semua jawaban assistant sebelumnya yang sudah diringkas.
 
 ══════════════════════════════════
 6. PENANGANAN KELUHAN (ESKALASI)
@@ -510,7 +515,7 @@ ROLE,
                 'amount' => (float) $inv->amount,
                 'due_date' => $inv->due_date?->format('Y-m-d'),
                 'status' => $inv->status,
-                'period' => ($inv->period_start?->format('Y-m-d')) . ' s/d ' . ($inv->period_end?->format('Y-m-d')),
+                'period' => ($inv->period_start?->format('Y-m-d')).' s/d '.($inv->period_end?->format('Y-m-d')),
                 'kos_name' => $inv->tenancy?->boardingHouse?->name,
                 'room_number' => $inv->tenancy?->room?->room_number,
             ]),
@@ -590,7 +595,7 @@ ROLE,
                 'id' => $inv->id,
                 'amount' => (float) $inv->amount,
                 'paid_date' => $inv->updated_at?->format('Y-m-d'),
-                'period' => ($inv->period_start?->format('Y-m-d')) . ' s/d ' . ($inv->period_end?->format('Y-m-d')),
+                'period' => ($inv->period_start?->format('Y-m-d')).' s/d '.($inv->period_end?->format('Y-m-d')),
                 'kos_name' => $inv->tenancy?->boardingHouse?->name,
                 'room_number' => $inv->tenancy?->room?->room_number,
             ]),
@@ -718,7 +723,7 @@ ROLE,
             ];
         }
 
-        $reviews = \App\Models\BoardingHouseReview::whereIn('boarding_house_id', $kosIds)
+        $reviews = BoardingHouseReview::whereIn('boarding_house_id', $kosIds)
             ->with(['user', 'boardingHouse'])
             ->orderByDesc('created_at')
             ->limit(10)
@@ -740,7 +745,7 @@ ROLE,
             'average_rating' => $avgRating,
             'recent_reviews' => $reviews->take(3)->map(fn ($r) => [
                 'rating' => $r->rating,
-                'comment' => \Illuminate\Support\Str::limit($r->comment, 150),
+                'comment' => Str::limit($r->comment, 150),
                 'tenant_name' => $r->user?->name,
                 'kos_name' => $r->boardingHouse?->name,
                 'date' => $r->created_at?->format('Y-m-d'),
@@ -792,7 +797,7 @@ ROLE,
                 'starting_price' => $k->rooms->isNotEmpty() ? (float) $k->rooms->first()->price : null,
                 'price_period' => $k->rooms->first()?->price_period,
                 'available_rooms' => $k->rooms->count(),
-                'detail_url' => $appUrl . '/kos/' . $k->id,
+                'detail_url' => $appUrl.'/kos/'.$k->id,
             ]),
             'message_to_ai' => 'Tampilkan daftar kos rekomendasi dengan format rapi berisi nama, lokasi, harga, dan link detail. Gunakan format Rupiah untuk harga.',
         ];
@@ -802,19 +807,19 @@ ROLE,
     protected function toolGetPlatformInfo(): array
     {
         $publishedKos = BoardingHouse::where('status', 'dipublikasikan')->count();
-        $availableRooms = \App\Models\Room::where('status', 'tersedia')->count();
+        $availableRooms = Room::where('status', 'tersedia')->count();
         $appName = Setting::getSetting('app_name', 'CariKosanMu');
         $appUrl = config('app.url');
 
         return [
             'app_name' => $appName,
             'app_url' => $appUrl,
-            'about_us' => \Illuminate\Support\Str::limit(Setting::getSetting('about_us', ''), 500),
+            'about_us' => Str::limit(Setting::getSetting('about_us', ''), 500),
             'contact_email' => Setting::getSetting('contact_email'),
             'contact_phone' => Setting::getSetting('contact_phone'),
             'total_published_kos' => $publishedKos,
             'total_available_rooms' => $availableRooms,
-            'register_url' => $appUrl . '/register',
+            'register_url' => $appUrl.'/register',
             'how_it_works' => "Platform {$appName} memudahkan pencarian dan pengelolaan kos-kosan secara online. Penyewa mencari kos → pilih kamar → bayar online → mulai ngekos. Pemilik mendaftarkan kos → diverifikasi admin → dipublikasikan → terima pembayaran otomatis.",
             'how_to_register' => "Kunjungi {$appUrl}/register, isi data diri, verifikasi email, dan akun siap digunakan. Bisa juga login menggunakan Google.",
             'message_to_ai' => 'Gunakan data ini untuk menjawab pertanyaan tentang platform. Sebutkan jumlah kos dan kamar yang tersedia sebagai bukti bahwa platform aktif. JANGAN mengarang informasi tambahan di luar data ini.',
@@ -833,16 +838,16 @@ ROLE,
         }
 
         $appUrl = rtrim(config('app.url'), '/');
-        $term = '%' . strtolower($keyword) . '%';
+        $term = '%'.strtolower($keyword).'%';
 
         $kosList = BoardingHouse::where('status', 'dipublikasikan')
             ->where(function ($q) use ($term) {
                 $q->whereRaw('LOWER(name) LIKE ?', [$term])
-                  ->orWhereRaw('LOWER(description) LIKE ?', [$term])
-                  ->orWhereRaw('LOWER(address) LIKE ?', [$term])
-                  ->orWhereRaw('LOWER(city) LIKE ?', [$term])
-                  ->orWhereRaw('LOWER(district) LIKE ?', [$term])
-                  ->orWhereRaw('LOWER(subdistrict) LIKE ?', [$term]);
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(address) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(city) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(district) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(subdistrict) LIKE ?', [$term]);
             })
             ->with(['rooms' => fn ($q) => $q->where('status', 'tersedia')->orderBy('price')])
             ->orderByDesc('updated_at')
@@ -864,11 +869,11 @@ ROLE,
                 'name' => $k->name,
                 'city' => $k->city,
                 'district' => $k->district,
-                'address' => \Illuminate\Support\Str::limit($k->address, 120),
+                'address' => Str::limit($k->address, 120),
                 'starting_price' => $k->rooms->isNotEmpty() ? (float) $k->rooms->first()->price : null,
                 'price_period' => $k->rooms->first()?->price_period,
                 'available_rooms' => $k->rooms->count(),
-                'detail_url' => $appUrl . '/kos/' . $k->id,
+                'detail_url' => $appUrl.'/kos/'.$k->id,
             ]),
             'message_to_ai' => 'Tampilkan hasil pencarian kos dengan format rapi: nama, lokasi, harga mulai dari, jumlah kamar tersedia, dan link detail. Gunakan format Rupiah untuk harga.',
         ];

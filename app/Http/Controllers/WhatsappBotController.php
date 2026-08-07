@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\WaBotConversation;
 use App\Models\WaBotMessage;
 use App\Models\WaSession;
+use App\Jobs\ProcessWhatsappBotMessageJob;
 use App\Services\WhatsappBotContextService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -161,35 +162,21 @@ class WhatsappBotController extends Controller
             ],
         ]);
 
-        // 12. Generate reply via LLM (function calling) & kirim via WA
-        $reply = app(\App\Services\WhatsappBotReplyService::class)
-            ->generateReply($conversation, $sender, $role, $validated['text']);
-
-        $this->sendReply($fromJid, $reply);
-
-        // 13. Log outbound
-        ActivityLog::create([
-            'user_id' => $sender?->id,
-            'action' => 'bot.reply_sent',
-            'subject_type' => WaBotConversation::class,
-            'subject_id' => $conversation->id,
-            'metadata' => [
-                'to_jid' => $fromJid,
-                'role' => $role,
-                'reply_length' => strlen($reply),
-                'reply_preview' => substr($reply, 0, 100),
-            ],
-        ]);
+        // 12. Pindahkan proses LLM yang berat ke Queue (Background Job)
+        ProcessWhatsappBotMessageJob::dispatch(
+            $conversation,
+            $sender,
+            $role,
+            $validated['text'],
+            $fromJid
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Message processed & replied',
+            'message' => 'Message accepted and queued for processing',
             'data' => [
                 'from_jid' => $fromJid,
-                'role' => $role,
                 'conversation_id' => $conversation->id,
-                'sender_name' => $sender?->name,
-                'reply' => $reply,
             ],
         ]);
     }

@@ -200,13 +200,16 @@ class WhatsappBotContextService
                 'type' => 'function',
                 'function' => [
                     'name' => 'search_kos_by_keyword',
-                    'description' => 'Cari kos berdasarkan lokasi atau landmark terdekat (mis. rumah sakit, kampus, stasiun, pasar). Cocokkan keyword terhadap deskripsi, alamat, nama, kota, kecamatan, atau kelurahan kos. Return daftar kos dengan link detail.',
+                    'description' => 'Cari kos berdasarkan lokasi, nama daerah, atau landmark terdekat (mis. kampus, rumah sakit, stasiun). '
+                        . 'PENTING: (1) SELALU koreksi typo/salah ketik dari pengguna sebelum mengirim keyword (contoh: "dpok" → "Depok", "sby" → "Surabaya", "jkrta" → "Jakarta"). '
+                        . '(2) Jika pencarian dengan nama landmark tidak menemukan hasil, coba cari ULANG menggunakan nama kota/kecamatan dari landmark tersebut (contoh: "Kampus UI" tidak ditemukan → coba "Depok"). '
+                        . '(3) Gunakan nama resmi/lengkap daerah, bukan singkatan.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'keyword' => [
                                 'type' => 'string',
-                                'description' => 'Kata kunci lokasi/landmark, mis. "RS Harapan Kita", "kampus UI", "stasiun Gambir". Boleh juga nama wilayah.',
+                                'description' => 'Kata kunci pencarian yang sudah dikoreksi (tanpa typo). Bisa berupa nama wilayah (kota/kecamatan/kelurahan), nama landmark, atau kata kunci lokasi.',
                             ],
                         ],
                         'required' => ['keyword'],

@@ -50,8 +50,8 @@ class WhatsappBotReplyService
             $messages = [['role' => 'system', 'content' => $systemPrompt]];
             $recent = $conversation->recentMessages((int) config('services.wa_bot.history_size', 10));
             foreach ($recent as $msg) {
-                // Skip pesan system (sudah di-add manual), skip tool messages (internal)
-                if (in_array($msg->role, ['system', 'tool'])) {
+                // Skip pesan system (sudah di-add manual di atas)
+                if ($msg->role === 'system') {
                     continue;
                 }
                 $messages[] = $msg->toOpenAiMessage();

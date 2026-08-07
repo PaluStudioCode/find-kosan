@@ -50,11 +50,13 @@ class WaBotConversation extends Model
 
     /**
      * Ambil N pesan terakhir untuk dikirim ke LLM.
+     * Include role 'tool' agar assistant message dengan tool_calls
+     * selalu berpasangan dengan hasil tool-nya (mencegah LLM bingung).
      */
     public function recentMessages(int $limit = 10)
     {
         return $this->messages()
-            ->whereIn('role', ['system', 'user', 'assistant'])
+            ->whereIn('role', ['system', 'user', 'assistant', 'tool'])
             ->orderByDesc('id')
             ->limit($limit)
             ->get()

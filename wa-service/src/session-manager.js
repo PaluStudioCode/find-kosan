@@ -235,30 +235,32 @@ class SessionManager {
 
             if (connection === 'close') {
                 const statusCode = lastDisconnect?.error?.output?.statusCode;
-                const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+                const reason = lastDisconnect?.error?.message;
+                
+                // PENTING: Jangan PERNAH menghapus credential secara otomatis saat restart/crash!
+                // Server WA sering memberikan 401/403 palsu saat reconnecting dari state yang tidak bersih.
+                // Kredensial HANYA dihapus jika dipanggil dari endpoint /sessions/:id/stop (fungsi stopSession).
+                const shouldReconnect = true; // Selalu coba reconnect
 
-                console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}. Reconnect: ${shouldReconnect}`);
+                console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}, Reason: ${reason}. Reconnect: ${shouldReconnect}`);
 
                 if (shouldReconnect) {
                     // Reconnect after a delay
                     currentSession.status = 'connecting';
                     currentSession.qr = null;
                     currentSession.qrBase64 = null;
+                    
+                    // Gunakan backoff sederhana
                     setTimeout(async () => {
                         try {
+                            // Hanya reconnect jika sesi masih ada di map (tidak distop manual)
                             if (this.sessions.has(adminId)) {
                                 await this._createSocket(adminId);
                             }
                         } catch (e) {
                             console.error(`[Session ${adminId}] Reconnect failed:`, e.message);
                         }
-                    }, 3000);
-                } else {
-                    // Logged out - clean up
-                    this.sessions.delete(adminId);
-                    await clearAuthState(adminId);
-                    await this._updateDbStatus(adminId, 'disconnected');
-                    console.log(`[Session ${adminId}] Logged out. Session cleaned.`);
+                    }, 5000);
                 }
             }
         });
@@ -282,10 +284,10 @@ class SessionManager {
                         continue;
                     }
 
-                    const remoteJid = msg.key.remoteJid;
-                    const phoneNumber = remoteJid.split('@')[0];
+                    // Extract remote JID and text content
+                    let rawJid = msg.key.participant || msg.key.remoteJid;
+                    let phoneNumber = rawJid.split('@')[0];
 
-                    // Extract text content from various message types
                     const text = msg.message?.conversation ||
                                  msg.message?.extendedTextMessage?.text ||
                                  msg.message?.ephemeralMessage?.message?.extendedTextMessage?.text ||
@@ -294,18 +296,30 @@ class SessionManager {
                     if (!text) {
                         // User sent image, voice, sticker, etc.
                         try {
-                            await socket.sendMessage(remoteJid, { text: NON_TEXT_REPLY });
+                            await socket.sendMessage(rawJid, { text: NON_TEXT_REPLY });
                         } catch (e) {
                             console.error(`[AI] Failed to send non-text reply to ${phoneNumber}:`, e.message);
                         }
                         continue;
                     }
 
-                    console.log(`[AI] Received message from ${phoneNumber}: ${text}`);
+                    if (rawJid.includes('@lid')) {
+                        console.log(`[AI] Deteksi pesan dari LID (Private JID): ${rawJid}`);
+                        // Karena LID menyembunyikan nomor asli, kita tidak bisa langsung
+                        // mengubahnya menjadi nomor MSISDN tanpa memanggil API kontak internal WhatsApp.
+                    } else {
+                        // Normalisasi ke 628xxx (jika bukan LID)
+                        phoneNumber = phoneNumber.replace(/\D/g, ''); // Buang non-digit
+                        if (phoneNumber.startsWith('0')) {
+                            phoneNumber = '62' + phoneNumber.substring(1);
+                        }
+                    }
+
+                    console.log(`[AI] Received message from ${phoneNumber} (fromMe: ${msg.key.fromMe}): ${text}`);
 
                     try {
                         const reply = await handleIncomingMessage(phoneNumber, text);
-                        await socket.sendMessage(remoteJid, { text: reply });
+                        await socket.sendMessage(rawJid, { text: reply });
                         console.log(`[AI] Replied to ${phoneNumber}`);
                     } catch (error) {
                         console.error(`[AI] Failed to process/reply to ${phoneNumber}:`, error.message);

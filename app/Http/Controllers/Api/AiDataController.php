@@ -8,21 +8,24 @@ use App\Models\BoardingHouse;
 use App\Models\Invoice;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\WaSession;
+use App\Services\WhatsappService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class AiDataController extends Controller
 {
+    protected WhatsappService $waService;
+
+    public function __construct(WhatsappService $waService)
+    {
+        $this->waService = $waService;
+    }
     public function identifyUser(string $phone): JsonResponse
     {
-        $normalized = WhatsappNumber::normalize($phone);
-
-        if (! $normalized) {
-            return response()->json(['role' => 'guest', 'user' => null]);
-        }
-
-        $user = User::where('whatsapp_number', $normalized)->first();
+        $user = $this->findUserByPhone($phone);
 
         if (! $user) {
             return response()->json(['role' => 'guest', 'user' => null]);
@@ -100,6 +103,7 @@ class AiDataController extends Controller
             return [
                 'id' => $kos->id,
                 'name' => $kos->name,
+                'url' => url('/kos/' . $kos->id),
                 'address' => $kos->address,
                 'city' => $kos->city,
                 'district' => $kos->district,
@@ -139,6 +143,7 @@ class AiDataController extends Controller
         return response()->json([
             'id' => $kos->id,
             'name' => $kos->name,
+            'url' => url('/kos/' . $kos->id),
             'description' => $kos->description,
             'address' => $kos->address,
             'city' => $kos->city,
@@ -290,12 +295,19 @@ class AiDataController extends Controller
         $unpaidInvoices = Invoice::where('admin_id', $user->id)
             ->whereIn('status', ['belum_dibayar', 'jatuh_tempo'])
             ->count();
+            
+        // Ambil saldo dompet
+        $walletBalance = $user->wallet ? $user->wallet->available_balance : 0;
+        $pendingWithdrawal = $user->wallet ? $user->wallet->pending_withdrawal_balance : 0;
 
         return response()->json([
             'owner_name' => $user->name,
+            'wallet_balance' => (float) $walletBalance,
+            'pending_withdrawal' => (float) $pendingWithdrawal,
             'kos_list' => $kosList->map(fn ($kos) => [
                 'id' => $kos->id,
                 'name' => $kos->name,
+                'url' => url('/kos/' . $kos->id),
                 'address' => $kos->address,
                 'total_rooms' => $kos->rooms_count,
                 'available_rooms' => $kos->available_rooms_count,
@@ -323,6 +335,66 @@ class AiDataController extends Controller
         return response()->json($settings);
     }
 
+    public function requestOtp(Request $request): JsonResponse
+    {
+        $request->validate(['phone' => 'required|string']);
+
+        $user = $this->findUserByPhone($request->phone);
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor WhatsApp tidak terdaftar di sistem kami. Silakan daftar melalui website.'
+            ]);
+        }
+
+        $normalized = WhatsappNumber::normalize($request->phone);
+        $otp = (string) rand(100000, 999999);
+        $cacheKey = 'ai_otp_' . $normalized;
+
+        Cache::put($cacheKey, $otp, now()->addMinutes(5));
+
+        $message = "Halo {$user->name}, ini adalah FindKos AI.\n\n"
+            . "Seseorang mencoba menautkan akun Anda dari obrolan rahasia. Jika ini Anda, balas obrolan tersebut dengan kode berikut:\n\n"
+            . "*{$otp}*\n\n"
+            . "Kode ini berlaku selama 5 menit. Jangan berikan kode ini kepada siapapun!";
+
+        // Gunakan sesi SuperAdmin (0) untuk mengirim OTP
+        $this->waService->sendMessage(WaSession::SUPERADMIN_SESSION_ID, $normalized, $message);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kode OTP telah dikirimkan ke nomor asli Anda. Silakan periksa pesan masuk dan balas di sini dengan format: /otp [kode]'
+        ]);
+    }
+
+    public function verifyOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'code' => 'required|string'
+        ]);
+
+        $normalized = WhatsappNumber::normalize($request->phone);
+        $cacheKey = 'ai_otp_' . $normalized;
+
+        $storedOtp = Cache::get($cacheKey);
+
+        if (! $storedOtp || $storedOtp !== $request->code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode OTP salah atau sudah kedaluwarsa. Silakan ketik /login [nomor] untuk meminta kode baru.'
+            ]);
+        }
+
+        Cache::forget($cacheKey);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Verifikasi berhasil!'
+        ]);
+    }
+
     private function findUserByPhone(string $phone): ?User
     {
         $normalized = WhatsappNumber::normalize($phone);
@@ -331,6 +403,11 @@ class AiDataController extends Controller
             return null;
         }
 
-        return User::where('whatsapp_number', $normalized)->first();
+        // Cari dengan format '628...' atau format lokal '08...'
+        $localFormat = '0' . substr($normalized, 2);
+
+        return User::where('whatsapp_number', $normalized)
+            ->orWhere('whatsapp_number', $localFormat)
+            ->first();
     }
 }

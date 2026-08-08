@@ -151,7 +151,7 @@ const toolDefinitions = [
         type: 'function',
         function: {
             name: 'get_owner_summary',
-            description: 'Ambil ringkasan kos milik pemilik/admin: daftar kos, jumlah kamar, okupansi, jumlah penyewa aktif, tagihan belum dibayar. Hanya bisa digunakan untuk user dengan role "admin".',
+            description: 'Ambil ringkasan kos milik pemilik/admin: daftar kos, jumlah kamar, okupansi, jumlah penyewa aktif, tagihan belum dibayar, saldo dompet aktif, dan saldo yang sedang dalam proses penarikan (pending_withdrawal). Hanya bisa digunakan untuk user dengan role "admin".',
             parameters: {
                 type: 'object',
                 properties: {

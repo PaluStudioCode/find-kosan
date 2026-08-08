@@ -6,11 +6,15 @@ const ROUTER_API_KEY = process.env['9ROUTER_API_KEY'] || '';
 const ROUTER_MODEL = process.env['9ROUTER_DEFAULT_MODEL'] || 'ag/gemini-3.6-flash-high(high)';
 
 const MAX_TOOL_ITERATIONS = 5;
-const HISTORY_LIMIT = 20;
+const HISTORY_LIMIT = 6;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 20;
 
 const rateLimitMap = new Map();
+// Mapping untuk LID (Nomor tersembunyi) ke MSISDN asli
+const lidToPhoneMap = new Map();
+// Mapping untuk melacak nomor mana yang sedang mencoba login dari LID
+const pendingLoginMap = new Map();
 
 const BASE_SYSTEM_PROMPT = `Kamu adalah FindKos AI, asisten customer service platform CariKosanMu (FindKosan).
 Kamu HANYA menjawab dalam Bahasa Indonesia.
@@ -25,11 +29,16 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 4. **Notifikasi**: Sistem mengirim pengingat tagihan via WhatsApp
 
 ## Panduan Menjawab
-- Selalu ramah, sopan, dan helpful
-- Gunakan tools untuk mengambil data real-time, JANGAN mengarang data
-- Sebutkan harga dalam format Rupiah (Rp500.000)
-- Jangan terlalu panjang, jawab ringkas dan to the point
-- Gunakan emoji secukupnya untuk membuat percakapan lebih ramah
+- Jawab dengan ramah, profesional, dan to the point.
+- Gunakan emoji dengan wajar dan ramah (misal: 👋, 😊, 🏠, 💰), terutama pada sapaan atau penutup.
+- Soroti poin-poin penting seperti nama kos, nominal harga, atau status dengan menggunakan tanda bintang ganda untuk teks tebal (contoh: **Kos Mawar** atau **Rp500.000**).
+- Gunakan tools untuk mengambil data real-time, JANGAN mengarang data.
+- SAAT MEREKOMENDASIKAN KOS: 
+  1. Sebutkan nama kos dan alamat.
+  2. Sebutkan rentang harga sewa.
+  3. Berikan link/URL secara utuh dan terpisah di baris baru agar bisa diklik. (Format: Link: http://...) Jangan bungkus link dengan tanda kurung atau teks lain.
+- Jangan menyebutkan nama/nomor/role user jika tidak ditanyakan secara spesifik.
+- Gunakan format angka (1., 2., 3.) untuk daftar, BUKAN strip (-).
 
 ## Batasan Penting
 - Kamu HANYA bisa memberikan informasi, TIDAK bisa melakukan aksi (booking, bayar, edit profil, dll)
@@ -43,14 +52,17 @@ const NON_TEXT_REPLY = 'Maaf, saat ini saya hanya bisa memproses pesan teks. Sil
 function formatForWhatsApp(text) {
     if (!text) return text;
     
-    // Ganti **teks** menjadi *teks* (Bold)
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '*$1*');
+    // Ganti **teks** menjadi *teks* (Bold WhatsApp) - regex lebih kuat menangani spasi
+    let formatted = text.replace(/\*\*([^*]+)\*\*/g, '*$1*');
     
     // Ganti # Header menjadi *Header*
     formatted = formatted.replace(/^#+\s*(.*)$/gm, '*$1*');
     
-    // Ganti [Teks](URL) menjadi URL
-    formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '$1 ($2)');
+    // Ganti [Teks](URL) menjadi URL biasa agar bisa diklik di WA
+    formatted = formatted.replace(/\[.*?\]\((https?:\/\/[^\s\)]+)\)/gi, '$1');
+    
+    // Hapus sisa-sisa markdown link referensi <URL> jika LLM membandel
+    formatted = formatted.replace(/<(https?:\/\/[^\s>]+)>/gi, '$1');
     
     return formatted;
 }
@@ -68,19 +80,27 @@ function checkRateLimit(phoneNumber) {
     return entry.count <= RATE_LIMIT_MAX;
 }
 
-function formatForWhatsApp(text) {
-    if (!text) return text;
+// Helper untuk call internal API di luar tool execution
+async function callInternalApi(endpoint, method = 'POST', body = null) {
+    const baseUrl = process.env.LARAVEL_API_URL || 'http://127.0.0.1:8000';
+    const finalUrl = `${baseUrl}/api/ai${endpoint}`;
+    const apiKey = process.env.LARAVEL_API_KEY || process.env.WA_SERVICE_API_KEY || process.env.API_KEY || '';
     
-    // Ganti **teks** menjadi *teks* (Bold)
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '*$1*');
+    const options = {
+        method,
+        headers: {
+            'X-Internal-API-Key': apiKey,
+            'Accept': 'application/json',
+        }
+    };
     
-    // Ganti # Header menjadi *Header*
-    formatted = formatted.replace(/^#+\s*(.*)$/gm, '*$1*');
-    
-    // Ganti [Teks](URL) menjadi URL
-    formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '$1 ($2)');
-    
-    return formatted;
+    if (body) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(finalUrl, options);
+    return response.json();
 }
 
 async function getChatHistory(phoneNumber) {
@@ -185,7 +205,9 @@ async function callLLM(messages, tools) {
     }
 }
 
-async function handleIncomingMessage(phoneNumber, messageText) {
+async function handleIncomingMessage(rawPhoneNumber, messageText) {
+    let phoneNumber = lidToPhoneMap.get(rawPhoneNumber) || rawPhoneNumber;
+
     if (!checkRateLimit(phoneNumber)) {
         return 'Mohon maaf, Anda terlalu sering mengirim pesan. Silakan tunggu sebentar lalu coba lagi. 🙏';
     }
@@ -196,6 +218,9 @@ async function handleIncomingMessage(phoneNumber, messageText) {
     if (trimmedMessage === '/reset' || trimmedMessage === '/clear') {
         try {
             await clearChatHistory(phoneNumber);
+            if (rawPhoneNumber !== phoneNumber) {
+                lidToPhoneMap.delete(rawPhoneNumber);
+            }
             return '✅ Riwayat percakapan Anda dengan saya telah berhasil dihapus. Mari mulai dari awal! Ada yang bisa saya bantu?';
         } catch (error) {
             console.error(`[AI] Error clearing chat for ${phoneNumber}:`, error.message);
@@ -203,33 +228,93 @@ async function handleIncomingMessage(phoneNumber, messageText) {
         }
     }
 
+    if (trimmedMessage.startsWith('/login ')) {
+        const inputNumber = trimmedMessage.replace('/login ', '').trim();
+        
+        try {
+            const result = await callInternalApi('/request-otp', 'POST', { phone: inputNumber });
+            if (result.success) {
+                pendingLoginMap.set(rawPhoneNumber, inputNumber);
+                return result.message;
+            } else {
+                return result.message || 'Gagal meminta OTP. Pastikan nomor sudah terdaftar.';
+            }
+        } catch (error) {
+            console.error(`[AI] Error requesting OTP for ${inputNumber}:`, error.message);
+            return 'Maaf, terjadi kesalahan saat menghubungi server. Silakan coba lagi.';
+        }
+    }
+
+    if (trimmedMessage.startsWith('/otp ')) {
+        const code = trimmedMessage.replace('/otp ', '').trim();
+        const pendingNumber = pendingLoginMap.get(rawPhoneNumber);
+        
+        if (!pendingNumber) {
+            return 'Anda belum meminta kode OTP. Silakan ketik /login [nomor_wa] terlebih dahulu.';
+        }
+        
+        try {
+            const result = await callInternalApi('/verify-otp', 'POST', { phone: pendingNumber, code: code });
+            if (result.success) {
+                let formattedNumber = pendingNumber.replace(/\D/g, '');
+                if (formattedNumber.startsWith('0')) {
+                    formattedNumber = '62' + formattedNumber.substring(1);
+                }
+                
+                lidToPhoneMap.set(rawPhoneNumber, formattedNumber);
+                phoneNumber = formattedNumber;
+                pendingLoginMap.delete(rawPhoneNumber);
+                
+                try {
+                    const db = getPool();
+                    await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
+                } catch (e) { /* ignore */ }
+                
+                return `✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
+            } else {
+                return result.message || 'Kode OTP salah atau kedaluwarsa.';
+            }
+        } catch (error) {
+            console.error(`[AI] Error verifying OTP for ${pendingNumber}:`, error.message);
+            return 'Maaf, terjadi kesalahan saat memverifikasi kode. Silakan coba lagi.';
+        }
+    }
+
     try {
         // 1. Identifikasi user secara otomatis sebelum memanggil LLM
         let userInfoStr = '';
-        try {
-            const identity = await executeTool('identify_user', { phone_number: phoneNumber });
-            
-            // Format identitas untuk disuntikkan ke System Prompt
-            if (identity && identity.role !== 'guest' && identity.user) {
-                const u = identity.user;
-                userInfoStr = `\n\n## INFO PENGIRIM PESAN INI (JANGAN TANYAKAN NOMORNYA LAGI)\n` +
-                              `- Nama: ${u.name}\n` +
-                              `- Nomor WA: ${u.whatsapp_number}\n` +
-                              `- Role: ${u.role === 'admin' || u.role === 'super_admin' ? 'Pemilik Kos / Admin' : 'Penyewa / User'}\n`;
+        
+        // Deteksi apakah phoneNumber adalah format LID
+        const isHiddenNumber = phoneNumber.length > 14 && !phoneNumber.startsWith('628') && !phoneNumber.startsWith('08');
+
+        if (isHiddenNumber) {
+            userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Role: guest\n- Status Privasi: Nomor pengirim disembunyikan oleh WhatsApp (Linked Device/LID).\n\nSebagai asisten, WAJIB katakan ini (salin persis kalimat berikut):\n"Maaf, karena pengaturan privasi WhatsApp, saya tidak dapat melihat nomor Anda. Agar saya bisa melayani informasi akun Anda dengan aman, silakan login dengan mengetik:\n\n/login [Nomor WA Anda, contoh: 08123456...]\n\nKami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifikasi."\n\nJangan memproses pencarian data pribadi sampai user memverifikasi nomornya.`;
+        } else {
+            try {
+                const identity = await executeTool('identify_user', { phone_number: phoneNumber });
                 
-                if (u.role === 'admin') {
-                    userInfoStr += `- Jumlah Kos Dimiliki: ${u.kos_count}\n` +
-                                   `\nSebagai Pemilik Kos, user ini berhak mengecek ringkasan propertinya menggunakan tool get_owner_summary. Selalu gunakan nomor WA di atas untuk parameter phone_number.`;
-                } else if (u.role === 'user') {
-                    userInfoStr += `- Punya Sewa Aktif: ${u.active_tenancy ? 'Ya' : 'Tidak'}\n` +
-                                   `\nSebagai Penyewa, user ini berhak mengecek tagihan dan masa sewanya menggunakan tool get_user_tenancy dan get_user_invoices. Selalu gunakan nomor WA di atas untuk parameter phone_number.`;
+                // Format identitas untuk disuntikkan ke System Prompt
+                if (identity && identity.role !== 'guest' && identity.user) {
+                    const u = identity.user;
+                    userInfoStr = `\n\n## INFO PENGIRIM PESAN INI (JANGAN TANYAKAN NOMORNYA LAGI)\n` +
+                                  `- Nama: ${u.name}\n` +
+                                  `- Nomor WA: ${u.whatsapp_number}\n` +
+                                  `- Role: ${u.role === 'admin' || u.role === 'super_admin' ? 'Pemilik Kos / Admin' : 'Penyewa / User'}\n`;
+                    
+                    if (u.role === 'admin') {
+                        userInfoStr += `- Jumlah Kos Dimiliki: ${u.kos_count}\n` +
+                                       `\nSebagai Pemilik Kos, user ini berhak mengecek ringkasan propertinya dan saldo dompet menggunakan tool get_owner_summary. Selalu gunakan nomor WA di atas untuk parameter phone_number.`;
+                    } else if (u.role === 'user') {
+                        userInfoStr += `- Punya Sewa Aktif: ${u.active_tenancy ? 'Ya' : 'Tidak'}\n` +
+                                       `\nSebagai Penyewa, user ini berhak mengecek tagihan dan masa sewanya menggunakan tool get_user_tenancy dan get_user_invoices. Selalu gunakan nomor WA di atas untuk parameter phone_number.`;
+                    }
+                } else {
+                    userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Role: guest (Belum terdaftar atau belum login)\n- Nomor WA: ${phoneNumber}\n\nSebagai guest, arahkan user untuk mendaftar jika ingin melihat tagihan atau menyewa kos.`;
                 }
-            } else {
-                userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Role: guest (Belum terdaftar atau belum login)\n- Nomor WA: ${phoneNumber}\n\nSebagai guest, arahkan user untuk mendaftar jika ingin melihat tagihan atau menyewa kos.`;
+            } catch (err) {
+                console.error('[AI] Gagal mengidentifikasi user:', err.message);
+                userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Nomor WA: ${phoneNumber}\n- Status: Tidak dapat diidentifikasi karena gangguan server.`;
             }
-        } catch (err) {
-            console.error('[AI] Gagal mengidentifikasi user:', err.message);
-            userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Nomor WA: ${phoneNumber}\n- Status: Tidak dapat diidentifikasi karena gangguan server.`;
         }
 
         const dynamicSystemPrompt = BASE_SYSTEM_PROMPT + userInfoStr;
@@ -246,6 +331,7 @@ async function handleIncomingMessage(phoneNumber, messageText) {
         let iteration = 0;
 
         // 3. Kita hapus 'identify_user' dari list tools yang dikirim ke LLM karena sudah kita proses di atas
+        // 'register_hidden_number' tetap kita pertahankan agar AI bisa memanggilnya
         const availableTools = toolDefinitions.filter(t => t.function.name !== 'identify_user');
 
         while (iteration < MAX_TOOL_ITERATIONS) {
@@ -269,6 +355,28 @@ async function handleIncomingMessage(phoneNumber, messageText) {
                     console.log(`[AI] Tool call: ${toolName}(${toolArgs})`);
 
                     const toolResult = await executeTool(toolName, toolArgs);
+
+                    // Intercept aksi khusus dari tool (misalnya register nomor LID)
+                    if (toolResult && toolResult._action === 'register_mapping') {
+                        const newPhone = toolResult.new_phone;
+                        lidToPhoneMap.set(rawPhoneNumber, newPhone);
+                        
+                        try {
+                            const db = getPool();
+                            await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [newPhone, phoneNumber]);
+                        } catch (e) { /* ignore */ }
+                        
+                        phoneNumber = newPhone; // Ganti nomor aktif untuk sisa sesi ini
+                        console.log(`[AI] LID ${rawPhoneNumber} berhasil diregistrasi ke ${newPhone}`);
+                        
+                        // Timpa respon tool agar LLM tahu identifikasi berhasil
+                        messages.push({
+                            role: 'tool',
+                            tool_call_id: toolCall.id,
+                            content: JSON.stringify({ success: true, message: `Nomor berhasil disimpan. Sekarang identitas user sudah di-update menjadi ${newPhone}. Silakan jawab pertanyaan user atau konfirmasi bahwa akunnya sudah terhubung.` }),
+                        });
+                        continue;
+                    }
 
                     messages.push({
                         role: 'tool',

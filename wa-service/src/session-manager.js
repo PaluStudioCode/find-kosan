@@ -8,6 +8,7 @@ const pino = require('pino');
 const QRCode = require('qrcode');
 const { useMySQLAuthState, clearAuthState } = require('./auth-store');
 const { getPool } = require('./database');
+const { handleIncomingMessage, NON_TEXT_REPLY } = require('./ai-handler');
 
 const logger = pino({ level: 'silent' });
 
@@ -265,16 +266,67 @@ class SessionManager {
         // Save credentials on update
         socket.ev.on('creds.update', saveCreds);
 
+        // Handle incoming messages (ONLY for SuperAdmin/system session: adminId === '0')
+        if (adminId === '0' || adminId === 0) {
+            socket.ev.on('messages.upsert', async ({ messages, type }) => {
+                if (type !== 'notify') return;
+
+                for (const msg of messages) {
+                    // Ignore messages from ourselves, broadcasts, statuses, or group chats
+                    if (msg.key.fromMe || msg.key.remoteJid.includes('@g.us') || msg.key.remoteJid === 'status@broadcast') {
+                        continue;
+                    }
+
+                    // Only process protocol messages if they contain actual text
+                    if (msg.message?.protocolMessage) {
+                        continue;
+                    }
+
+                    const remoteJid = msg.key.remoteJid;
+                    const phoneNumber = remoteJid.split('@')[0];
+
+                    // Extract text content from various message types
+                    const text = msg.message?.conversation ||
+                                 msg.message?.extendedTextMessage?.text ||
+                                 msg.message?.ephemeralMessage?.message?.extendedTextMessage?.text ||
+                                 null;
+
+                    if (!text) {
+                        // User sent image, voice, sticker, etc.
+                        try {
+                            await socket.sendMessage(remoteJid, { text: NON_TEXT_REPLY });
+                        } catch (e) {
+                            console.error(`[AI] Failed to send non-text reply to ${phoneNumber}:`, e.message);
+                        }
+                        continue;
+                    }
+
+                    console.log(`[AI] Received message from ${phoneNumber}: ${text}`);
+
+                    try {
+                        const reply = await handleIncomingMessage(phoneNumber, text);
+                        await socket.sendMessage(remoteJid, { text: reply });
+                        console.log(`[AI] Replied to ${phoneNumber}`);
+                    } catch (error) {
+                        console.error(`[AI] Failed to process/reply to ${phoneNumber}:`, error.message);
+                    }
+                }
+            });
+        }
+
         // If using pairing code, request it after socket is ready
         if (usePairingCode && session?.requestedPhoneNumber && !state.creds.registered) {
             setTimeout(async () => {
+                // Pastikan status belum tersambung (open) saat merequest
+                const currentSession = this.getSession(adminId);
+                if (!currentSession || currentSession.status === 'connected') return;
+                
                 try {
                     let phone = session.requestedPhoneNumber.replace(/[^0-9]/g, '');
                     if (phone.startsWith('0')) {
                         phone = '62' + phone.substring(1);
                     }
                     const code = await socket.requestPairingCode(phone);
-                    const currentSession = this.getSession(adminId);
                     if (currentSession) {
                         currentSession.pairingCode = code;
                         currentSession.status = 'connecting';

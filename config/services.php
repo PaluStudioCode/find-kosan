@@ -40,6 +40,12 @@ return [
         'api_key' => env('WA_SERVICE_API_KEY'),
     ],
 
+    '9router' => [
+        'url' => env('9ROUTER_BASE_URL', 'http://localhost:20128'),
+        'api_key' => env('9ROUTER_API_KEY'),
+        'model' => env('9ROUTER_DEFAULT_MODEL', 'ag/gemini-3.6-flash-high(high)'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

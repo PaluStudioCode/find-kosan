@@ -4,7 +4,7 @@
  */
 function authMiddleware(req, res, next) {
     const apiKey = req.headers['x-api-key'];
-    const expectedKey = process.env.API_KEY;
+    const expectedKey = process.env.WA_SERVICE_API_KEY || process.env.API_KEY;
 
     if (!expectedKey) {
         console.warn('[Auth] API_KEY not set in .env, allowing all requests.');

@@ -43,6 +43,21 @@ services:
     volumes:
       - ./wa-service:/app
       - /app/node_modules
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_DATABASE}
+      - API_KEY=${WA_SERVICE_API_KEY}
+      - LARAVEL_API_URL=http://web
+      - LARAVEL_API_KEY=${WA_SERVICE_API_KEY}
+      - 9ROUTER_BASE_URL=http://9router:20128
+      - 9ROUTER_API_KEY=${9ROUTER_API_KEY}
+      - 9ROUTER_DEFAULT_MODEL=${9ROUTER_DEFAULT_MODEL}
+    depends_on:
+      - db
+      - web
     restart: always
 
   queue:

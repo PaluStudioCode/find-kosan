@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ActiveAccountMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InternalApiKeyMiddleware;
 use App\Http\Middleware\MustChangePasswordMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -30,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'active' => ActiveAccountMiddleware::class,
             'must_change_password' => MustChangePasswordMiddleware::class,
+            'internal_api' => InternalApiKeyMiddleware::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
@@ -38,6 +41,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return $response;
+            }
+
             if (in_array($response->getStatusCode(), [500, 503, 404, 403])) {
                 return Inertia::render('Error', ['status' => $response->getStatusCode()])
                     ->toResponse($request)

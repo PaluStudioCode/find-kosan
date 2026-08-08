@@ -50,7 +50,7 @@ class WhatsappBotService
         return WaBotConversation::updateOrCreate(
             ['from_jid' => $fromJid],
             [
-                'phone_number' => $phone,
+                'phone_number' => $phone ?? null,
                 'user_id' => $user?->id,
                 'identified_role' => $role,
             ]

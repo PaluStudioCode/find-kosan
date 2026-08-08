@@ -15,9 +15,15 @@ return new class extends Migration
             $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
             $table->date('period_start');
             $table->date('period_end');
+            $table->decimal('rent_price', 12, 2)->default(0);
+            $table->decimal('ppn_percent', 5, 2)->default(0);
+            $table->decimal('ppn_amount', 12, 2)->default(0);
             $table->decimal('amount', 12, 2);
             $table->date('due_date');
             $table->enum('status', ['belum_dibayar', 'jatuh_tempo', 'menunggu_konfirmasi', 'lunas']);
+            $table->string('payment_reference')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

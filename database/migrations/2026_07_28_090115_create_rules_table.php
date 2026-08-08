@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('rules', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('icon')->nullable();
             $table->boolean('is_positive')->default(true);
             $table->timestamps();
         });

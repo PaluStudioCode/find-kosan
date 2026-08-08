@@ -125,7 +125,6 @@ class KosPaluDummySeeder extends Seeder
         ];
 
         // Daftar fasilitas umum / landmark di Kota Palu untuk referensi deskripsi kos.
-        // Mendorong pemilik kos menyebutkan landmark terdekat agar mudah ditemukan via WhatsApp bot.
         $paluLandmarks = [
             // Pendidikan
             'Universitas Tadulako (Untad)', 'UIN Datokarama Palu', 'Universitas Alkhairaat',
@@ -159,7 +158,6 @@ class KosPaluDummySeeder extends Seeder
             $name = 'Kos ' . $faker->firstName() . ' ' . $areaName;
 
             // Pilih 1-2 landmark acak dari daftar fasilitas umum Kota Palu
-            // untuk disebutkan di deskripsi (mendukung pencarian bot WhatsApp by lokasi)
             $selectedLandmarks = array_rand(array_flip($paluLandmarks), rand(1, 2));
             if (!is_array($selectedLandmarks)) {
                 $selectedLandmarks = [$selectedLandmarks];

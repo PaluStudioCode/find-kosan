@@ -34,7 +34,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'duitku/callback',
-            'wa/webhook/incoming',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

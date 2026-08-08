@@ -12,6 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('admin_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 12, 2);
+            $table->decimal('pph_percent', 5, 2)->default(0);
+            $table->decimal('pph_amount', 12, 2)->default(0);
+            $table->decimal('net_amount', 12, 2)->default(0);
             $table->string('bank_name', 100);
             $table->string('account_number', 50);
             $table->string('account_holder_name', 150);

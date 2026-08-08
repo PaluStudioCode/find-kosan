@@ -13,14 +13,12 @@ return new class extends Migration
     {
         Schema::create('wa_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('admin_id')->unique();
             $table->enum('status', ['disconnected', 'connecting', 'connected'])->default('disconnected');
             $table->string('phone_number', 30)->nullable();
             $table->timestamp('connected_at')->nullable();
             $table->timestamp('disconnected_at')->nullable();
             $table->timestamps();
-
-            $table->unique('admin_id');
         });
     }
 

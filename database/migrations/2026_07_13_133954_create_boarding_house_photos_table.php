@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('boarding_house_id')->constrained()->onDelete('cascade');
             $table->string('file_path', 255);
+            $table->string('category', 50)->default('lainnya');
             $table->string('caption', 150)->nullable();
             $table->unsignedInteger('sort_order');
             $table->boolean('is_primary');

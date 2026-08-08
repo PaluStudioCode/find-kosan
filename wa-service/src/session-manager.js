@@ -6,18 +6,10 @@ const {
 } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const QRCode = require('qrcode');
-const axios = require('axios');
 const { useMySQLAuthState, clearAuthState } = require('./auth-store');
 const { getPool } = require('./database');
 
 const logger = pino({ level: 'silent' });
-
-/**
- * Laravel webhook URL for forwarding incoming messages (bot AI CS).
- * Loaded from env; if empty, incoming messages are ignored.
- */
-const LARAVEL_WEBHOOK_URL = process.env.LARAVEL_WEBHOOK_URL || '';
-const WEBHOOK_API_KEY = process.env.API_KEY || '';
 
 class SessionManager {
     constructor() {
@@ -272,68 +264,6 @@ class SessionManager {
 
         // Save credentials on update
         socket.ev.on('creds.update', saveCreds);
-
-        // Forward incoming messages to Laravel webhook (for WA Bot AI CS)
-        socket.ev.on('messages.upsert', async ({ messages, type }) => {
-            // Hanya proses pesan masuk baru, skip history sync
-            if (type !== 'notify') return;
-
-            for (const msg of messages) {
-                try {
-                    // Skip pesan dari diri sendiri (status broadcast, dll)
-                    if (msg.key.fromMe) continue;
-
-                    // Hanya chat pribadi 1-on-1:
-                    //  - @s.whatsapp.net  → nomor telepon eksplisit (kontak tersimpan/terdaftar)
-                    //  - @lid              → Linked Identity (nomor tidak di kontak / privasi WA)
-                    // Skip grup (@g.us), status broadcast, newsletter, channel, dll.
-                    const remoteJid = msg.key.remoteJid || '';
-                    const isPrivate = remoteJid.endsWith('@s.whatsapp.net') || remoteJid.endsWith('@lid');
-                    if (!isPrivate) {
-                        console.log(`[Session ${adminId}] Skipping non-private JID: ${remoteJid}`);
-                        continue;
-                    }
-
-                    // Ambil text pesan dari berbagai kemungkinan format
-                    const messageObj = msg.message || {};
-                    let text = messageObj.conversation
-                        || (messageObj.extendedTextMessage && messageObj.extendedTextMessage.text)
-                        || (messageObj.imageMessage && messageObj.imageMessage.caption)
-                        || (messageObj.videoMessage && messageObj.videoMessage.caption)
-                        || '';
-
-                    // Skip jika tidak ada text (mis. gambar tanpa caption, lokasi, dll)
-                    if (!text || !text.trim()) continue;
-
-                    // Extract identifier pengirim (tanpa suffix @...)
-                    const from = remoteJid.split('@')[0];
-
-                    console.log(`[Session ${adminId}] Incoming private message from ${remoteJid}: ${text.substring(0, 50)}`);
-
-                    // Skip jika tidak ada webhook URL terconfigurasi
-                    if (!LARAVEL_WEBHOOK_URL) continue;
-
-                    // Forward ke Laravel webhook (async, tidak block event handler Baileys)
-                    // from_jid = JID asli lengkap (untuk balas ke JID yang benar)
-                    axios.post(LARAVEL_WEBHOOK_URL, {
-                        from: from,
-                        from_jid: remoteJid,
-                        text: text,
-                        messageId: msg.key.id,
-                        timestamp: msg.messageTimestamp,
-                        sessionId: adminId,
-                    }, {
-                        headers: { 'X-WA-Signature': WEBHOOK_API_KEY },
-                        timeout: 60000,
-                    }).catch((err) => {
-                        console.error(`[Session ${adminId}] Webhook forward failed:`, err.message);
-                    });
-
-                } catch (err) {
-                    console.error(`[Session ${adminId}] Failed to process incoming message:`, err.message);
-                }
-            }
-        });
 
         // If using pairing code, request it after socket is ready
         if (usePairingCode && session?.requestedPhoneNumber && !state.creds.registered) {

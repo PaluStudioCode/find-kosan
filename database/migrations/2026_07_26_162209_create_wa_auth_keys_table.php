@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('wa_auth_keys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('admin_id');
             $table->string('key_id', 255);
             $table->longText('key_data');
             $table->timestamps();

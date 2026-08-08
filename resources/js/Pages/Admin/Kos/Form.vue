@@ -184,8 +184,7 @@ const handleLocationSelected = async (location) => {
                     
                     <div class="space-y-2">
                         <Label for="description">Deskripsi <span class="text-red-500">*</span></Label>
-                        <Textarea id="description" v-model="form.description" rows="4" placeholder="Ceritakan tentang kos Anda, fasilitas unggulan, atau aturan umum. Tip: Sebutkan landmark terdekat (mis. 'dekat RS Harapan Kita', '5 menit ke Stasiun Sudirman', 'dekat Kampus UI') agar mudah ditemukan calon penyewa via WhatsApp bot." required />
-                        <p class="text-xs text-gray-500 dark:text-slate-400">💡 Tip: Sebutkan rumah sakit, kampus, stasiun, atau tempat terkenal terdekat. Bot WhatsApp kami menggunakan info ini untuk membantu penyewa mencari kos berdasarkan lokasi.</p>
+                        <Textarea id="description" v-model="form.description" rows="4" placeholder="Ceritakan tentang kos Anda, fasilitas unggulan, atau aturan umum. Tip: Sebutkan landmark terdekat (mis. 'dekat RS Harapan Kita', '5 menit ke Stasiun Sudirman', 'dekat Kampus UI') agar mudah ditemukan calon penyewa." required />
                         <p v-if="form.errors.description" class="text-sm text-red-500">{{ form.errors.description }}</p>
                     </div>
 

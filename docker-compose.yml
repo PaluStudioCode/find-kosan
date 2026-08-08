@@ -23,7 +23,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
-      - 9router
 
   db:
     image: mysql:8.0
@@ -46,14 +45,6 @@ services:
       - /app/node_modules
     restart: always
 
-  9router:
-    image: decolua/9router:latest
-    ports:
-      - "127.0.0.1:20128:20128"
-    volumes:
-      - 9router_data:/app/data
-    restart: always
-
   queue:
     build:
       context: .
@@ -69,7 +60,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
-      - 9router
     restart: always
 
   schedule:
@@ -87,9 +77,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - db
-      - 9router
     restart: always
 
 volumes:
   dbdata:
-  9router_data:

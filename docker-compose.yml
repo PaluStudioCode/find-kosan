@@ -40,6 +40,8 @@ services:
     build:
       context: ./wa-service
       dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
     volumes:
       - ./wa-service:/app
       - /app/node_modules
@@ -49,6 +51,7 @@ services:
       - DB_USER=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_DATABASE}
+      - PORT=3001
       - API_KEY=${WA_SERVICE_API_KEY}
       - LARAVEL_API_URL=http://web
       - LARAVEL_API_KEY=${WA_SERVICE_API_KEY}

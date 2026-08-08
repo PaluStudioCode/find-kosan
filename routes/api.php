@@ -13,7 +13,7 @@ Route::middleware('internal_api')->prefix('ai')->group(function () {
     Route::get('/user/{phone}/invoices', [AiDataController::class, 'userInvoices']);
     Route::get('/owner/{phone}/summary', [AiDataController::class, 'ownerSummary']);
     Route::get('/settings', [AiDataController::class, 'platformSettings']);
-    
+
     // Endpoints for OTP / Security Link
     Route::post('/request-otp', [AiDataController::class, 'requestOtp']);
     Route::post('/verify-otp', [AiDataController::class, 'verifyOtp']);

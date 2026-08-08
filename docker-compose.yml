@@ -46,7 +46,7 @@ services:
       - ./wa-service:/app
       - /app/node_modules
     env_file:
-      - .env.production
+      - .env
     depends_on:
       - db
       - web

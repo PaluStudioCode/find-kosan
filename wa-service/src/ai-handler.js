@@ -257,7 +257,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
                     await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
                 } catch (e) { /* ignore */ }
                 
-                return ✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
+                return `✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
             } else {
                 return result.message || 'Kode OTP salah atau kedaluwarsa.';
             }

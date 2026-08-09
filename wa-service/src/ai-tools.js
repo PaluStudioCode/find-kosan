@@ -3,7 +3,7 @@ const LARAVEL_API_KEY = process.env.LARAVEL_API_KEY || process.env.WA_SERVICE_AP
 const configuredTimeout = Number.parseInt(process.env.LARAVEL_API_TIMEOUT_MS || '10000', 10);
 const LARAVEL_API_TIMEOUT_MS = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10000;
 
-async function requestLaravelApi(endpoint, { method = 'GET', params = {}, body = null } = {}) {
+async function requestLaravelApi(endpoint, { method = 'GET', params = {}, body = null, headers = {} } = {}) {
     const url = new URL(`${LARAVEL_API_URL}/api/ai${endpoint}`);
     for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null && value !== '') {
@@ -16,6 +16,7 @@ async function requestLaravelApi(endpoint, { method = 'GET', params = {}, body =
         headers: {
             'X-Internal-API-Key': LARAVEL_API_KEY,
             'Accept': 'application/json',
+            ...headers,
         },
         signal: AbortSignal.timeout(LARAVEL_API_TIMEOUT_MS),
     };
@@ -42,9 +43,32 @@ async function requestLaravelApi(endpoint, { method = 'GET', params = {}, body =
     return response.json();
 }
 
-async function callLaravelApi(endpoint, params = {}) {
-    return requestLaravelApi(endpoint, { params });
+async function callLaravelApi(endpoint, params = {}, headers = {}) {
+    return requestLaravelApi(endpoint, { params, headers });
 }
+
+function normalizePhoneNumber(phoneNumber) {
+    const digits = String(phoneNumber || '').replace(/\D/g, '');
+
+    return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
+}
+
+function requesterHeaders(context) {
+    if (!context?.requesterPhone || !context?.verificationToken) {
+        return {};
+    }
+
+    return {
+        'X-AI-Requester-Phone': context.requesterPhone,
+        'X-AI-Verification-Token': context.verificationToken,
+    };
+}
+
+const privateTools = {
+    get_user_tenancy: 'user',
+    get_user_invoices: 'user',
+    get_owner_summary: 'admin',
+};
 
 const toolDefinitions = [
     {
@@ -104,7 +128,7 @@ const toolDefinitions = [
         type: 'function',
         function: {
             name: 'get_kos_detail',
-            description: 'Ambil detail lengkap satu kos: deskripsi, alamat, semua kamar, fasilitas, aturan, review, dan kontak pemilik.',
+            description: 'Ambil detail lengkap satu kos: deskripsi, alamat, semua kamar, fasilitas, aturan, dan review. Nomor WhatsApp pemilik tidak tersedia melalui tool ini.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -138,7 +162,7 @@ const toolDefinitions = [
         type: 'function',
         function: {
             name: 'get_user_tenancy',
-            description: 'Ambil info penyewaan aktif seorang tenant/penyewa: kos mana, kamar berapa, masa sewa, kontak pemilik. Hanya bisa digunakan untuk user dengan role "user".',
+            description: 'Ambil info penyewaan aktif seorang tenant/penyewa: kos mana, kamar berapa, masa sewa, dan nomor WhatsApp pemilik. Hanya bisa digunakan untuk user dengan role "user" yang memiliki sewa aktif.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -222,16 +246,16 @@ const toolExecutors = {
         return callLaravelApi(`/kos/${args.kos_id}/rooms`);
     },
 
-    async get_user_tenancy(args) {
-        return callLaravelApi(`/user/${encodeURIComponent(args.phone_number)}/tenancy`);
+    async get_user_tenancy(args, context) {
+        return callLaravelApi(`/user/${encodeURIComponent(args.phone_number)}/tenancy`, {}, requesterHeaders(context));
     },
 
-    async get_user_invoices(args) {
-        return callLaravelApi(`/user/${encodeURIComponent(args.phone_number)}/invoices`);
+    async get_user_invoices(args, context) {
+        return callLaravelApi(`/user/${encodeURIComponent(args.phone_number)}/invoices`, {}, requesterHeaders(context));
     },
 
-    async get_owner_summary(args) {
-        return callLaravelApi(`/owner/${encodeURIComponent(args.phone_number)}/summary`);
+    async get_owner_summary(args, context) {
+        return callLaravelApi(`/owner/${encodeURIComponent(args.phone_number)}/summary`, {}, requesterHeaders(context));
     },
 
     async get_platform_info() {
@@ -239,7 +263,7 @@ const toolExecutors = {
     },
 };
 
-async function executeTool(name, argsJson) {
+async function executeTool(name, argsJson, context = {}) {
     const executor = toolExecutors[name];
     if (!executor) {
         return { error: `Unknown tool: ${name}` };
@@ -247,7 +271,22 @@ async function executeTool(name, argsJson) {
 
     try {
         const args = typeof argsJson === 'string' ? JSON.parse(argsJson) : argsJson;
-        return await executor(args);
+        const requiredRole = privateTools[name];
+
+        if (requiredRole) {
+            const requesterPhone = normalizePhoneNumber(context.requesterPhone);
+            const requestedPhone = normalizePhoneNumber(args.phone_number);
+
+            if (context.role !== requiredRole || !requesterPhone || requesterPhone !== requestedPhone) {
+                return { error: 'Anda tidak berhak mengakses data pribadi pengguna lain.' };
+            }
+
+            if (!context.verificationToken) {
+                return { error: 'Silakan verifikasi akun terlebih dahulu dengan /login lalu /otp.' };
+            }
+        }
+
+        return await executor(args, context);
     } catch (error) {
         console.error(`[AI-Tools] Error executing ${name}:`, error.message);
         return { error: error.message };

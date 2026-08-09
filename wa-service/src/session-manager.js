@@ -192,6 +192,23 @@ class SessionManager {
                 jid = jid + '@s.whatsapp.net';
             }
 
+            // Baileys dapat mengembalikan sukses ketika permintaan diterima
+            // meski nomor tujuan tidak terdaftar. Validasi tujuan lebih dulu
+            // agar API tidak memberi laporan sukses palsu kepada penyewa.
+            if (!jid.endsWith('@lid') && typeof session.socket.onWhatsApp === 'function') {
+                const matches = await session.socket.onWhatsApp(jid);
+                const recipient = Array.isArray(matches) ? matches[0] : matches;
+
+                if (!recipient?.exists) {
+                    return {
+                        success: false,
+                        reason: 'Nomor WhatsApp tujuan tidak terdaftar atau tidak dapat dihubungi',
+                    };
+                }
+
+                jid = recipient.jid || jid;
+            }
+
             const result = await session.socket.sendMessage(jid, { text: message });
 
             return {

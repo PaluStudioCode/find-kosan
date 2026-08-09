@@ -10,6 +10,7 @@ Route::middleware('internal_api')->prefix('ai')->group(function () {
     Route::get('/kos/{id}', [AiDataController::class, 'kosDetail']);
     Route::get('/kos/{id}/rooms', [AiDataController::class, 'kosRooms']);
     Route::get('/user/{phone}/tenancy', [AiDataController::class, 'userTenancy']);
+    Route::post('/user/{phone}/report', [AiDataController::class, 'submitTenantReport'])->name('ai.user.report');
     Route::get('/user/{phone}/invoices', [AiDataController::class, 'userInvoices']);
     Route::get('/owner/{phone}/summary', [AiDataController::class, 'ownerSummary']);
     Route::get('/settings', [AiDataController::class, 'platformSettings']);

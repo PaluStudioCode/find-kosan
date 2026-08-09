@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WaSession;
+use App\Models\WhatsappNotification;
 use App\Services\WhatsappService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -151,7 +152,6 @@ class AiDataController extends Controller
             'district' => $kos->district,
             'subdistrict' => $kos->subdistrict,
             'public_contact_name' => $kos->public_contact_name,
-            'public_contact_whatsapp_number' => $kos->public_contact_whatsapp_number,
             'facilities' => $kos->facilities->pluck('name'),
             'rules' => $kos->rules->map(fn ($r) => [
                 'name' => $r->name,
@@ -207,8 +207,12 @@ class AiDataController extends Controller
         ]);
     }
 
-    public function userTenancy(string $phone): JsonResponse
+    public function userTenancy(Request $request, string $phone): JsonResponse
     {
+        if ($response = $this->authorizeAiRequester($request, $phone, 'user')) {
+            return $response;
+        }
+
         $user = $this->findUserByPhone($phone);
 
         if (! $user) {
@@ -218,7 +222,8 @@ class AiDataController extends Controller
         $tenancies = $user->tenanciesAsTenant()
             ->where('status', 'aktif')
             ->with([
-                'boardingHouse:id,name,address,public_contact_name,public_contact_whatsapp_number',
+                'boardingHouse:id,name,address',
+                'admin:id,name,whatsapp_number',
                 'room:id,name,room_number,price,price_period',
             ])
             ->get();
@@ -229,8 +234,8 @@ class AiDataController extends Controller
                 'id' => $t->id,
                 'kos_name' => $t->boardingHouse->name,
                 'kos_address' => $t->boardingHouse->address,
-                'kos_contact_name' => $t->boardingHouse->public_contact_name,
-                'kos_contact_wa' => $t->boardingHouse->public_contact_whatsapp_number,
+                'kos_contact_name' => $t->admin->name,
+                'kos_contact_wa' => $t->admin->whatsapp_number,
                 'room_name' => $t->room->name,
                 'room_number' => $t->room->room_number,
                 'room_price' => (float) $t->room->price,
@@ -242,8 +247,104 @@ class AiDataController extends Controller
         ]);
     }
 
-    public function userInvoices(string $phone): JsonResponse
+    public function submitTenantReport(Request $request, string $phone): JsonResponse
     {
+        $validated = $request->validate([
+            'tenancy_id' => ['required', 'integer'],
+            'report' => ['required', 'string', 'min:5', 'max:1000'],
+        ]);
+
+        if ($response = $this->authorizeAiRequester($request, $phone, 'user')) {
+            return $response;
+        }
+
+        $user = $this->findUserByPhone($phone);
+
+        $tenancy = $user->tenanciesAsTenant()
+            ->where('status', 'aktif')
+            ->whereKey($validated['tenancy_id'])
+            ->with([
+                'admin:id,name,whatsapp_number',
+                'boardingHouse:id,name',
+                'room:id,name,room_number',
+            ])
+            ->first();
+
+        if (! $tenancy) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sewa aktif untuk laporan ini tidak ditemukan.',
+            ], 403);
+        }
+
+        $owner = $tenancy->admin;
+        $ownerPhone = WhatsappNumber::normalize($owner?->whatsapp_number);
+
+        if (! $ownerPhone || ! WhatsappNumber::isValid($ownerPhone)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor WhatsApp pemilik kos belum tersedia.',
+            ], 422);
+        }
+
+        $message = "*Laporan Baru dari Penyewa*\n\n"
+            ."Kos: *{$tenancy->boardingHouse->name}*\n"
+            ."Kamar: *{$tenancy->room->name} ({$tenancy->room->room_number})*\n"
+            ."Penyewa: *{$user->name}*\n"
+            ."Nomor WA penyewa: *{$user->whatsapp_number}*\n\n"
+            ."Laporan:\n{$validated['report']}\n\n"
+            .'Dikirim melalui CariKosanMu AI.';
+
+        // Simpan jejak laporan sebelum mengirimnya. Selain membantu pemilik
+        // menelusuri laporan, ini mencegah bot menyatakan berhasil tanpa
+        // status pengiriman yang dapat diaudit.
+        $notification = WhatsappNotification::create([
+            'user_id' => $user->id,
+            'admin_id' => $owner->id,
+            'send_via' => 'admin',
+            'phone_number' => $ownerPhone,
+            'message_type' => 'laporan_penyewa',
+            'message_body' => $message,
+            'scheduled_date' => today(),
+            'status' => 'belum_dikirim',
+        ]);
+
+        $result = $this->waService->sendMessage(
+            WaSession::SUPERADMIN_SESSION_ID,
+            $ownerPhone,
+            $message,
+        );
+
+        if (! ($result['status'] ?? false)) {
+            $notification->update([
+                'status' => 'gagal',
+                'failed_reason' => $result['reason'] ?? 'Unknown error',
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Laporan belum dapat diteruskan ke pemilik kos. Silakan coba lagi nanti.',
+            ], 503);
+        }
+
+        $notification->update([
+            'status' => 'terkirim',
+            'sent_at' => now(),
+            'gateway_response' => $result['response'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan Anda telah diteruskan ke pemilik kos.',
+        ]);
+    }
+
+    public function userInvoices(Request $request, string $phone): JsonResponse
+    {
+        if ($response = $this->authorizeAiRequester($request, $phone, 'user')) {
+            return $response;
+        }
+
         $user = $this->findUserByPhone($phone);
 
         if (! $user) {
@@ -275,8 +376,12 @@ class AiDataController extends Controller
         ]);
     }
 
-    public function ownerSummary(string $phone): JsonResponse
+    public function ownerSummary(Request $request, string $phone): JsonResponse
     {
+        if ($response = $this->authorizeAiRequester($request, $phone, 'admin')) {
+            return $response;
+        }
+
         $user = $this->findUserByPhone($phone);
 
         if (! $user || $user->role !== 'admin') {
@@ -389,10 +494,13 @@ class AiDataController extends Controller
         }
 
         Cache::forget($cacheKey);
+        $verificationToken = Str::random(64);
+        Cache::put('ai_verified_session_'.$normalized, $verificationToken, now()->addMinutes(30));
 
         return response()->json([
             'success' => true,
             'message' => 'Verifikasi berhasil!',
+            'verification_token' => $verificationToken,
         ]);
     }
 
@@ -410,5 +518,39 @@ class AiDataController extends Controller
         return User::where('whatsapp_number', $normalized)
             ->orWhere('whatsapp_number', $localFormat)
             ->first();
+    }
+
+    private function authorizeAiRequester(Request $request, string $phone, string $requiredRole): ?JsonResponse
+    {
+        $requesterPhone = WhatsappNumber::normalize($request->header('X-AI-Requester-Phone'));
+        $requestedPhone = WhatsappNumber::normalize($phone);
+        $verificationToken = $request->header('X-AI-Verification-Token');
+
+        if (! $requesterPhone || ! $requestedPhone || $requesterPhone !== $requestedPhone || ! $verificationToken) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses data pribadi tidak diizinkan.',
+            ], 403);
+        }
+
+        $storedToken = Cache::get('ai_verified_session_'.$requestedPhone);
+
+        if (! is_string($storedToken) || ! hash_equals($storedToken, $verificationToken)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Verifikasi OTP diperlukan untuk mengakses data pribadi.',
+            ], 403);
+        }
+
+        $user = $this->findUserByPhone($requestedPhone);
+
+        if (! $user || $user->role !== $requiredRole) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses data pribadi tidak diizinkan.',
+            ], 403);
+        }
+
+        return null;
     }
 }

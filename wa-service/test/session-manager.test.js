@@ -3,6 +3,54 @@ const test = require('node:test');
 const { DisconnectReason } = require('@whiskeysockets/baileys');
 const SessionManager = require('../src/session-manager');
 
+test('does not claim success when the owner phone number is not on WhatsApp', async () => {
+    const manager = new SessionManager();
+    let sent = false;
+
+    manager.sessions.set('0', {
+        status: 'connected',
+        socket: {
+            onWhatsApp: async () => [],
+            sendMessage: async () => {
+                sent = true;
+            },
+        },
+    });
+
+    const result = await manager.sendMessage(0, '6281234567890', 'Laporan penyewa');
+
+    assert.equal(result.success, false);
+    assert.match(result.reason, /tidak terdaftar/i);
+    assert.equal(sent, false);
+});
+
+test('sends a report only after the owner phone number is verified on WhatsApp', async () => {
+    const manager = new SessionManager();
+    const calls = [];
+
+    manager.sessions.set('0', {
+        status: 'connected',
+        socket: {
+            onWhatsApp: async (jid) => {
+                calls.push(['lookup', jid]);
+                return [{ exists: true, jid }];
+            },
+            sendMessage: async (jid, payload) => {
+                calls.push(['send', jid, payload]);
+                return { key: { id: 'message-id' } };
+            },
+        },
+    });
+
+    const result = await manager.sendMessage(0, '081234567890', 'Laporan penyewa');
+
+    assert.deepEqual(result, { success: true, messageId: 'message-id' });
+    assert.deepEqual(calls, [
+        ['lookup', '6281234567890@s.whatsapp.net'],
+        ['send', '6281234567890@s.whatsapp.net', { text: 'Laporan penyewa' }],
+    ]);
+});
+
 test('restores sessions marked connected or connecting', async () => {
     const manager = new SessionManager();
     const restarted = [];

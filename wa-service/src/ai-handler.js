@@ -9,12 +9,16 @@ const MAX_TOOL_ITERATIONS = 5;
 const HISTORY_LIMIT = 6;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 20;
+const REPORT_SESSION_TIMEOUT_MS = 10 * 60 * 1000;
+const VERIFIED_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 
 const rateLimitMap = new Map();
 // Mapping untuk LID (Nomor tersembunyi) ke MSISDN asli
 const lidToPhoneMap = new Map();
 // Mapping untuk melacak nomor mana yang sedang mencoba login dari LID
 const pendingLoginMap = new Map();
+const tenantReportSessions = new Map();
+const verifiedSessions = new Map();
 
 const BASE_SYSTEM_PROMPT = `Kamu adalah CariKosanMu AI, asisten customer service platform CariKosanMu.
 Kamu HANYA menjawab dalam Bahasa Indonesia.
@@ -46,11 +50,15 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 - Gunakan format angka (1., 2., 3.) untuk daftar, BUKAN strip (-).
 
 ## Batasan Penting
-- Kamu HANYA bisa memberikan informasi, TIDAK bisa melakukan aksi (booking, bayar, edit profil, dll)
+- Kamu HANYA bisa memberikan informasi, TIDAK bisa melakukan aksi (booking, bayar, edit profil, dll). Pengecualian: laporan penyewa aktif diproses oleh alur sistem setelah konfirmasi "YA".
 - Untuk aksi, arahkan user ke website CariKosanMu
 - Jangan mengarang data kos, harga, atau informasi yang tidak ada di hasil tool
 - Jika tool mengembalikan error atau data kosong, sampaikan dengan jujur
-- Jangan memberikan informasi pribadi user lain (nomor WA, dll) kecuali kontak publik kos`;
+- Jika pertanyaan tidak memiliki data atau tool yang relevan, katakan bahwa informasi/fungsi tersebut belum tersedia di CariKosanMu. Jangan menjawab berdasarkan asumsi atau pengetahuan umum.
+- Jangan meminta /login atau /otp untuk pertanyaan umum. Minta login hanya ketika pengguna belum terverifikasi dan secara spesifik meminta data pribadi atau hendak membuat laporan.
+- Jangan memberikan nomor WhatsApp pemilik kos kepada guest. Nomor tersebut hanya boleh diberikan kepada penyewa yang memiliki sewa aktif melalui tool get_user_tenancy.
+- Semua data pribadi (kontak pemilik, data sewa, tagihan, ringkasan pemilik) dan pengiriman laporan WAJIB melalui /login lalu /otp, termasuk untuk pengirim dengan nomor WhatsApp biasa.
+- Jangan memberikan informasi pribadi user lain (nomor WA, dll)`;
 
 const NON_TEXT_REPLY = 'Maaf, saat ini saya hanya bisa memproses pesan teks. Silakan kirim pertanyaan Anda dalam bentuk teks ya. ðŸ™';
 
@@ -85,9 +93,223 @@ function checkRateLimit(phoneNumber) {
     return entry.count <= RATE_LIMIT_MAX;
 }
 
+function isHiddenPhoneNumber(phoneNumber) {
+    return phoneNumber.length > 14 && !phoneNumber.startsWith('628') && !phoneNumber.startsWith('08');
+}
+
+function getVerifiedSession(rawPhoneNumber, phoneNumber) {
+    const session = verifiedSessions.get(rawPhoneNumber);
+
+    if (!session) {
+        return null;
+    }
+
+    if (session.expiresAt < Date.now() || session.phoneNumber !== phoneNumber) {
+        verifiedSessions.delete(rawPhoneNumber);
+        return null;
+    }
+
+    return session;
+}
+
+function authenticationRequiredMessage() {
+    return 'Untuk menjaga privasi, silakan verifikasi akun terlebih dahulu dengan mengetik:\n\n/login [Nomor WA Anda, contoh: 081234567890]\n\nKami akan mengirimkan kode OTP ke nomor tersebut.';
+}
+
+function sanitizeAuthenticatedReply(reply, verifiedSession) {
+    if (!verifiedSession || !/(?:\/login\b|\/otp\b|verifikasi(?:kan)?\s+(?:akun|nomor)|login\s+(?:terlebih dahulu|dulu))/i.test(reply)) {
+        return reply;
+    }
+
+    return 'Akun Anda sudah terverifikasi. Namun, informasi atau fungsi yang Anda tanyakan belum tersedia di CariKosanMu. Saya dapat membantu pencarian kos, informasi akun yang tersedia, dan laporan penyewa.';
+}
+
+function hasReportIntent(message) {
+    return /\b(?:melapor(?:kan)?|lapor(?:kan)?|keluhan|komplain|aduan)\b/i.test(message);
+}
+
+function extractReportText(message) {
+    return message
+        .replace(/^(?:saya\s+)?(?:(?:ingin|mau|hendak)\s+)?(?:melapor(?:kan)?|lapor(?:kan)?|keluhan|komplain|aduan)\s*(?:tentang|bahwa)?\s*/i, '')
+        .trim();
+}
+
+function isValidReportText(reportText) {
+    return reportText.length >= 5 && reportText.length <= 1000;
+}
+
+function formatTenancyOptions(tenancies) {
+    return tenancies.map((tenancy, index) => (
+        `${index + 1}. *${tenancy.kos_name}* — Kamar ${tenancy.room_number || tenancy.room_name}`
+    )).join('\n');
+}
+
+function confirmationMessage(session) {
+    return `Laporan akan dikirim ke pemilik *${session.selectedTenancy.kos_name}* (Kamar ${session.selectedTenancy.room_number || session.selectedTenancy.room_name}):\n\n${session.reportText}\n\nKetik *YA* untuk kirim atau *BATAL* untuk membatalkan.`;
+}
+
+async function getReportTenancies(phoneNumber, verifiedSession) {
+    const identity = await executeTool('identify_user', { phone_number: phoneNumber });
+
+    if (!identity?.user || identity.role !== 'user') {
+        return { error: 'Laporan hanya dapat dibuat oleh penyewa dengan sewa aktif.' };
+    }
+
+    const tenancyData = await executeTool('get_user_tenancy', { phone_number: phoneNumber }, {
+        requesterPhone: phoneNumber,
+        role: 'user',
+        verificationToken: verifiedSession.verificationToken,
+    });
+    const tenancies = tenancyData?.tenancies || [];
+
+    if (!Array.isArray(tenancies) || tenancies.length === 0) {
+        return { error: 'Anda tidak memiliki sewa aktif, sehingga belum dapat membuat laporan.' };
+    }
+
+    return { tenancies };
+}
+
+function startReportConfirmation(phoneNumber, reportText, tenancy) {
+    const session = {
+        stage: 'confirm',
+        reportText,
+        selectedTenancy: tenancy,
+        expiresAt: Date.now() + REPORT_SESSION_TIMEOUT_MS,
+    };
+
+    tenantReportSessions.set(phoneNumber, session);
+    return confirmationMessage(session);
+}
+
+async function startTenantReport(phoneNumber, reportText, verifiedSession) {
+    const result = await getReportTenancies(phoneNumber, verifiedSession);
+
+    if (result.error) {
+        return result.error;
+    }
+
+    if (!isValidReportText(reportText)) {
+        tenantReportSessions.set(phoneNumber, {
+            stage: 'collect_report',
+            tenancies: result.tenancies,
+            expiresAt: Date.now() + REPORT_SESSION_TIMEOUT_MS,
+        });
+        return 'Silakan jelaskan laporan Anda secara singkat, misalnya: "AC kamar tidak dingin sejak pagi."';
+    }
+
+    if (result.tenancies.length === 1) {
+        return startReportConfirmation(phoneNumber, reportText, result.tenancies[0]);
+    }
+
+    tenantReportSessions.set(phoneNumber, {
+        stage: 'select_tenancy',
+        reportText,
+        tenancies: result.tenancies,
+        expiresAt: Date.now() + REPORT_SESSION_TIMEOUT_MS,
+    });
+
+    return `Laporan ini untuk kos yang mana?\n\n${formatTenancyOptions(result.tenancies)}\n\nBalas dengan nomor pilihan Anda.`;
+}
+
+async function handleTenantReport(phoneNumber, messageText, verifiedSession) {
+    if (isHiddenPhoneNumber(phoneNumber)) {
+        return null;
+    }
+
+    const message = messageText.trim();
+    const normalizedMessage = message.toLowerCase();
+    let session = tenantReportSessions.get(phoneNumber);
+
+    if (session && session.expiresAt < Date.now()) {
+        tenantReportSessions.delete(phoneNumber);
+        session = null;
+    }
+
+    if (!session) {
+        if (!hasReportIntent(message)) {
+            return null;
+        }
+
+        if (!verifiedSession) {
+            return authenticationRequiredMessage();
+        }
+
+        return startTenantReport(phoneNumber, extractReportText(message), verifiedSession);
+    }
+
+    if (normalizedMessage === 'batal' || normalizedMessage === 'batalkan') {
+        tenantReportSessions.delete(phoneNumber);
+        return 'Laporan dibatalkan. Jika masih membutuhkan bantuan, Anda dapat membuat laporan baru kapan saja.';
+    }
+
+    if (session.stage === 'collect_report') {
+        const reportText = extractReportText(message) || message;
+
+        if (!isValidReportText(reportText)) {
+            return 'Laporan perlu berisi minimal 5 karakter dan maksimal 1.000 karakter. Silakan jelaskan kendalanya kembali.';
+        }
+
+        if (session.tenancies.length === 1) {
+            return startReportConfirmation(phoneNumber, reportText, session.tenancies[0]);
+        }
+
+        tenantReportSessions.set(phoneNumber, {
+            ...session,
+            stage: 'select_tenancy',
+            reportText,
+            expiresAt: Date.now() + REPORT_SESSION_TIMEOUT_MS,
+        });
+        return `Laporan ini untuk kos yang mana?\n\n${formatTenancyOptions(session.tenancies)}\n\nBalas dengan nomor pilihan Anda.`;
+    }
+
+    if (session.stage === 'select_tenancy') {
+        const selectedIndex = Number.parseInt(normalizedMessage.match(/^\s*(?:kos\s*)?(?:nomor\s*)?(\d+)\s*$/)?.[1], 10) - 1;
+        const selectedTenancy = session.tenancies[selectedIndex];
+
+        if (!selectedTenancy) {
+            return `Pilihan tidak tersedia. Balas dengan salah satu nomor berikut:\n\n${formatTenancyOptions(session.tenancies)}`;
+        }
+
+        return startReportConfirmation(phoneNumber, session.reportText, selectedTenancy);
+    }
+
+    if (session.stage === 'confirm') {
+        if (normalizedMessage !== 'ya') {
+            return 'Untuk mengirim laporan, ketik *YA*. Ketik *BATAL* jika ingin membatalkannya.';
+        }
+
+        const result = await callInternalApi(
+            `/user/${encodeURIComponent(phoneNumber)}/report`,
+            'POST',
+            {
+                tenancy_id: session.selectedTenancy.id,
+                report: session.reportText,
+            },
+            verifiedSession,
+        );
+
+        if (result?.success) {
+            tenantReportSessions.delete(phoneNumber);
+            return result.message || 'Laporan Anda telah diteruskan ke pemilik kos.';
+        }
+
+        return result?.message || 'Laporan belum dapat diteruskan. Silakan coba lagi dengan mengetik YA.';
+    }
+
+    tenantReportSessions.delete(phoneNumber);
+    return null;
+}
+
 // Helper untuk call internal API di luar tool execution
-async function callInternalApi(endpoint, method = 'POST', body = null) {
-    return requestLaravelApi(endpoint, { method, body });
+async function callInternalApi(endpoint, method = 'POST', body = null, verifiedSession = null) {
+    return requestLaravelApi(endpoint, {
+        method,
+        body,
+        headers: verifiedSession ? {
+            'X-AI-Requester-Phone': verifiedSession.phoneNumber,
+            'X-AI-Verification-Token': verifiedSession.verificationToken,
+        } : {},
+    });
 }
 
 async function getChatHistory(phoneNumber) {
@@ -205,6 +427,8 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
     if (trimmedMessage === '/reset' || trimmedMessage === '/clear') {
         try {
             await clearChatHistory(phoneNumber);
+            tenantReportSessions.delete(phoneNumber);
+            verifiedSessions.delete(rawPhoneNumber);
             if (rawPhoneNumber !== phoneNumber) {
                 lidToPhoneMap.delete(rawPhoneNumber);
             }
@@ -213,6 +437,10 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
             console.error(`[AI] Error clearing chat for ${phoneNumber}:`, error.message);
             return 'Maaf, terjadi kesalahan saat mereset percakapan. Silakan coba lagi.';
         }
+    }
+
+    if (trimmedMessage === '/login') {
+        return 'Gunakan format: /login [Nomor WA Anda]. Contoh: /login 081234567890';
     }
 
     if (trimmedMessage.startsWith('/login ')) {
@@ -251,11 +479,18 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
                 lidToPhoneMap.set(rawPhoneNumber, formattedNumber);
                 phoneNumber = formattedNumber;
                 pendingLoginMap.delete(rawPhoneNumber);
+                verifiedSessions.set(rawPhoneNumber, {
+                    phoneNumber: formattedNumber,
+                    verificationToken: result.verification_token,
+                    expiresAt: Date.now() + VERIFIED_SESSION_TIMEOUT_MS,
+                });
                 
-                try {
-                    const db = getPool();
-                    await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
-                } catch (e) { /* ignore */ }
+                if (rawPhoneNumber !== formattedNumber) {
+                    try {
+                        const db = getPool();
+                        await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
+                    } catch (e) { /* ignore */ }
+                }
                 
                 return `✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
             } else {
@@ -268,11 +503,24 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
     }
 
     try {
+        const verifiedSession = getVerifiedSession(rawPhoneNumber, phoneNumber);
+        const reportReply = await handleTenantReport(phoneNumber, messageText, verifiedSession);
+        if (reportReply) {
+            return reportReply;
+        }
+    } catch (error) {
+        console.error(`[AI] Error handling tenant report for ${phoneNumber}:`, error.message);
+        return 'Maaf, laporan belum dapat diproses. Silakan coba lagi nanti.';
+    }
+
+    try {
         // 1. Identifikasi user secara otomatis sebelum memanggil LLM
         let userInfoStr = '';
+        let senderRole = 'guest';
+        const verifiedSession = getVerifiedSession(rawPhoneNumber, phoneNumber);
         
         // Deteksi apakah phoneNumber adalah format LID
-        const isHiddenNumber = phoneNumber.length > 14 && !phoneNumber.startsWith('628') && !phoneNumber.startsWith('08');
+        const isHiddenNumber = isHiddenPhoneNumber(phoneNumber);
 
         if (isHiddenNumber) {
             userInfoStr = `\n\n## INFO PENGIRIM PESAN INI
@@ -296,6 +544,7 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
                 // Format identitas untuk disuntikkan ke System Prompt
                 if (identity && identity.role !== 'guest' && identity.user) {
                     const u = identity.user;
+                    senderRole = identity.role;
                     userInfoStr = `\n\n## INFO PENGIRIM PESAN INI (JANGAN TANYAKAN NOMORNYA LAGI)\n` +
                                   `- Nama: ${u.name}\n` +
                                   `- Nomor WA: ${u.whatsapp_number}\n` +
@@ -307,6 +556,12 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
                     } else if (u.role === 'user') {
                         userInfoStr += `- Punya Sewa Aktif: ${u.active_tenancy ? 'Ya' : 'Tidak'}\n` +
                                        `\nSebagai Penyewa, user ini berhak mengecek tagihan dan masa sewanya menggunakan tool get_user_tenancy dan get_user_invoices. Selalu gunakan nomor WA di atas untuk parameter phone_number.`;
+                    }
+
+                    if (verifiedSession) {
+                        userInfoStr += '\n\nStatus verifikasi: Sudah OTP dan masih aktif. Jangan meminta /login atau /otp lagi. Jika data yang diminta tidak tersedia, jawab dengan jujur bahwa informasi/fungsinya belum tersedia.';
+                    } else {
+                        userInfoStr += '\n\nStatus verifikasi: Belum OTP. Jangan memanggil tool data pribadi. Jika user memintanya, arahkan untuk /login lalu /otp.';
                     }
                 } else {
                     userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Role: guest (Belum terdaftar atau belum login)\n- Nomor WA: ${phoneNumber}\n\nSebagai guest, arahkan user untuk mendaftar jika ingin melihat tagihan atau menyewa kos.`;
@@ -354,7 +609,11 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
 
                     console.log(`[AI] Tool call: ${toolName}(${toolArgs})`);
 
-                    const toolResult = await executeTool(toolName, toolArgs);
+                    const toolResult = await executeTool(toolName, toolArgs, {
+                        requesterPhone: phoneNumber,
+                        role: senderRole,
+                        verificationToken: verifiedSession?.verificationToken,
+                    });
 
                     // Intercept aksi khusus dari tool (misalnya register nomor LID)
                     if (toolResult && toolResult._action === 'register_mapping') {
@@ -388,7 +647,10 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
                 continue;
             }
 
-            const rawReply = message.content || 'Maaf, saya tidak bisa memproses permintaan Anda saat ini.';
+            const rawReply = sanitizeAuthenticatedReply(
+                message.content || 'Maaf, saya tidak bisa memproses permintaan Anda saat ini.',
+                verifiedSession,
+            );
             const reply = formatForWhatsApp(rawReply);
 
             await saveChatMessage(phoneNumber, 'user', messageText);
@@ -404,7 +666,7 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
     }
 }
 
-module.exports = { handleIncomingMessage, NON_TEXT_REPLY };
+module.exports = { handleIncomingMessage, NON_TEXT_REPLY, sanitizeAuthenticatedReply };
 
 
 

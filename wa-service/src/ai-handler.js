@@ -1,4 +1,4 @@
-const { getPool } = require('./database');
+﻿const { getPool } = require('./database');
 const { toolDefinitions, executeTool, requestLaravelApi } = require('./ai-tools');
 
 const ROUTER_BASE_URL = (process.env['9ROUTER_BASE_URL'] || 'http://localhost:20128').replace(/\/+$/, '');
@@ -30,7 +30,7 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 
 ## Panduan Menjawab
 - Jawab dengan ramah, profesional, dan to the point.
-- Gunakan emoji dengan wajar dan ramah (misal: dY`<, dY~S, dY?, dY'), terutama pada sapaan atau penutup.
+- Gunakan emoji dengan wajar dan ramah (seperlunya saja), terutama pada sapaan atau penutup.
 - Soroti poin-poin penting seperti nama kos, nominal harga, atau status dengan menggunakan tanda bintang ganda untuk teks tebal (contoh: **Kos Mawar** atau **Rp500.000**).
 - Gunakan tools untuk mengambil data real-time, JANGAN mengarang data.
 - SAAT MEREKOMENDASIKAN KOS: 
@@ -52,7 +52,7 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 - Jika tool mengembalikan error atau data kosong, sampaikan dengan jujur
 - Jangan memberikan informasi pribadi user lain (nomor WA, dll) kecuali kontak publik kos`;
 
-const NON_TEXT_REPLY = 'Maaf, saat ini saya hanya bisa memproses pesan teks. Silakan kirim pertanyaan Anda dalam bentuk teks ya. 🙏';
+const NON_TEXT_REPLY = 'Maaf, saat ini saya hanya bisa memproses pesan teks. Silakan kirim pertanyaan Anda dalam bentuk teks ya. ðŸ™';
 
 function formatForWhatsApp(text) {
     if (!text) return text;
@@ -196,7 +196,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
     let phoneNumber = lidToPhoneMap.get(rawPhoneNumber) || rawPhoneNumber;
 
     if (!checkRateLimit(phoneNumber)) {
-        return 'Mohon maaf, Anda terlalu sering mengirim pesan. Silakan tunggu sebentar lalu coba lagi. 🙏';
+        return 'Mohon maaf, Anda terlalu sering mengirim pesan. Silakan tunggu sebentar lalu coba lagi. ðŸ™';
     }
 
     const trimmedMessage = messageText.trim().toLowerCase();
@@ -208,7 +208,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
             if (rawPhoneNumber !== phoneNumber) {
                 lidToPhoneMap.delete(rawPhoneNumber);
             }
-            return '✅ Riwayat percakapan Anda dengan saya telah berhasil dihapus. Mari mulai dari awal! Ada yang bisa saya bantu?';
+            return 'âœ… Riwayat percakapan Anda dengan saya telah berhasil dihapus. Mari mulai dari awal! Ada yang bisa saya bantu?';
         } catch (error) {
             console.error(`[AI] Error clearing chat for ${phoneNumber}:`, error.message);
             return 'Maaf, terjadi kesalahan saat mereset percakapan. Silakan coba lagi.';
@@ -257,7 +257,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
                     await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
                 } catch (e) { /* ignore */ }
                 
-                return `✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
+                return `âœ… Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
             } else {
                 return result.message || 'Kode OTP salah atau kedaluwarsa.';
             }
@@ -387,8 +387,9 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
         return 'Maaf, saya membutuhkan waktu lebih lama untuk memproses permintaan Anda. Silakan coba lagi.';
     } catch (error) {
         console.error(`[AI] Error handling message from ${phoneNumber}:`, error.message);
-        return 'Maaf, terjadi gangguan pada sistem. Silakan coba lagi nanti. 🙏';
+        return 'Maaf, terjadi gangguan pada sistem. Silakan coba lagi nanti. ðŸ™';
     }
 }
 
 module.exports = { handleIncomingMessage, NON_TEXT_REPLY };
+

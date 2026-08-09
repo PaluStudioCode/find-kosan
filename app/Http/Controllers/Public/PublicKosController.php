@@ -15,15 +15,48 @@ class PublicKosController extends Controller
         $lng = (float) $request->query('lng');
         $radius = (float) $request->query('radius', 5);
         $highlightKosId = $request->query('highlight_kos_id');
+        $minPrice = $request->query('min_price');
+        $maxPrice = $request->query('max_price');
+        $facilitiesQuery = $request->query('facilities'); // array of facility IDs
 
         $query = BoardingHouse::with([
             'facilities',
             'photos' => function ($q) {
                 $q->where('is_primary', true);
             },
-        ])->where('status', 'dipublikasikan')
+        ])->withMin('rooms', 'price') // Include minimum room price
+          ->where('status', 'dipublikasikan')
           ->whereNotNull('latitude')
           ->whereNotNull('longitude');
+
+        // Apply Price Filter
+        if ($minPrice || $maxPrice) {
+            $query->whereHas('rooms', function ($q) use ($minPrice, $maxPrice) {
+                $q->where('status', 'tersedia'); // Only consider available rooms for price filter
+                if ($minPrice) {
+                    $q->where('price', '>=', $minPrice);
+                }
+                if ($maxPrice) {
+                    $q->where('price', '<=', $maxPrice);
+                }
+            });
+        }
+
+        // Apply Facilities Filter (Checks both Kos Facilities and Available Room Facilities)
+        if ($facilitiesQuery && is_array($facilitiesQuery) && count($facilitiesQuery) > 0) {
+            foreach ($facilitiesQuery as $facilityId) {
+                $query->where(function ($subQuery) use ($facilityId) {
+                    $subQuery->whereHas('facilities', function ($q) use ($facilityId) {
+                        $q->where('facilities.id', $facilityId);
+                    })->orWhereHas('rooms', function ($q) use ($facilityId) {
+                        $q->where('status', 'tersedia')
+                          ->whereHas('facilities', function ($q2) use ($facilityId) {
+                              $q2->where('facilities.id', $facilityId);
+                          });
+                    });
+                });
+            }
+        }
 
         if ($lat && $lng) {
             // SQL Haversine Formula
@@ -42,13 +75,23 @@ class PublicKosController extends Controller
         // Limit the result to avoid overloading the browser map
         $allKos = $query->limit(100)->get();
 
+        // Get essential facilities for filter master data
+        $essentialFacilityNames = ['WiFi / Internet', 'Kamar Mandi Dalam', 'AC', 'Parkir Mobil'];
+        $filterFacilities = \App\Models\Facility::whereIn('name', $essentialFacilityNames)
+            ->where('status', 'aktif')
+            ->get(['id', 'name']);
+
         return Inertia::render('Public/Kos/Index', [
             'allKos' => $allKos,
+            'filterFacilities' => $filterFacilities,
             'filters' => [
                 'lat' => $lat,
                 'lng' => $lng,
                 'radius' => $radius,
                 'highlight_kos_id' => $highlightKosId,
+                'min_price' => $minPrice,
+                'max_price' => $maxPrice,
+                'facilities' => $facilitiesQuery ?? [],
             ]
         ]);
     }

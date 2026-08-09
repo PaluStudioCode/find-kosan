@@ -1,7 +1,9 @@
 const LARAVEL_API_URL = (process.env.LARAVEL_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 const LARAVEL_API_KEY = process.env.LARAVEL_API_KEY || process.env.WA_SERVICE_API_KEY || process.env.API_KEY || '';
+const configuredTimeout = Number.parseInt(process.env.LARAVEL_API_TIMEOUT_MS || '10000', 10);
+const LARAVEL_API_TIMEOUT_MS = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10000;
 
-async function callLaravelApi(endpoint, params = {}) {
+async function requestLaravelApi(endpoint, { method = 'GET', params = {}, body = null } = {}) {
     const url = new URL(`${LARAVEL_API_URL}/api/ai${endpoint}`);
     for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null && value !== '') {
@@ -9,13 +11,28 @@ async function callLaravelApi(endpoint, params = {}) {
         }
     }
 
-    const response = await fetch(url.toString(), {
-        method: 'GET',
+    const options = {
+        method,
         headers: {
             'X-Internal-API-Key': LARAVEL_API_KEY,
             'Accept': 'application/json',
         },
-    });
+        signal: AbortSignal.timeout(LARAVEL_API_TIMEOUT_MS),
+    };
+
+    if (body !== null) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+    }
+
+    let response;
+    try {
+        response = await fetch(url.toString(), options);
+    } catch (error) {
+        const reason = error.cause?.message || error.message;
+        console.error(`[AI-Tools] Laravel API request failed: ${method} ${url.toString()} (${reason})`);
+        throw new Error(`Laravel API tidak dapat dihubungi: ${reason}`);
+    }
 
     if (!response.ok) {
         const text = await response.text();
@@ -23,6 +40,10 @@ async function callLaravelApi(endpoint, params = {}) {
     }
 
     return response.json();
+}
+
+async function callLaravelApi(endpoint, params = {}) {
+    return requestLaravelApi(endpoint, { params });
 }
 
 const toolDefinitions = [
@@ -233,4 +254,4 @@ async function executeTool(name, argsJson) {
     }
 }
 
-module.exports = { toolDefinitions, executeTool };
+module.exports = { toolDefinitions, executeTool, requestLaravelApi };

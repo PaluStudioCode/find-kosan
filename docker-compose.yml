@@ -53,6 +53,7 @@ services:
       - DB_USER=${DB_USERNAME}
       - DB_NAME=${DB_DATABASE}
       - DB_PASSWORD=${DB_PASSWORD}
+      - LARAVEL_API_URL=http://web:80
     depends_on:
       - db
       - web

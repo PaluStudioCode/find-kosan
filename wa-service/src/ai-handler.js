@@ -1,5 +1,5 @@
 const { getPool } = require('./database');
-const { toolDefinitions, executeTool } = require('./ai-tools');
+const { toolDefinitions, executeTool, requestLaravelApi } = require('./ai-tools');
 
 const ROUTER_BASE_URL = (process.env['9ROUTER_BASE_URL'] || 'http://localhost:20128').replace(/\/+$/, '');
 const ROUTER_API_KEY = process.env['9ROUTER_API_KEY'] || '';
@@ -34,9 +34,14 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 - Soroti poin-poin penting seperti nama kos, nominal harga, atau status dengan menggunakan tanda bintang ganda untuk teks tebal (contoh: **Kos Mawar** atau **Rp500.000**).
 - Gunakan tools untuk mengambil data real-time, JANGAN mengarang data.
 - SAAT MEREKOMENDASIKAN KOS: 
-  1. Sebutkan nama kos dan alamat.
-  2. Sebutkan rentang harga sewa.
-  3. Berikan link/URL secara utuh dan terpisah di baris baru agar bisa diklik. (Format: Link: http://...) Jangan bungkus link dengan tanda kurung atau teks lain.
+  1. WAJIB gunakan kalimat pembuka (misal: "Berikut beberapa rekomendasi kos dekat [Lokasi]: \uD83D\uDE0A")
+  2. Gunakan format berikut SECARA KETAT untuk setiap kos (jangan ubah format ini):
+  *[Nomor Urut]. [Nama Kos]*
+  [Alamat Kos]
+  Harga: *Rp[Harga Minimum] - Rp[Harga Maksimum]/bulan*
+  [URL Kos secara utuh, HANYA link saja tanpa tambahan teks]
+
+  3. WAJIB tambahkan kalimat penutup ini di paling bawah daftar rekomendasi: "Silakan klik link untuk melihat detail kos, ketersediaan kamar, dan fasilitas."
 - Jangan menyebutkan nama/nomor/role user jika tidak ditanyakan secara spesifik.
 - Gunakan format angka (1., 2., 3.) untuk daftar, BUKAN strip (-).
 
@@ -82,25 +87,7 @@ function checkRateLimit(phoneNumber) {
 
 // Helper untuk call internal API di luar tool execution
 async function callInternalApi(endpoint, method = 'POST', body = null) {
-    const baseUrl = process.env.LARAVEL_API_URL || 'http://127.0.0.1:8000';
-    const finalUrl = `${baseUrl}/api/ai${endpoint}`;
-    const apiKey = process.env.LARAVEL_API_KEY || process.env.WA_SERVICE_API_KEY || process.env.API_KEY || '';
-    
-    const options = {
-        method,
-        headers: {
-            'X-Internal-API-Key': apiKey,
-            'Accept': 'application/json',
-        }
-    };
-    
-    if (body) {
-        options.headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(body);
-    }
-
-    const response = await fetch(finalUrl, options);
-    return response.json();
+    return requestLaravelApi(endpoint, { method, body });
 }
 
 async function getChatHistory(phoneNumber) {

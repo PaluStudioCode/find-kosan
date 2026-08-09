@@ -104,7 +104,7 @@ class AiDataController extends Controller
             return [
                 'id' => $kos->id,
                 'name' => $kos->name,
-                'url' => url('/kos/'.$kos->id),
+                'url' => rtrim(config('app.url'), '/') . '/kos/' . $kos->id,
                 'address' => $kos->address,
                 'city' => $kos->city,
                 'district' => $kos->district,
@@ -144,7 +144,7 @@ class AiDataController extends Controller
         return response()->json([
             'id' => $kos->id,
             'name' => $kos->name,
-            'url' => url('/kos/'.$kos->id),
+            'url' => rtrim(config('app.url'), '/') . '/kos/' . $kos->id,
             'description' => $kos->description,
             'address' => $kos->address,
             'city' => $kos->city,
@@ -308,7 +308,7 @@ class AiDataController extends Controller
             'kos_list' => $kosList->map(fn ($kos) => [
                 'id' => $kos->id,
                 'name' => $kos->name,
-                'url' => url('/kos/'.$kos->id),
+                'url' => rtrim(config('app.url'), '/') . '/kos/' . $kos->id,
                 'address' => $kos->address,
                 'total_rooms' => $kos->rooms_count,
                 'available_rooms' => $kos->available_rooms_count,

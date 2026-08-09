@@ -30,11 +30,11 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 
 ## Panduan Menjawab
 - Jawab dengan ramah, profesional, dan to the point.
-- Gunakan emoji dengan wajar dan ramah (seperlunya saja), terutama pada sapaan atau penutup.
+- Hindari menggunakan emoji yang tidak standar atau karakter aneh. Jika ragu, tidak perlu pakai emoji.
 - Soroti poin-poin penting seperti nama kos, nominal harga, atau status dengan menggunakan tanda bintang ganda untuk teks tebal (contoh: **Kos Mawar** atau **Rp500.000**).
 - Gunakan tools untuk mengambil data real-time, JANGAN mengarang data.
 - SAAT MEREKOMENDASIKAN KOS: 
-  1. WAJIB gunakan kalimat pembuka (misal: "Berikut beberapa rekomendasi kos dekat [Lokasi]: \uD83D\uDE0A")
+  1. WAJIB gunakan kalimat pembuka (misal: "Berikut beberapa rekomendasi kos dekat [Lokasi]:")
   2. Gunakan format berikut SECARA KETAT untuk setiap kos (jangan ubah format ini):
   *[Nomor Urut]. [Nama Kos]*
   [Alamat Kos]
@@ -275,7 +275,20 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
         const isHiddenNumber = phoneNumber.length > 14 && !phoneNumber.startsWith('628') && !phoneNumber.startsWith('08');
 
         if (isHiddenNumber) {
-            userInfoStr = `\n\n## INFO PENGIRIM PESAN INI\n- Role: guest\n- Status Privasi: Nomor pengirim disembunyikan oleh WhatsApp (Linked Device/LID).\n\nSebagai asisten, WAJIB katakan ini (salin persis kalimat berikut):\n"Maaf, karena pengaturan privasi WhatsApp, saya tidak dapat melihat nomor Anda. Agar saya bisa melayani informasi akun Anda dengan aman, silakan login dengan mengetik:\n\n/login [Nomor WA Anda, contoh: 08123456...]\n\nKami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifikasi."\n\nJangan memproses pencarian data pribadi sampai user memverifikasi nomornya.`;
+            userInfoStr = `\n\n## INFO PENGIRIM PESAN INI
+- Role: guest
+- Status Privasi: Nomor pengirim disembunyikan oleh WhatsApp (Linked Device/LID).
+
+INSTRUKSI PENTING UNTUK NOMOR TERSEMBUNYI:
+1. Jika user hanya bertanya info umum (cari kos, daftar fasilitas, lokasi), JAWAB SEPERTI BIASA dan berikan informasinya. TIDAK PERLU meminta login.
+2. JIKA DAN HANYA JIKA user meminta informasi pribadi akunnya (contoh: tagihan, status sewa, saldo, kos yang dimiliki), MAKA WAJIB balas dengan kalimat berikut ini HANYA JIKA DITANYA DATA PRIBADI (jangan gunakan kalimat ini di awal chat/sapaan biasa):
+"Maaf, karena pengaturan privasi WhatsApp, saya tidak dapat melihat nomor Anda. Agar saya bisa melayani informasi akun Anda dengan aman, silakan login dengan mengetik:
+
+/login [Nomor WA Anda, contoh: 08123456...]
+
+Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifikasi."
+
+3. Jangan memproses tool data pribadi (get_user_tenancy, get_user_invoices, get_owner_summary) sebelum user memverifikasi nomornya.`;
         } else {
             try {
                 const identity = await executeTool('identify_user', { phone_number: phoneNumber });

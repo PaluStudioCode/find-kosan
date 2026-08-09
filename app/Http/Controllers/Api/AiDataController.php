@@ -355,7 +355,7 @@ class AiDataController extends Controller
 
         Cache::put($cacheKey, $otp, now()->addMinutes(5));
 
-        $message = "Halo {$user->name}, ini adalah FindKos AI.\n\n"
+        $message = "Halo {$user->name}, ini adalah CariKosanMu AI.\n\n"
             ."Seseorang mencoba menautkan akun Anda dari obrolan rahasia. Jika ini Anda, balas obrolan tersebut dengan kode berikut:\n\n"
             ."*{$otp}*\n\n"
             .'Kode ini berlaku selama 5 menit. Jangan berikan kode ini kepada siapapun!';

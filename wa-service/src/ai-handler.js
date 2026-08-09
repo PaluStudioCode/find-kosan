@@ -30,7 +30,7 @@ CariKosanMu adalah platform pencarian kos dan pengelolaan sewa properti. User bi
 
 ## Panduan Menjawab
 - Jawab dengan ramah, profesional, dan to the point.
-- Hindari menggunakan emoji yang tidak standar atau karakter aneh. Jika ragu, tidak perlu pakai emoji.
+- Gunakan 1 atau 2 emoji umum (seperti 😊, 🙏, atau ✅) di setiap balasan agar terlihat ramah, tetapi jangan berlebihan.
 - Soroti poin-poin penting seperti nama kos, nominal harga, atau status dengan menggunakan tanda bintang ganda untuk teks tebal (contoh: **Kos Mawar** atau **Rp500.000**).
 - Gunakan tools untuk mengambil data real-time, JANGAN mengarang data.
 - SAAT MEREKOMENDASIKAN KOS: 
@@ -208,7 +208,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
             if (rawPhoneNumber !== phoneNumber) {
                 lidToPhoneMap.delete(rawPhoneNumber);
             }
-            return 'âœ… Riwayat percakapan Anda dengan saya telah berhasil dihapus. Mari mulai dari awal! Ada yang bisa saya bantu?';
+            return '✅ Riwayat percakapan Anda dengan saya telah berhasil dihapus. Mari mulai dari awal! Ada yang bisa saya bantu?';
         } catch (error) {
             console.error(`[AI] Error clearing chat for ${phoneNumber}:`, error.message);
             return 'Maaf, terjadi kesalahan saat mereset percakapan. Silakan coba lagi.';
@@ -257,7 +257,7 @@ async function handleIncomingMessage(rawPhoneNumber, messageText) {
                     await db.execute('UPDATE wa_conversations SET phone_number = ? WHERE phone_number = ?', [formattedNumber, rawPhoneNumber]);
                 } catch (e) { /* ignore */ }
                 
-                return `âœ… Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
+                return ✅ Autentikasi berhasil! Nomor WhatsApp Anda (${formattedNumber}) telah terhubung ke obrolan ini. Silakan tanyakan informasi akun Anda.`;
             } else {
                 return result.message || 'Kode OTP salah atau kedaluwarsa.';
             }
@@ -405,4 +405,14 @@ Kami akan mengirimkan pesan berisi kode rahasia ke nomor tersebut untuk verifika
 }
 
 module.exports = { handleIncomingMessage, NON_TEXT_REPLY };
+
+
+
+
+
+
+
+
+
+
 

@@ -1,5 +1,6 @@
 const {
     default: makeWASocket,
+    DisconnectReason,
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
 } = require('@whiskeysockets/baileys');
@@ -401,9 +402,22 @@ class SessionManager {
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const reason = lastDisconnect?.error?.message;
 
-            // PENTING: Jangan PERNAH menghapus credential secara otomatis saat restart/crash!
-            // Server WA sering memberikan 401/403 palsu saat reconnecting dari state yang tidak bersih.
-            // Kredensial HANYA dihapus jika dipanggil dari endpoint /sessions/:id/stop (fungsi stopSession).
+            if (statusCode === DisconnectReason.loggedOut) {
+                session.stopping = true;
+                this.clearReconnectTimer(adminId);
+                this.sessions.delete(adminId);
+
+                try {
+                    await this._clearAuthState(adminId);
+                } catch (error) {
+                    console.error(`[Session ${adminId}] Failed to clear logged-out credentials:`, error.message);
+                }
+
+                await this._updateDbStatus(adminId, 'disconnected');
+                console.log(`[Session ${adminId}] Logged out by WhatsApp. Session cleared.`);
+                return;
+            }
+
             console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}, Reason: ${reason}. Reconnect: true`);
 
             session.status = 'connecting';

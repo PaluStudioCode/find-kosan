@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { DisconnectReason } = require('@whiskeysockets/baileys');
 const SessionManager = require('../src/session-manager');
 
 test('restores sessions marked connected or connecting', async () => {
@@ -94,4 +95,30 @@ test('persists reconnecting state after an unexpected socket close', async () =>
     assert.equal(manager.reconnectTimers.has('42'), true);
 
     manager.clearReconnectTimer('42');
+});
+
+test('clears credentials and stops retrying after WhatsApp logs the user out', async () => {
+    const manager = new SessionManager();
+    const socket = {};
+    const session = { socket, status: 'connected', stopping: false, reconnectAttempts: 0 };
+    const calls = [];
+
+    manager.sessions.set('42', session);
+    manager._clearAuthState = async (adminId) => calls.push(`clear:${adminId}`);
+    manager._updateDbStatus = async (adminId, status) => calls.push(`db:${adminId}:${status}`);
+
+    await manager._handleConnectionUpdate('42', session, socket, {
+        connection: 'close',
+        lastDisconnect: {
+            error: {
+                output: { statusCode: DisconnectReason.loggedOut },
+                message: 'logged out',
+            },
+        },
+    });
+
+    assert.equal(manager.getSession('42'), null);
+    assert.equal(manager.reconnectTimers.has('42'), false);
+    assert.equal(session.stopping, true);
+    assert.deepEqual(calls, ['clear:42', 'db:42:disconnected']);
 });

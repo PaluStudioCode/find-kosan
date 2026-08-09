@@ -58,14 +58,19 @@ class WhatsappSettingsController extends Controller
         $liveStatus = $this->waService->getStatus(WaSession::SUPERADMIN_SESSION_ID);
         $session = WaSession::superAdminSession()->first();
 
-        $status = $liveStatus['status'] ?? ($session?->status ?? 'disconnected');
-        $phoneNumber = $liveStatus['phoneNumber'] ?? $session?->phone_number;
+        $serviceAvailable = (bool) ($liveStatus['success'] ?? false);
+        $status = $serviceAvailable
+            ? ($liveStatus['status'] ?? 'disconnected')
+            : ($session?->status ?? 'disconnected');
+        $phoneNumber = $serviceAvailable
+            ? ($liveStatus['phoneNumber'] ?? $session?->phone_number)
+            : $session?->phone_number;
         $connectedAt = $session?->connected_at?->toISOString();
 
         // If live status is disconnected but DB still says connected,
         // the session was likely dropped on the wa-service side. Mark
         // it disconnected in DB so subsequent page loads are consistent.
-        if ($status === 'disconnected' && $session && $session->status !== 'disconnected') {
+        if ($serviceAvailable && $status === 'disconnected' && $session && $session->status !== 'disconnected') {
             $session->update([
                 'status' => 'disconnected',
                 'disconnected_at' => now(),
@@ -74,11 +79,12 @@ class WhatsappSettingsController extends Controller
         }
 
         return response()->json([
-            'success' => $liveStatus['success'] ?? true,
+            'success' => $serviceAvailable,
             'status' => $status,
             'phone_number' => $phoneNumber,
             'pairingCode' => $liveStatus['pairingCode'] ?? null,
             'connected_at' => $connectedAt,
+            'error' => $liveStatus['error'] ?? null,
         ]);
     }
 
@@ -108,9 +114,9 @@ class WhatsappSettingsController extends Controller
         $type = $request->query('type', 'jatuh_tempo');
 
         if ($type === 'jatuh_tempo') {
-            $message = "Halo Uji Coba, ini adalah pengingat simulasi bahwa tagihan sewa kamar Anda di Kos Dummy sebesar Rp1.500.000 jatuh tempo HARI INI (" . today()->format('d M Y') . ").\n\nSilakan abaikan pesan ini, ini hanya testing dari SuperAdmin.";
+            $message = 'Halo Uji Coba, ini adalah pengingat simulasi bahwa tagihan sewa kamar Anda di Kos Dummy sebesar Rp1.500.000 jatuh tempo HARI INI ('.today()->format('d M Y').").\n\nSilakan abaikan pesan ini, ini hanya testing dari SuperAdmin.";
         } else {
-            $message = "Halo! Ini adalah pesan uji coba (testing) dari sistem CariKosanMu. Jika Anda menerima pesan ini, artinya Gateway WhatsApp beroperasi dengan baik.";
+            $message = 'Halo! Ini adalah pesan uji coba (testing) dari sistem CariKosanMu. Jika Anda menerima pesan ini, artinya Gateway WhatsApp beroperasi dengan baik.';
         }
 
         // Send immediately bypassing queue
@@ -121,7 +127,7 @@ class WhatsappSettingsController extends Controller
             'message_type' => $type,
             'phone' => $normalized,
             'wa_api_response' => $result,
-            'note' => 'Pesan dikirim secara instan (bypassing queue)'
+            'note' => 'Pesan dikirim secara instan (bypassing queue)',
         ]);
     }
 }

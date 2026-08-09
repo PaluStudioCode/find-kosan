@@ -23,20 +23,12 @@ async function start() {
         // Initialize database tables
         await initTables();
 
-        // Start Express server
+        await sessionManager.restartSavedSessions();
+
         app.listen(PORT, () => {
             console.log(`[WA-Service] Running on http://localhost:${PORT}`);
             console.log(`[WA-Service] Health check: http://localhost:${PORT}/api/health`);
         });
-
-        // Auto-restart saved sessions after a short delay
-        setTimeout(async () => {
-            try {
-                await sessionManager.restartSavedSessions();
-            } catch (error) {
-                console.error('[WA-Service] Failed to restart saved sessions:', error.message);
-            }
-        }, 2000);
 
     } catch (error) {
         console.error('[WA-Service] Fatal error:', error);

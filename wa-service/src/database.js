@@ -7,9 +7,9 @@ function getPool() {
         pool = mysql.createPool({
             host: process.env.DB_HOST || '127.0.0.1',
             port: parseInt(process.env.DB_PORT || '3306'),
-            user: process.env.DB_USER || 'root',
+            user: process.env.DB_USER || process.env.DB_USERNAME || 'root',
             password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'kos_online',
+            database: process.env.DB_NAME || process.env.DB_DATABASE || 'kos_online',
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0,

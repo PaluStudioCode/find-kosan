@@ -1,6 +1,5 @@
 const {
     default: makeWASocket,
-    DisconnectReason,
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
 } = require('@whiskeysockets/baileys');
@@ -16,6 +15,7 @@ class SessionManager {
     constructor() {
         /** @type {Map<string, object>} adminId -> { socket, qr, status, pairingCode } */
         this.sessions = new Map();
+        this.reconnectTimers = new Map();
     }
 
     /**
@@ -23,6 +23,46 @@ class SessionManager {
      */
     getSession(adminId) {
         return this.sessions.get(String(adminId)) || null;
+    }
+
+    isCurrentSession(adminId, session, socket = null) {
+        return Boolean(session)
+            && this.getSession(adminId) === session
+            && !session.stopping
+            && (!socket || session.socket === socket);
+    }
+
+    clearReconnectTimer(adminId) {
+        const timer = this.reconnectTimers.get(adminId);
+        if (timer) {
+            clearTimeout(timer);
+            this.reconnectTimers.delete(adminId);
+        }
+    }
+
+    scheduleReconnect(adminId, session, socket = null) {
+        if (!this.isCurrentSession(adminId, session, socket)) return;
+
+        this.clearReconnectTimer(adminId);
+        const delay = Math.min(30000, 5000 * (2 ** Math.min(session.reconnectAttempts || 0, 2)));
+        session.reconnectAttempts = (session.reconnectAttempts || 0) + 1;
+
+        const timer = setTimeout(async () => {
+            this.reconnectTimers.delete(adminId);
+
+            if (!this.isCurrentSession(adminId, session, socket)) return;
+
+            session.socket = null;
+
+            try {
+                await this._createSocket(adminId, session);
+            } catch (error) {
+                console.error(`[Session ${adminId}] Reconnect failed:`, error.message);
+                this.scheduleReconnect(adminId, session);
+            }
+        }, delay);
+
+        this.reconnectTimers.set(adminId, timer);
     }
 
     /**
@@ -49,21 +89,24 @@ class SessionManager {
         adminId = String(adminId);
         const { usePairingCode = false, phoneNumber = null } = options;
 
-        // If session already exists and is connected, return it
+        // If session already exists, keep its current socket and state.
         const existing = this.getSession(adminId);
         if (existing && existing.status === 'connected') {
             return { status: 'already_connected', phoneNumber: existing.phoneNumber };
         }
 
-        // If there's an existing socket, close it first
-        if (existing && existing.socket) {
-            try {
-                existing.socket.end();
-            } catch (e) { /* ignore */ }
+        if (existing && existing.status === 'connecting') {
+            return {
+                status: 'connecting',
+                qr: existing.qrBase64 || null,
+                pairingCode: existing.pairingCode || null,
+            };
         }
 
+        this.clearReconnectTimer(adminId);
+
         // Initialize session data
-        this.sessions.set(adminId, {
+        const session = {
             socket: null,
             qr: null,
             qrBase64: null,
@@ -72,18 +115,21 @@ class SessionManager {
             phoneNumber: null,
             usePairingCode,
             requestedPhoneNumber: phoneNumber,
-        });
+            reconnectAttempts: 0,
+            stopping: false,
+        };
+
+        this.sessions.set(adminId, session);
 
         await this._updateDbStatus(adminId, 'connecting');
 
         try {
-            await this._createSocket(adminId);
+            await this._createSocket(adminId, session);
             return { status: 'connecting' };
         } catch (error) {
             console.error(`[Session ${adminId}] Failed to start:`, error.message);
-            this.sessions.delete(adminId);
-            await this._updateDbStatus(adminId, 'disconnected');
-            throw error;
+            this.scheduleReconnect(adminId, session);
+            return { status: 'connecting' };
         }
     }
 
@@ -93,6 +139,13 @@ class SessionManager {
     async stopSession(adminId) {
         adminId = String(adminId);
         const session = this.getSession(adminId);
+
+        this.clearReconnectTimer(adminId);
+
+        if (session) {
+            session.stopping = true;
+            this.sessions.delete(adminId);
+        }
 
         if (session && session.socket) {
             try {
@@ -104,8 +157,7 @@ class SessionManager {
             }
         }
 
-        this.sessions.delete(adminId);
-        await clearAuthState(adminId);
+        await this._clearAuthState(adminId);
         await this._updateDbStatus(adminId, 'disconnected');
 
         return { status: 'disconnected' };
@@ -155,13 +207,10 @@ class SessionManager {
     }
 
     /**
-     * Restart all sessions that were previously connected (on server boot)
+     * Restart all sessions that were active before the server stopped.
      */
     async restartSavedSessions() {
-        const db = getPool();
-        const [rows] = await db.execute(
-            "SELECT admin_id FROM wa_sessions WHERE status = 'connected'"
-        );
+        const rows = await this._getRestartableSessions();
 
         console.log(`[SessionManager] Found ${rows.length} saved session(s) to restart.`);
 
@@ -175,15 +224,31 @@ class SessionManager {
         }
     }
 
+    async _getRestartableSessions() {
+        const db = getPool();
+        const [rows] = await db.execute(
+            "SELECT admin_id FROM wa_sessions WHERE status IN ('connected', 'connecting')"
+        );
+
+        return rows;
+    }
+
+    async _clearAuthState(adminId) {
+        await clearAuthState(adminId);
+    }
+
     /**
      * Internal: Create Baileys socket
      */
-    async _createSocket(adminId) {
+    async _createSocket(adminId, session = this.getSession(adminId)) {
+        if (!this.isCurrentSession(adminId, session)) return;
+
         const { state, saveCreds } = await useMySQLAuthState(adminId);
         const { version } = await fetchLatestBaileysVersion();
 
-        const session = this.getSession(adminId);
-        const usePairingCode = session?.usePairingCode || false;
+        if (!this.isCurrentSession(adminId, session)) return;
+
+        const usePairingCode = session.usePairingCode || false;
 
         const socket = makeWASocket({
             version,
@@ -197,81 +262,30 @@ class SessionManager {
             generateHighQualityLinkPreview: false,
         });
 
-        // Update session with socket
-        if (this.sessions.has(adminId)) {
-            this.sessions.get(adminId).socket = socket;
+        if (!this.isCurrentSession(adminId, session)) {
+            socket.end();
+            return;
         }
 
+        session.socket = socket;
+
         // Handle connection updates
-        socket.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect, qr } = update;
-            const currentSession = this.getSession(adminId);
-            if (!currentSession) return;
-
-            if (qr && !usePairingCode) {
-                // New QR code received
-                try {
-                    const qrBase64 = await QRCode.toDataURL(qr, { width: 300 });
-                    currentSession.qr = qr;
-                    currentSession.qrBase64 = qrBase64;
-                    currentSession.status = 'connecting';
-                    console.log(`[Session ${adminId}] New QR code generated.`);
-                } catch (e) {
-                    console.error(`[Session ${adminId}] QR generation error:`, e.message);
-                }
-            }
-
-            if (connection === 'open') {
-                // Connected successfully
-                const phoneNumber = socket.user?.id?.split(':')[0] || socket.user?.id?.split('@')[0] || null;
-                currentSession.status = 'connected';
-                currentSession.phoneNumber = phoneNumber;
-                currentSession.qr = null;
-                currentSession.qrBase64 = null;
-                currentSession.pairingCode = null;
-                await this._updateDbStatus(adminId, 'connected', phoneNumber);
-                console.log(`[Session ${adminId}] Connected as ${phoneNumber}.`);
-            }
-
-            if (connection === 'close') {
-                const statusCode = lastDisconnect?.error?.output?.statusCode;
-                const reason = lastDisconnect?.error?.message;
-                
-                // PENTING: Jangan PERNAH menghapus credential secara otomatis saat restart/crash!
-                // Server WA sering memberikan 401/403 palsu saat reconnecting dari state yang tidak bersih.
-                // Kredensial HANYA dihapus jika dipanggil dari endpoint /sessions/:id/stop (fungsi stopSession).
-                const shouldReconnect = true; // Selalu coba reconnect
-
-                console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}, Reason: ${reason}. Reconnect: ${shouldReconnect}`);
-
-                if (shouldReconnect) {
-                    // Reconnect after a delay
-                    currentSession.status = 'connecting';
-                    currentSession.qr = null;
-                    currentSession.qrBase64 = null;
-                    
-                    // Gunakan backoff sederhana
-                    setTimeout(async () => {
-                        try {
-                            // Hanya reconnect jika sesi masih ada di map (tidak distop manual)
-                            if (this.sessions.has(adminId)) {
-                                await this._createSocket(adminId);
-                            }
-                        } catch (e) {
-                            console.error(`[Session ${adminId}] Reconnect failed:`, e.message);
-                        }
-                    }, 5000);
-                }
-            }
+        socket.ev.on('connection.update', (update) => {
+            void this._handleConnectionUpdate(adminId, session, socket, update)
+                .catch((error) => console.error(`[Session ${adminId}] Connection update failed:`, error.message));
         });
 
         // Save credentials on update
-        socket.ev.on('creds.update', saveCreds);
+        socket.ev.on('creds.update', () => {
+            if (this.isCurrentSession(adminId, session, socket)) {
+                void saveCreds().catch((error) => console.error(`[Session ${adminId}] Failed to save credentials:`, error.message));
+            }
+        });
 
         // Handle incoming messages (ONLY for SuperAdmin/system session: adminId === '0')
-        if (adminId === '0' || adminId === 0) {
+        if (adminId === '0') {
             socket.ev.on('messages.upsert', async ({ messages, type }) => {
-                if (type !== 'notify') return;
+                if (!this.isCurrentSession(adminId, session, socket) || type !== 'notify') return;
 
                 for (const msg of messages) {
                     // Ignore messages from ourselves, broadcasts, statuses, or group chats
@@ -329,27 +343,74 @@ class SessionManager {
         }
 
         // If using pairing code, request it after socket is ready
-        if (usePairingCode && session?.requestedPhoneNumber && !state.creds.registered) {
+        if (usePairingCode && session.requestedPhoneNumber && !state.creds.registered) {
             setTimeout(async () => {
-                // Pastikan status belum tersambung (open) saat merequest
-                const currentSession = this.getSession(adminId);
-                if (!currentSession || currentSession.status === 'connected') return;
-                
+                if (!this.isCurrentSession(adminId, session, socket) || session.status === 'connected') return;
+
                 try {
                     let phone = session.requestedPhoneNumber.replace(/[^0-9]/g, '');
                     if (phone.startsWith('0')) {
                         phone = '62' + phone.substring(1);
                     }
                     const code = await socket.requestPairingCode(phone);
-                    if (currentSession) {
-                        currentSession.pairingCode = code;
-                        currentSession.status = 'connecting';
+                    if (this.isCurrentSession(adminId, session, socket)) {
+                        session.pairingCode = code;
+                        session.status = 'connecting';
                         console.log(`[Session ${adminId}] Pairing code: ${code}`);
                     }
                 } catch (error) {
                     console.error(`[Session ${adminId}] Pairing code request failed:`, error.message);
                 }
             }, 3000);
+        }
+    }
+
+    async _handleConnectionUpdate(adminId, session, socket, update) {
+        const { connection, lastDisconnect, qr } = update;
+        if (!this.isCurrentSession(adminId, session, socket)) return;
+
+        if (qr && !session.usePairingCode) {
+            // New QR code received
+            try {
+                const qrBase64 = await QRCode.toDataURL(qr, { width: 300 });
+                if (!this.isCurrentSession(adminId, session, socket)) return;
+                session.qr = qr;
+                session.qrBase64 = qrBase64;
+                session.status = 'connecting';
+                console.log(`[Session ${adminId}] New QR code generated.`);
+            } catch (e) {
+                console.error(`[Session ${adminId}] QR generation error:`, e.message);
+            }
+        }
+
+        if (connection === 'open') {
+            // Connected successfully
+            const phoneNumber = socket.user?.id?.split(':')[0] || socket.user?.id?.split('@')[0] || null;
+            session.status = 'connected';
+            session.phoneNumber = phoneNumber;
+            session.qr = null;
+            session.qrBase64 = null;
+            session.pairingCode = null;
+            session.reconnectAttempts = 0;
+            this.clearReconnectTimer(adminId);
+            await this._updateDbStatus(adminId, 'connected', phoneNumber);
+            console.log(`[Session ${adminId}] Connected as ${phoneNumber}.`);
+        }
+
+        if (connection === 'close') {
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+            const reason = lastDisconnect?.error?.message;
+
+            // PENTING: Jangan PERNAH menghapus credential secara otomatis saat restart/crash!
+            // Server WA sering memberikan 401/403 palsu saat reconnecting dari state yang tidak bersih.
+            // Kredensial HANYA dihapus jika dipanggil dari endpoint /sessions/:id/stop (fungsi stopSession).
+            console.log(`[Session ${adminId}] Connection closed. Status: ${statusCode}, Reason: ${reason}. Reconnect: true`);
+
+            session.status = 'connecting';
+            session.qr = null;
+            session.qrBase64 = null;
+            await this._updateDbStatus(adminId, 'connecting');
+            this.scheduleReconnect(adminId, session, socket);
         }
     }
 

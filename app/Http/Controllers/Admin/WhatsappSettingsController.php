@@ -24,9 +24,11 @@ class WhatsappSettingsController extends Controller
     public function index()
     {
         $adminId = auth()->id();
+
         return Inertia::render('Admin/WhatsappSettings', [
             'session' => Inertia::defer(function () use ($adminId) {
                 $session = WaSession::where('admin_id', $adminId)->first();
+
                 return $session ? [
                     'status' => $session->status,
                     'phone_number' => $session->phone_number,
@@ -103,14 +105,19 @@ class WhatsappSettingsController extends Controller
         // Also get DB session for extra info (connected_at, etc.)
         $session = WaSession::where('admin_id', $adminId)->first();
 
-        $status = $liveStatus['status'] ?? ($session?->status ?? 'disconnected');
-        $phoneNumber = $liveStatus['phoneNumber'] ?? $session?->phone_number;
+        $serviceAvailable = (bool) ($liveStatus['success'] ?? false);
+        $status = $serviceAvailable
+            ? ($liveStatus['status'] ?? 'disconnected')
+            : ($session?->status ?? 'disconnected');
+        $phoneNumber = $serviceAvailable
+            ? ($liveStatus['phoneNumber'] ?? $session?->phone_number)
+            : $session?->phone_number;
         $connectedAt = $session?->connected_at?->toISOString();
 
         // If live status is disconnected but DB still says connected,
         // the session was likely dropped on the wa-service side. Mark
         // it disconnected in DB so subsequent page loads are consistent.
-        if ($status === 'disconnected' && $session && $session->status !== 'disconnected') {
+        if ($serviceAvailable && $status === 'disconnected' && $session && $session->status !== 'disconnected') {
             $session->update([
                 'status' => 'disconnected',
                 'disconnected_at' => now(),
@@ -119,11 +126,12 @@ class WhatsappSettingsController extends Controller
         }
 
         return response()->json([
-            'success' => $liveStatus['success'] ?? true,
+            'success' => $serviceAvailable,
             'status' => $status,
             'phone_number' => $phoneNumber,
             'pairingCode' => $liveStatus['pairingCode'] ?? null,
             'connected_at' => $connectedAt,
+            'error' => $liveStatus['error'] ?? null,
         ]);
     }
 

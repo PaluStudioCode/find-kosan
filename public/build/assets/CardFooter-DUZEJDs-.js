@@ -1,1 +1,0 @@
-import{c as a}from"./utils-DCADjnpI.js";import{o as t,k as o,C as c,m as l,u as n}from"./app-DsPV2ZME.js";const u={__name:"CardFooter",props:{class:{type:[Boolean,null,String,Object,Array],required:!1,skipCheck:!0}},setup(e){const s=e;return(r,p)=>(t(),o("div",{class:l(n(a)("flex items-center p-6 pt-0",s.class))},[c(r.$slots,"default")],2))}};export{u as _};

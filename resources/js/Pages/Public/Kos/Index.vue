@@ -2,19 +2,35 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { useDraggable } from '@vueuse/core';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import { Button } from '@/components/ui/button';
 
 import {  Navigation, Map, Settings2, X, Search, Filter, List, MapPin, Lock, Unlock } from 'lucide-vue-next';
 
 const isListView = ref(false); // Default to false (hidden) on all screens initially
+const isSettingsOpen = ref(false);
+
 const toggleListView = () => {
     isListView.value = !isListView.value;
-    if (!isListView.value) {
+    
+    // Opsi A: Jika Daftar terbuka, pastikan panel Filter (Settings) tertutup
+    if (isListView.value) {
+        isSettingsOpen.value = false;
+    } else {
         // Redraw map on next tick to fix size issues when map container unhides on mobile
         setTimeout(() => {
             if (map) map.invalidateSize();
         }, 100);
+    }
+};
+
+const toggleSettings = (state = null) => {
+    isSettingsOpen.value = state !== null ? state : !isSettingsOpen.value;
+    
+    // Opsi A: Jika Filter terbuka, pastikan panel Daftar (List) tertutup
+    if (isSettingsOpen.value) {
+        isListView.value = false;
     }
 };
 
@@ -93,7 +109,6 @@ const mapContainer = ref(null);
 const cardRef = ref(null);
 const dragHandleRef = ref(null);
 const detectingLocation = ref(false);
-const isSettingsOpen = ref(false);
 
 const { style: cardStyle } = useDraggable(cardRef, {
     initialValue: { 
@@ -171,8 +186,8 @@ const fetchKosFromServer = () => {
     updateMapMarkers();
     fitMapToRadius();
     
-    if (latitude.value && longitude.value) {
-        router.get(route('public.kos'), {
+    if (latitude.value !== null && longitude.value !== null) {
+        router.get(route('public.kos.index'), {
             lat: latitude.value,
             lng: longitude.value,
             radius: radius.value,
@@ -196,12 +211,15 @@ const searchLocation = async () => {
     
     isSearchingLocation.value = true;
     try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value + ', Indonesia')}&limit=1`);
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-            latitude.value = parseFloat(data[0].lat);
-            longitude.value = parseFloat(data[0].lon);
+        const response = await axios.get(route('public.kos.geocode'), {
+            params: {
+                query: searchQuery.value,
+            }
+        });
+
+        if (Number.isFinite(response.data?.latitude) && Number.isFinite(response.data?.longitude)) {
+            latitude.value = response.data.latitude;
+            longitude.value = response.data.longitude;
             
             if (map) {
                 map.flyTo([latitude.value, longitude.value], 14, {
@@ -210,13 +228,18 @@ const searchLocation = async () => {
                 });
             }
             
+            // Tutup panel settings (termasuk di mobile) setelah pencarian berhasil
+            isSettingsOpen.value = false;
+            
             fetchKosFromServer();
         } else {
             alert('Lokasi tidak ditemukan. Coba gunakan nama kota atau daerah yang lebih spesifik.');
         }
     } catch (error) {
         console.error('Error searching location:', error);
-        alert('Terjadi kesalahan saat mencari lokasi.');
+        const message = error.response?.data?.message
+            || 'Gagal mencari lokasi. Silakan coba lagi nanti.';
+        alert(message);
     } finally {
         isSearchingLocation.value = false;
     }
@@ -497,7 +520,7 @@ onMounted(() => {
                         </div>
                         <div class="flex items-center gap-2">
                             <button 
-                                @click="isSettingsOpen = true"
+                                @click="toggleSettings(true)"
                                 class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors flex items-center gap-2 lg:hidden"
                             >
                                 <Filter class="w-4 h-4" />
@@ -639,7 +662,7 @@ onMounted(() => {
                         'absolute top-6 right-6 z-[400] items-center justify-center w-12 h-12 bg-white text-slate-700 rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.1)] hover:bg-slate-50 border border-slate-200 active:scale-95 transition-all',
                         isSettingsOpen ? 'hidden' : 'flex'
                     ]"
-                    @click="isSettingsOpen = true"
+                    @click="toggleSettings(true)"
                 >
                     <Filter class="w-5 h-5" />
                     <!-- Notification dot if filters active -->
@@ -654,7 +677,7 @@ onMounted(() => {
                 :class="isSettingsOpen ? 'flex' : 'hidden'"
             >
                 <button 
-                    @click="isSettingsOpen = false" 
+                    @click="toggleSettings(false)" 
                     class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors z-10"
                 >
                     <X class="w-4 h-4" />

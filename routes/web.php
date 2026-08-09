@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([GuestOrTenant::class])->group(function () {
     Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
+    Route::get('/kos/geocode', [PublicKosController::class, 'geocode'])->name('public.kos.geocode');
     Route::get('/kos', [PublicKosController::class, 'index'])->name('public.kos.index');
     Route::get('/kos/{kos}', [PublicKosController::class, 'show'])->name('public.kos.show');
     Route::get('/{slug}', [PageController::class, 'show'])

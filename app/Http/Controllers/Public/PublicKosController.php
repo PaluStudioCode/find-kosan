@@ -4,11 +4,74 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\BoardingHouse;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class PublicKosController extends Controller
 {
+    public function geocode(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'query' => ['required', 'string', 'max:120'],
+        ]);
+
+        $query = trim($validated['query']);
+        $cacheKey = 'public-kos-geocode:'.md5(mb_strtolower($query));
+
+        try {
+            $result = Cache::remember($cacheKey, now()->addDay(), function () use ($query) {
+                $response = Http::acceptJson()
+                    ->withUserAgent(config('app.name', 'Find Kosan').'/1.0 ('.config('app.url').')')
+                    ->timeout(8)
+                    ->get('https://nominatim.openstreetmap.org/search', [
+                        'format' => 'jsonv2',
+                        'q' => $query.', Indonesia',
+                        'limit' => 1,
+                        'countrycodes' => 'id',
+                        'accept-language' => 'id',
+                    ]);
+
+                if (! $response->successful()) {
+                    return null;
+                }
+
+                $location = collect($response->json())->first();
+
+                if (! is_array($location) || ! isset($location['lat'], $location['lon'])) {
+                    return [];
+                }
+
+                return [
+                    'latitude' => (float) $location['lat'],
+                    'longitude' => (float) $location['lon'],
+                    'display_name' => $location['display_name'] ?? $query,
+                ];
+            });
+        } catch (ConnectionException $exception) {
+            return response()->json([
+                'message' => 'Layanan pencarian lokasi sedang tidak tersedia.',
+            ], 503);
+        }
+
+        if ($result === null) {
+            return response()->json([
+                'message' => 'Layanan pencarian lokasi sedang tidak tersedia.',
+            ], 503);
+        }
+
+        if ($result === []) {
+            return response()->json([
+                'message' => 'Lokasi tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json($result);
+    }
+
     public function index(Request $request)
     {
         $lat = (float) $request->query('lat');

@@ -144,18 +144,76 @@ const handleLocationSelected = async (location) => {
         <Deferred :data="['facilities', 'rules']">
             <template #fallback>
                 <div class="animate-pulse">
+                    <!-- Header Skeleton -->
                     <div class="mb-6">
                         <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
-                        <div class="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
-                        <div class="h-4 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                        <div class="h-8 w-64 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                        <div class="h-4 w-96 bg-slate-200 dark:bg-slate-800 rounded"></div>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="h-[400px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-                            <div class="h-[200px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                    
+                    <!-- Form Skeleton Layout: Stack of Cards -->
+                    <div class="space-y-8">
+                        <!-- Card 1: Informasi Dasar -->
+                        <div class="border dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 shadow-sm p-6 space-y-4">
+                            <div class="h-6 w-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-4 w-72 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                            
+                            <div class="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                            
+                            <div class="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded mt-4"></div>
+                            <div class="h-24 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                                <div>
+                                    <div class="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="space-y-6">
-                            <div class="h-[300px] bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+
+                        <!-- Card 2: Lokasi -->
+                        <div class="border dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 shadow-sm p-6 space-y-4">
+                            <div class="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-4 w-80 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                            
+                            <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                            <div class="h-[400px] w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                            
+                            <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mt-4"></div>
+                            <div class="h-16 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <div>
+                                    <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                                <div>
+                                    <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                                <div>
+                                    <div class="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                                    <div class="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 & 4 (Fasilitas & Aturan) -->
+                        <div class="border dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 shadow-sm p-6">
+                            <div class="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                            <div class="h-4 w-64 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                            <div class="h-32 w-full bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="flex justify-end space-x-4">
+                            <div class="h-10 w-24 bg-slate-200 dark:bg-slate-800 rounded-md"></div>
+                            <div class="h-10 w-32 bg-slate-200 dark:bg-slate-800 rounded-md"></div>
                         </div>
                     </div>
                 </div>
